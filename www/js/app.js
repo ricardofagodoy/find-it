@@ -92,6 +92,12 @@ function init() {
         
         // Set up flip to work manually
         cardInfo.flip({trigger: 'manual', speed: 1500});
+        
+        // When flip is done, is safe to load another level
+        cardInfo.on('flip:done', function (){
+            // Preload next level
+            loadLevel(currentLevel + 1);
+        });
 
         // Can't scroll mazes
         cardInfo.on('touchmove', function(e) { e.preventDefault(); }, false);
@@ -105,8 +111,9 @@ function init() {
         timerInfo.css('top', -windowHeight + 'px');
         timerInfo.css('background-color', timerColor);
         
-        // Load level to start
+        // Load both-sides levels to start
         loadLevel(currentLevel);
+        loadLevel(currentLevel + 1);
         
         // TODO: menu goes here
         //alert('Press OK to start!');
@@ -207,9 +214,6 @@ function startPreloadedCurrentLevel() {
         
     // Start timer for current level
     startTimer(levels[currentLevel-1].timer);
-    
-    // Preload next level
-    loadLevel(currentLevel + 1);
 }
 
 function startTimer(seconds) {
@@ -257,19 +261,19 @@ function setMapClickEvents(level, correct, wrong) {
     if(correct == undefined || wrong == undefined) {
         console.log('Unbinding maze {0} vclick events...'.format(mazeTarget.attr('id')));
         
-        $('#{0} area'.format(mazeMapTarget.attr('id'))).unbind('vclick');
-        mazeTarget.parent().unbind('vclick');
+        $('#{0} area'.format(mazeMapTarget.attr('id'))).unbind('click');
+        mazeTarget.parent().unbind('click');
         
     } else {
         console.log('Binding maze {0} vclick events...'.format(mazeTarget.attr('id')));
         
         // Click on correct position: win
-        $('#{0} area'.format(mazeMapTarget.attr('id'))).on('vclick', function (event) {
+        $('#{0} area'.format(mazeMapTarget.attr('id'))).on('click', function (event) {
             correct(this);
         }); 
 
         // Click anywhere else: lose
-        mazeTarget.parent().on('vclick', function(event) { 
+        mazeTarget.parent().on('click', function(event) { 
             if(event.target.nodeName != 'AREA')
                 wrong();
         });
