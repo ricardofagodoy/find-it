@@ -1,0 +1,27 @@
+html, body{
+    /* background-color: deepskyblue !important; */
+    margin: 0;
+    font-size: 20px;
+    text-align: center;
+}
+
+#levelInfo {
+    position: absolute;
+    display: none;
+    font-size: 11rem;
+    width: 100%;
+    opacity: 0.3;
+}
+
+#timerInfo {
+    position: absolute;
+    width: 100%;
+    opacity: 0.4;
+    transition-property: top;
+    transition-duration: 5s;
+    transition-timing-function: linear;
+}
+
+#card {
+    -webkit-transform: translate3d(0px,0px,0px);
+}

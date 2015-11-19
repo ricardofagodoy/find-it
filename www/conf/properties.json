@@ -1,0 +1,33 @@
+{
+    "maxLevel": 3,
+    "imageWidth": 780,
+    "imageHeight": 1346,
+    "imageFilesPath": "images/level{0}.png",
+    "timerColor": "aquamarine",
+    "mapHighlightProps" : { "fill": true,
+	                        "fillColor": "6eff24",
+	                        "fillOpacity": 0.5,
+                            "strokeColor": "468327",
+	                        "strokeOpacity": 1,
+	                        "strokeWidth": 2
+    },
+    
+    "messages": {
+        "error.fatal": "Fatal error: "
+    },
+    
+    "levels": [
+        {
+            "timer": 10,
+            "coords": [88, 722, 88, 454, 523, 454, 523, 545, 175, 545, 175, 723]
+        },
+        {
+            "timer": 20,
+            "coords": [493, 747, 561, 748, 561, 1128, 350, 1127, 350, 1059, 493, 1059]
+        },
+        {
+            "timer": 15,
+            "coords": [623, 816, 623, 816, 712, 816, 710, 1090, 348, 1091, 349, 1179, 478, 1179, 476, 1272, 76, 1272, 76, 999, 169, 999, 168, 1179, 256, 1179, 257, 998, 623, 999]
+        }
+    ]
+}

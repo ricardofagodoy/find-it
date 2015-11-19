@@ -1,0 +1,39 @@
+<!DOCTYPE html> 
+<html>
+<head>
+  <title>Find It!</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="lib/jquery.mobile-1.4.5.min.css" />
+    
+  <link rel="stylesheet" href="css/style.css" />
+    
+  <script src="lib/jquery-2.1.1.min.js"></script>
+  <script src="lib/jquery.flip.min.js"></script>
+  <script src="js/app.js"></script>
+    
+  <script src="lib/jquery.mobile-1.4.5.min.js"></script> 
+    
+</head>
+
+<body data-role="page">
+    
+    <div id="timerInfo"></div>
+    
+    <div id="levelInfo"></div>
+    
+    <div id="card">
+        <div class="front">
+            <img id="maze-first" usemap="#mazemap-first">
+            <map id="mazemap-first" name="mazemap-first"></map>
+        </div>
+
+        <div class="back">
+            <img id="maze-second" usemap="#mazemap-second">
+            <map id="mazemap-second" name="mazemap-second"></map>
+        </div>
+    </div>
+ 
+    <script src="lib/jquery.maphilight.js"></script>
+    <script src="cordova.js"></script>
+</body>
+</html>
