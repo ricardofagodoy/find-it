@@ -1,15 +1,6 @@
-var deviceReadyDeferred = $.Deferred();
-var jqmReadyDeferred = $.Deferred();
-
 $(document).on("deviceready", function() {
-  deviceReadyDeferred.resolve();
+    init();
 });
-
-$(document).on("mobileinit", function () {
-  jqmReadyDeferred.resolve();
-});
-
-$.when(deviceReadyDeferred, jqmReadyDeferred).then(init);
 
 // Format string function
 if (!String.prototype.format) {
@@ -43,7 +34,7 @@ var propertiesDeffered = $.Deferred(),
     levelInfo = null,
     timerInfo = null,
     cardInfo = null,
-    currentLevel = 1;
+    currentLevel = 0;
     
 function init() {
     
@@ -53,6 +44,9 @@ function init() {
     // Get window size
     windowWidth = $(window).width();
     windowHeight = $(window).height();
+    
+    // TODO: Load level which user saved
+    currentLevel = 1;
     
     console.log('Starting to init...');
     
@@ -91,10 +85,11 @@ function init() {
         console.log('Starting properties loaded callback...');
         
         // Set up flip to work manually
-        cardInfo.flip({trigger: 'manual', speed: 1500});
+        cardInfo.flip({trigger: 'manual', speed: 600});
         
         // When flip is done, is safe to load another level
-        cardInfo.on('flip:done', function (){
+        cardInfo.on('flip:done', function () {
+            
             // Preload next level
             loadLevel(currentLevel + 1);
         });
@@ -113,11 +108,12 @@ function init() {
         
         // Load both-sides levels to start
         loadLevel(currentLevel);
-        loadLevel(currentLevel + 1);
+        loadLevel(currentLevel + 1);        
         
         // TODO: menu goes here
         //alert('Press OK to start!');
         
+        // Start first level
         startPreloadedCurrentLevel();
     });
     
@@ -150,6 +146,9 @@ function loadLevel(level) {
     // Fits image to use all screen size
     mazeTarget.width(windowWidth).height(windowHeight);
     
+    // Remove previous area
+    mazeMapTarget.find('area').remove();
+    
     // Position to correct click
     var area = $('<area>', {
         shape: 'poly',
@@ -158,11 +157,8 @@ function loadLevel(level) {
         }).join(', ')
     }).appendTo(mazeMapTarget);
     
-    // Binds JQuery Maphighlight to image
-    mazeTarget.maphilight(mapHighlightProps);  
-     
-    // Add click events
-    setMapClickEvents(level, winCurrentLevel, loseCurrentLevel);
+    // Initialize jquery maphilight to current maze
+    mazeTarget.maphilight(mapHighlightProps);
     
     console.log('Level {0} loaded with success!'.format(level));
 }
@@ -172,7 +168,7 @@ function winCurrentLevel(element) {
     console.log('Victory level {0}'.format(currentLevel));
     
     // Prevent user of clicking many times
-    setMapClickEvents(currentLevel);
+    removeMapClickEvents();
     
     // Cleans and resets timer
     resetTimer();
@@ -180,28 +176,34 @@ function winCurrentLevel(element) {
     // Win the game!
     if(currentLevel == maxLevel) {
         console.log('Player win last level!');
+        alert('You win! :)');
         return;
     }
     
     console.log('Upgrading level - going to: {0}'.format(currentLevel+1));
     currentLevel++;
     
-    //TODO: fix this
+    // Wait until flip
     setTimeout(function() {
         
         // Clear green painting
-        $(element).trigger('mouseout');
+        $(element).trigger('cleanAll');
+        
+        // Clear level number during transition
+        levelInfo.hide();
+        levelInfo.html(currentLevel);
+        
+        // Start new current level
+        startPreloadedCurrentLevel();
         
         // Flips to next level (already preloaded)
         cardInfo.flip('toggle');
         
-        startPreloadedCurrentLevel();
-        
-    }, 1000); 
-}
+    }, 2000); 
+} 
 
-function loseCurrentLevel() {
-    // alert('Lose');
+function loseCurrentLevel() { 
+    alert('Lose');
 }
 
 function startPreloadedCurrentLevel() {
@@ -209,13 +211,16 @@ function startPreloadedCurrentLevel() {
     console.log('Starting preloaded level {0}...'.format(currentLevel));
     
     // Show level information
-    levelInfo.html(currentLevel);
     levelInfo.show();
         
+    // Add click events
+    addMapClickEvents();
+    
     // Start timer for current level
     startTimer(levels[currentLevel-1].timer);
 }
 
+// TODO: use jquery transition
 function startTimer(seconds) {
 
     console.log('Starting timer for {0} seconds...'.format(seconds));
@@ -239,6 +244,7 @@ function startTimer(seconds) {
         });    
 }
 
+// TODO: use jquery transition
 function resetTimer() {
     
     console.log('Reseting timer...');
@@ -253,29 +259,32 @@ function resetTimer() {
     timerInfo.css('background-color', timerColor);
 }
 
-function setMapClickEvents(level, correct, wrong) {
+function addMapClickEvents() {
 
-    var mazeTarget = mazeElements[level%2],
-        mazeMapTarget = mazeMapElements[level%2];
+    var mazeTarget = mazeElements[currentLevel%2],
+        mazeMapTarget = mazeMapElements[currentLevel%2];
+        
+    console.log('Binding maze {0} vclick events...'.format(mazeTarget.attr('id')));
+        
+    // Click on correct position: win
+    $('#{0} area'.format(mazeMapTarget.attr('id'))).bind('click', function (event) {
+        winCurrentLevel(this);
+    }); 
     
-    if(correct == undefined || wrong == undefined) {
-        console.log('Unbinding maze {0} vclick events...'.format(mazeTarget.attr('id')));
-        
-        $('#{0} area'.format(mazeMapTarget.attr('id'))).unbind('click');
-        mazeTarget.parent().unbind('click');
-        
-    } else {
-        console.log('Binding maze {0} vclick events...'.format(mazeTarget.attr('id')));
-        
-        // Click on correct position: win
-        $('#{0} area'.format(mazeMapTarget.attr('id'))).on('click', function (event) {
-            correct(this);
-        }); 
+    // Click anywhere else: lose
+    cardInfo.bind('click', function(event) { 
+        if(event.target.nodeName != 'AREA')
+            loseCurrentLevel();
+    });   
+}
 
-        // Click anywhere else: lose
-        mazeTarget.parent().on('click', function(event) { 
-            if(event.target.nodeName != 'AREA')
-                wrong();
-        });
-    }
+function removeMapClickEvents() {
+    
+    var mazeTarget = mazeElements[currentLevel%2],
+        mazeMapTarget = mazeMapElements[currentLevel%2];
+    
+    console.log('Unbinding maze {0} vclick events...'.format(mazeTarget.attr('id')));
+        
+    $('#{0} area'.format(mazeMapTarget.attr('id'))).unbind('click');
+    cardInfo.unbind('click');
 }

@@ -327,7 +327,7 @@
 						$(canvas).append('<v:rect></v:rect>');
 					}
 				}
-			}).bind('mouseout.maphilight, blur.maphilight', function(e) { clear_canvas(canvas); });
+			}).bind('cleanAll.maphilight, blur.maphilight', function(e) { clear_canvas(canvas); });
 			
 			img.before(canvas); // if we put this after, the mouseover events wouldn't fire.
 			
