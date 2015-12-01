@@ -10,6 +10,7 @@
         <param name="onload" value="true" />
     </feature>
     <allow-intent href="market:*" />
+    <preference name="android-minSdkVersion" value="15" />
     <preference name="android-targetSdkVersion" value="19" />
     <name>Find It</name>
     <description>
@@ -19,6 +20,7 @@
         Ricardo Godoy
     </author>
     <content src="index.html" />
+    <icon src="icon.png" />
     <preference name="Orientation" value="portrait" />
     <preference name="SplashScreen" value="icon" />
     <preference name="AutoHideSplashScreen" value="false" />

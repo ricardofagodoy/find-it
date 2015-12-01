@@ -17,9 +17,6 @@ html, body{
     position: absolute;
     width: 100%;
     opacity: 0.4;
-    transition-property: top;
-    transition-duration: 5s;
-    transition-timing-function: linear;
 }
 
 #card {

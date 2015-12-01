@@ -10,6 +10,7 @@
     
     <content src="index.html" />
     
+    <icon src="icon.png" />
     <preference name="Orientation" value="portrait" />
     
     <preference name="SplashScreen" value="icon" />
@@ -25,6 +26,7 @@
     <allow-intent href="geo:*" />
     <platform name="android">
         <allow-intent href="market:*" />
+        <preference name="android-minSdkVersion" value="15" />
         <preference name="android-targetSdkVersion" value="19" />
     </platform>
     <platform name="ios">

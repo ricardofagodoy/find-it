@@ -40,6 +40,9 @@ function init() {
     
     // Hide splashscreen
     navigator.splashscreen.hide();
+    
+    // Initilize fast click to prevent click delay
+    Origami.fastclick(document.body);
 
     // Get window size
     windowWidth = $(window).width();
@@ -89,6 +92,8 @@ function init() {
         
         // When flip is done, is safe to load another level
         cardInfo.on('flip:done', function () {
+            
+            
             
             // Preload next level
             loadLevel(currentLevel + 1);
@@ -157,9 +162,6 @@ function loadLevel(level) {
         }).join(', ')
     }).appendTo(mazeMapTarget);
     
-    // Initialize jquery maphilight to current maze
-    mazeTarget.maphilight(mapHighlightProps);
-    
     console.log('Level {0} loaded with success!'.format(level));
 }
 
@@ -191,13 +193,12 @@ function winCurrentLevel(element) {
         
         // Clear level number during transition
         levelInfo.hide();
-        levelInfo.html(currentLevel);
-        
-        // Start new current level
-        startPreloadedCurrentLevel();
         
         // Flips to next level (already preloaded)
         cardInfo.flip('toggle');
+        
+        // Start new current level
+        startPreloadedCurrentLevel();
         
     }, 2000); 
 } 
@@ -210,7 +211,8 @@ function startPreloadedCurrentLevel() {
       
     console.log('Starting preloaded level {0}...'.format(currentLevel));
     
-    // Show level information
+    // Update and show level information
+    levelInfo.html(currentLevel);
     levelInfo.show();
         
     // Add click events
@@ -220,7 +222,6 @@ function startPreloadedCurrentLevel() {
     startTimer(levels[currentLevel-1].timer);
 }
 
-// TODO: use jquery transition
 function startTimer(seconds) {
 
     console.log('Starting timer for {0} seconds...'.format(seconds));
@@ -242,9 +243,18 @@ function startTimer(seconds) {
             timerInfo.css('background-color', 'red');
             loseCurrentLevel();
         });    
+    
+    /* timerInfo.animate({
+        top: '0'
+    },{
+        duration: seconds*1000,
+        complete: function() {
+            timerInfo.css('background-color', 'red');
+            loseCurrentLevel();
+        }
+    }); */
 }
 
-// TODO: use jquery transition
 function resetTimer() {
     
     console.log('Reseting timer...');
@@ -257,6 +267,8 @@ function resetTimer() {
     
     // Set background to original colors
     timerInfo.css('background-color', timerColor);
+    
+    // timerInfo.removeAttr('style');
 }
 
 function addMapClickEvents() {
@@ -266,6 +278,9 @@ function addMapClickEvents() {
         
     console.log('Binding maze {0} vclick events...'.format(mazeTarget.attr('id')));
         
+    // Initialize jquery maphilight to current maze
+    mazeTarget.maphilight(mapHighlightProps);
+    
     // Click on correct position: win
     $('#{0} area'.format(mazeMapTarget.attr('id'))).bind('click', function (event) {
         winCurrentLevel(this);
