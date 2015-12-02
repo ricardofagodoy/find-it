@@ -5,6 +5,16 @@ html, body{
     text-align: center;
 }
 
+#menu {
+    background-image: url("../images/menu.png");
+    width: 100%;
+    height: 100%;
+}
+
+#menu span {
+    display: block;
+}
+
 #levelInfo {
     position: absolute;
     display: none;

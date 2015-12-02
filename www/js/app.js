@@ -37,9 +37,8 @@ var propertiesDeffered = $.Deferred(),
     currentLevel = 0;
     
 function init() {
-    
-    // Hide splashscreen
-    navigator.splashscreen.hide();
+
+    console.log('Starting to init...');
     
     // Initilize fast click to prevent click delay
     Origami.fastclick(document.body);
@@ -48,10 +47,17 @@ function init() {
     windowWidth = $(window).width();
     windowHeight = $(window).height();
     
+    // Load main menu
+    loadMainMenu();
+    
+    // Hide splashscreen
+    navigator.splashscreen.hide();
+    
+    // Effectively displays main menu
+    showMainMenu();
+    
     // TODO: Load level which user saved
     currentLevel = 1;
-    
-    console.log('Starting to init...');
     
     // Reference DOM elements to easy access
     mazeElements = [$('#maze-second'), $('#maze-first')];
@@ -121,6 +127,34 @@ function init() {
     });
     
     console.log('Init method reached its end');
+}
+
+function loadMainMenu() {
+    
+    console.log('Loading main menu...');
+    
+    // Uses all screen
+    $('#menu').width(windowWidth).height(windowHeight);
+    
+    // Title using 25% of screen height
+    $('#menu #title').height(windowHeight/5);
+    
+    // Each option using
+    $('#options span').height(windowHeight/10);
+    
+    // Some space between items
+    $('#options span').css('margin-top', windowHeight/20);
+    
+    
+    
+    // Background image added here
+    //$('#menu').css('background-image', 'url("../images/menu.png")');
+    
+    console.log('Main Menu loaded!');
+}
+
+function showMainMenu() {
+    $('#menu').show();
 }
 
 function loadLevel(level) {
@@ -202,7 +236,7 @@ function winCurrentLevel(element) {
 } 
 
 function loseCurrentLevel() { 
-    alert('Lose');
+    console.log('Lose');
 }
 
 function startPreloadedCurrentLevel() {
@@ -300,4 +334,12 @@ function removeMapClickEvents() {
         
     $('#{0} area'.format(mazeMapTarget.attr('id'))).unbind('click');
     cardInfo.unbind('click');
+}
+
+function reloadStylesheets() {
+    var stylesheets = $('link[rel="stylesheet"]');
+    var reloadQueryString = '?reload=' + new Date().getTime();
+    stylesheets.each(function () {
+        this.href = this.href.replace(/\?.*|$/, reloadQueryString);
+    });
 }

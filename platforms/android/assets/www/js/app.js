@@ -93,8 +93,6 @@ function init() {
         // When flip is done, is safe to load another level
         cardInfo.on('flip:done', function () {
             
-            
-            
             // Preload next level
             loadLevel(currentLevel + 1);
         });
@@ -123,6 +121,10 @@ function init() {
     });
     
     console.log('Init method reached its end');
+}
+
+function showMenu() {
+    $('#menu')width(windowWidth).height(windowHeight);
 }
 
 function loadLevel(level) {
@@ -200,11 +202,11 @@ function winCurrentLevel(element) {
         // Start new current level
         startPreloadedCurrentLevel();
         
-    }, 2000); 
+    }, 500); 
 } 
 
 function loseCurrentLevel() { 
-    alert('Lose');
+    console.log('Lose');
 }
 
 function startPreloadedCurrentLevel() {

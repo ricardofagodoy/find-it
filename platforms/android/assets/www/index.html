@@ -3,27 +3,42 @@
 <head>
   <title>Find It!</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-    
-  <link rel="stylesheet" href="lib/jquery.mobile-1.4.5.min.css" />
+
   <link rel="stylesheet" href="css/style.css" />
     
 </head>
 
 <body>
-    <div id="timerInfo"></div>
     
-    <div id="levelInfo"></div>
+    <!-- MENU -->
     
-    <div id="card">
-        <div class="front">
-            <img id="maze-first" usemap="#mazemap-first">
-            <map id="mazemap-first" name="mazemap-first"></map>
-        </div>
+    <div id="menu">
+        <span id="play">New Game</span>
+        <span id="Instructions">Instructions</span>
+        <span id="record">Record: Level 1</span>
+        <span id="exit">See You!</span>
+    </div>
+    
+    <!-- MAZES -->
+    
+    <div id="mazes" style="display: none">
+    
+        <div id="timerInfo"></div>
 
-        <div class="back">
-            <img id="maze-second" usemap="#mazemap-second">
-            <map id="mazemap-second" name="mazemap-second"></map>
+        <div id="levelInfo"></div>
+
+        <div id="card">
+            <div class="front">
+                <img id="maze-first" usemap="#mazemap-first">
+                <map id="mazemap-first" name="mazemap-first"></map>
+            </div>
+
+            <div class="back">
+                <img id="maze-second" usemap="#mazemap-second">
+                <map id="mazemap-second" name="mazemap-second"></map>
+            </div>
         </div>
+        
     </div>
  
     <script src="lib/jquery-2.1.1.min.js"></script>
