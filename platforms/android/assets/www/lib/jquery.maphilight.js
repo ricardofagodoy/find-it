@@ -248,8 +248,8 @@
 				backgroundSize:'100% 100%',
 				position:'relative',
 				padding:0,
-				width:this.width,
-				height:this.height
+				width: '100%',
+				height: '100%'
 				});
 			if(options.wrapClass) {
 				if(options.wrapClass === true) {

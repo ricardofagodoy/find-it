@@ -15,8 +15,6 @@ if (!String.prototype.format) {
   };
 }
 
-//$(function() { init(); });
-
 var propertiesDeffered = $.Deferred(),
     windowWidth = 0,
     windowHeight = 0,
@@ -40,21 +38,23 @@ function init() {
 
     console.log('Starting to init...');
     
-    // Initilize fast click to prevent click delay
-    Origami.fastclick(document.body);
-
     // Get window size
     windowWidth = $(window).width();
     windowHeight = $(window).height();
     
-    // Load main menu
-    loadMainMenu();
+    console.log(windowHeight);
+    
+    // Sets my body to fit in all screen!
+    $('body').width(windowWidth).height(windowHeight);
     
     // Hide splashscreen
     navigator.splashscreen.hide();
     
-    // Effectively displays main menu
-    showMainMenu();
+    // Initilize fast click to prevent click delay
+    Origami.fastclick(document.body);
+    
+    // Load main menu
+    loadMainMenu();
     
     // TODO: Load level which user saved
     currentLevel = 1;
@@ -98,7 +98,6 @@ function init() {
         
         // When flip is done, is safe to load another level
         cardInfo.on('flip:done', function () {
-            
             // Preload next level
             loadLevel(currentLevel + 1);
         });
@@ -106,24 +105,9 @@ function init() {
         // Can't scroll mazes
         cardInfo.on('touchmove', function(e) { e.preventDefault(); }, false);
 
-        // Set up number informing current level
-        levelInfo.html(currentLevel);
-        levelInfo.css('top', (windowHeight/2 - levelInfo.height()/2) + 'px');
-
-        // Set up timer color effect
-        timerInfo.height(windowHeight);
-        timerInfo.css('top', -windowHeight + 'px');
-        timerInfo.css('background-color', timerColor);
-        
         // Load both-sides levels to start
         loadLevel(currentLevel);
         loadLevel(currentLevel + 1);        
-        
-        // TODO: menu goes here
-        //alert('Press OK to start!');
-        
-        // Start first level
-        startPreloadedCurrentLevel();
     });
     
     console.log('Init method reached its end');
@@ -131,30 +115,30 @@ function init() {
 
 function loadMainMenu() {
     
-    console.log('Loading main menu...');
+    console.log('Loading main menu (adding listeners)...');
     
-    // Uses all screen
-    $('#menu').width(windowWidth).height(windowHeight);
+    var menu = $('#menu');
     
-    // Title using 25% of screen height
-    $('#menu #title').height(windowHeight/5);
-    
-    // Each option using
-    $('#options span').height(windowHeight/10);
-    
-    // Some space between items
-    $('#options span').css('margin-top', windowHeight/20);
-    
-    
-    
-    // Background image added here
-    //$('#menu').css('background-image', 'url("../images/menu.png")');
+    menu.find('#options #play').on('click', function(event) {
+        
+        menu.fadeOut("slow", function() {
+            
+            // Resets timer - ready to play!
+            resetTimer();
+            
+            // Slowly shows maze
+            $('#mazes').fadeIn("slow");
+            
+            // Position correctly level indicator
+            levelInfo.html(currentLevel);
+            levelInfo.css('top', (windowHeight/2 - levelInfo.height()/2) + 'px');
+            
+            startPreloadedCurrentLevel();
+        }); 
+        
+    });
     
     console.log('Main Menu loaded!');
-}
-
-function showMainMenu() {
-    $('#menu').show();
 }
 
 function loadLevel(level) {
@@ -300,6 +284,9 @@ function resetTimer() {
     // Set background to original colors
     timerInfo.css('background-color', timerColor);
     
+    // Turn off callback when animation is completed (not needed when reseting)
+    timerInfo.off('transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd');
+    
     // timerInfo.removeAttr('style');
 }
 
@@ -334,12 +321,4 @@ function removeMapClickEvents() {
         
     $('#{0} area'.format(mazeMapTarget.attr('id'))).unbind('click');
     cardInfo.unbind('click');
-}
-
-function reloadStylesheets() {
-    var stylesheets = $('link[rel="stylesheet"]');
-    var reloadQueryString = '?reload=' + new Date().getTime();
-    stylesheets.each(function () {
-        this.href = this.href.replace(/\?.*|$/, reloadQueryString);
-    });
 }

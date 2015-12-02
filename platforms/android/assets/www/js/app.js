@@ -15,8 +15,6 @@ if (!String.prototype.format) {
   };
 }
 
-//$(function() { init(); });
-
 var propertiesDeffered = $.Deferred(),
     windowWidth = 0,
     windowHeight = 0,
@@ -37,21 +35,29 @@ var propertiesDeffered = $.Deferred(),
     currentLevel = 0;
     
 function init() {
+
+    console.log('Starting to init...');
+    
+    // Get window size
+    windowWidth = $(window).width();
+    windowHeight = $(window).height();
+    
+    console.log(windowHeight);
+    
+    // Sets my body to fit in all screen!
+    $('body').width(windowWidth).height(windowHeight);
     
     // Hide splashscreen
     navigator.splashscreen.hide();
     
     // Initilize fast click to prevent click delay
     Origami.fastclick(document.body);
-
-    // Get window size
-    windowWidth = $(window).width();
-    windowHeight = $(window).height();
+    
+    // Load main menu
+    loadMainMenu();
     
     // TODO: Load level which user saved
     currentLevel = 1;
-    
-    console.log('Starting to init...');
     
     // Reference DOM elements to easy access
     mazeElements = [$('#maze-second'), $('#maze-first')];
@@ -92,7 +98,6 @@ function init() {
         
         // When flip is done, is safe to load another level
         cardInfo.on('flip:done', function () {
-            
             // Preload next level
             loadLevel(currentLevel + 1);
         });
@@ -100,31 +105,40 @@ function init() {
         // Can't scroll mazes
         cardInfo.on('touchmove', function(e) { e.preventDefault(); }, false);
 
-        // Set up number informing current level
-        levelInfo.html(currentLevel);
-        levelInfo.css('top', (windowHeight/2 - levelInfo.height()/2) + 'px');
-
-        // Set up timer color effect
-        timerInfo.height(windowHeight);
-        timerInfo.css('top', -windowHeight + 'px');
-        timerInfo.css('background-color', timerColor);
-        
         // Load both-sides levels to start
         loadLevel(currentLevel);
         loadLevel(currentLevel + 1);        
-        
-        // TODO: menu goes here
-        //alert('Press OK to start!');
-        
-        // Start first level
-        startPreloadedCurrentLevel();
     });
     
     console.log('Init method reached its end');
 }
 
-function showMenu() {
-    $('#menu')width(windowWidth).height(windowHeight);
+function loadMainMenu() {
+    
+    console.log('Loading main menu (adding listeners)...');
+    
+    var menu = $('#menu');
+    
+    menu.find('#options #play').on('click', function(event) {
+        
+        menu.fadeOut("slow", function() {
+            
+            // Resets timer - ready to play!
+            resetTimer();
+            
+            // Slowly shows maze
+            $('#mazes').fadeIn("slow");
+            
+            // Position correctly level indicator
+            levelInfo.html(currentLevel);
+            levelInfo.css('top', (windowHeight/2 - levelInfo.height()/2) + 'px');
+            
+            startPreloadedCurrentLevel();
+        }); 
+        
+    });
+    
+    console.log('Main Menu loaded!');
 }
 
 function loadLevel(level) {
