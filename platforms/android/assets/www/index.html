@@ -25,7 +25,7 @@
         
     </div>
     
-    <!-- MAZES -->
+    <!-- MAZE -->
     
     <div id="mazes" style="display: none">
     
@@ -34,14 +34,23 @@
         <div id="levelInfo"></div>
 
         <div id="card">
-            <div class="front">
-                <img id="maze-first" usemap="#mazemap-first">
-                <map id="mazemap-first" name="mazemap-first"></map>
+            <div id="transition" class="front">
+        
+                <div id="title">Let's Play!</div>
+
+                <div id="options">
+                    <span id="next" style="padding-bottom: 4%">Next Level: 2</span>
+                    <span id="time">Time: 15 seconds</span>
+                    <span style="padding-bottom: 4%"></span>
+                    <span id="play">Play!</span>
+                    <span id="back">Menu</span>
+                </div>
+      
             </div>
 
             <div class="back">
-                <img id="maze-second" usemap="#mazemap-second">
-                <map id="mazemap-second" name="mazemap-second"></map>
+                <img id="maze" usemap="#mazemap">
+                <map id="mazemap" name="mazemap"></map>
             </div>
         </div>
         
