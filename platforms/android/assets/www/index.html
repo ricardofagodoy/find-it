@@ -13,16 +13,25 @@
     <!-- MENU -->
     
     <div id="menu">
-        
         <div id="title">Find It!</div>
         
         <div id="options">
-            <span id="play">New Game</span>
-            <span id="Instructions">Instructions</span>
-            <span id="record">Record: Level 1</span>
-            <span id="exit">See You!</span>
+            <div>
+                <span id="play">New Game</span>
+            </div>
+            
+            <div>
+                <span id="Instructions">Instructions</span>
+            </div>
+            
+            <div>
+                <span id="record">Best: Level 1</span>
+            </div>
+            
+            <div>
+                <span id="credits" style="padding-bottom: 0">Credits</span>
+            </div>
         </div>
-        
     </div>
     
     <!-- MAZE -->
@@ -36,14 +45,34 @@
         <div id="card">
             <div id="transition" class="front">
         
-                <div id="title">Let's Play!</div>
+                <div id="title"></div>
 
                 <div id="options">
-                    <span id="next" style="padding-bottom: 4%">Next Level: 2</span>
-                    <span id="time">Time: 15 seconds</span>
-                    <span style="padding-bottom: 4%"></span>
-                    <span id="play">Play!</span>
-                    <span id="back">Menu</span>
+                    <div style="padding-bottom: 4%">
+                        <span id="msg1"></span>
+                    </div>
+                    
+                    <div>
+                        <span id="msg2"></span>
+                    </div>
+                    
+                    <div id="stars" style="padding-bottom: 10%">
+                        <span>
+                            <img id="gameover" src="images/gameover.jpg" width="60%" height="20%"></img>
+                            <img id="star1" src="images/star.png" width="20%"></img>
+                            <img id="star2" src="images/star.png" width="20%"></img>
+                            <img id="star3" src="images/star.png" width="20%"></img>
+                            
+                        </span>
+                    </div>
+                    
+                    <div>
+                        <span id="play" style="padding-bottom: 3%">Play Now</span>
+                    </div>
+                    
+                    <div>
+                        <span id="back" style="padding-bottom: 0">Back to Menu</span>
+                    </div>
                 </div>
       
             </div>

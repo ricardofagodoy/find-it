@@ -1,10 +1,10 @@
 <?xml version='1.0' encoding='utf-8'?>
 <widget id="com.ricardofagodoy.findit" version="0.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
-    <name>Find It</name>
+    <name>Find It!</name>
     <description>
         Innovative maze game
     </description>
-    <author email="dev@cordova.apache.org" href="http://cordova.io">
+    <author email="ricardofagodoy@gmail.com" href="http://ricardofagodoy.com">
         Ricardo Godoy
     </author>
     

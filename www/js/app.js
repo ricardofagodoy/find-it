@@ -15,6 +15,8 @@ if (!String.prototype.format) {
   };
 }
 
+var STATUS = { NEW: 'new', RESUME: 'resume', NEXT: 'next', LOSE: 'lose', WIN: 'win' };
+
 var propertiesDeffered = $.Deferred(),
     windowWidth = 0,
     windowHeight = 0,
@@ -33,7 +35,8 @@ var propertiesDeffered = $.Deferred(),
     levelInfo = null,
     timerInfo = null,
     cardInfo = null,
-    currentLevel = 0;
+    transition = {},
+    currentLevel = 1;
     
 function init() {
 
@@ -43,17 +46,13 @@ function init() {
     windowWidth = $(window).width();
     windowHeight = $(window).height();
     
+    console.log('Screen size: ' + windowWidth + ' x ' + windowHeight);
+    
     // Sets my body to fit in all screen!
     $('body').width(windowWidth).height(windowHeight);
     
-    // Hide splashscreen
-    navigator.splashscreen.hide();
-    
     // Initilize fast click to prevent click delay
     Origami.fastclick(document.body);
-    
-    // TODO: Load level which user saved
-    currentLevel = 1;
     
     // Reference DOM elements to easy access
     mazeTarget = $('#maze');
@@ -61,6 +60,13 @@ function init() {
     levelInfo = $('#levelInfo');
     timerInfo = $('#timerInfo');
     cardInfo = $("#card");
+    
+    transition.title = $('#transition #title');
+    transition.msg1 = $('#transition #msg1');
+    transition.msg2 = $('#transition #msg2');
+    transition.stars = $('#transition #stars');
+    transition.play = $('#transition #play');
+    transition.stars = $('#transition #stars');
     
     // Load general properties
     $.getJSON('conf/properties.json').done(function (json) {
@@ -95,8 +101,25 @@ function init() {
         // Load transition screen
         configureTransitionEvents();
         
+        // Reads user's current level from storage
+        retrievePlayerCurrentLevel();
+    
+        // Update record massage based on level
+        updateRecordMessage();
+    
+        // If menu's option is NEW GAME or CONTINUE
+        if(currentLevel > 1)
+            $('#menu #options #play').html(messages['menu.continue']);
+    
+        // If he's already won, different layout
+        if(currentLevel > maxLevel)
+            configureMainMenuWinner();
+        
+        // Hide splashscreen
+        //navigator.splashscreen.hide();
+          
         // Set up flip to work manually
-        cardInfo.flip({trigger: 'manual', speed: 1000});
+        cardInfo.flip({trigger: 'manual', speed: 700});
         
         // When flip is done - callback
         cardInfo.on('flip:done', flipDoneCallback);
@@ -108,6 +131,59 @@ function init() {
     console.log('Init method reached its end');
 }
 
+function updateCurrentLevel(level) {
+    
+    console.log('Updating level {0} to {1}'.format
+                (currentLevel, level ? level : currentLevel + 1));
+    
+    currentLevel = level ? level : currentLevel + 1;
+    
+    console.log('Saving level {0} to local storage...'.format(currentLevel));
+    localStorage.setItem('level', currentLevel);
+}
+
+function retrievePlayerCurrentLevel() {
+
+    console.log('Retrieving level from local storage...');
+
+    var level = localStorage.getItem('level');
+        
+    if(level === null || level.length === 0)
+        level = 1;
+        
+    currentLevel = parseInt(level); 
+    
+    console.log('Retrieved level {0} from local storage.'.format(currentLevel));
+}
+
+function resetLevels() {
+
+    var menu = $('#menu');
+    
+    // Loses winner layout
+    if(currentLevel > maxLevel) {
+  
+        // Paints record white again
+        menu.find('#options #record').css('color', '#FFF');
+    
+        // Titles gets painted white again
+        menu.find('#title').css('color', '#FFF');
+    
+        // It's white again
+        menu.find('#options #play').css('color', '#FFF');
+        
+        // Add events again
+        configureMainMenuEvents();
+    }
+    
+    // New Game instead of Continue
+    menu.find('#options #play').html(messages['menu.new']);
+    
+    updateCurrentLevel(1);
+    cardStatus = 0;
+    transition.play.show();
+}
+
 function configureMainMenuEvents() {
     
     console.log('Loading main menu (adding listeners)...');
@@ -117,6 +193,8 @@ function configureMainMenuEvents() {
     menu.find('#options #play').on('click', function(event) {
         
         menu.fadeOut("slow", function() {
+            
+            updateTransitionText(STATUS.NEW);
             
             // Slowly cards
             $('#mazes').fadeIn("slow");
@@ -134,7 +212,42 @@ function configureMainMenuEvents() {
         
     });
     
+    menu.find('#options #record').on('click', function(event) {
+        resetLevels();
+        updateRecordMessage();
+    });
+    
     console.log('Main Menu loaded!');
+}
+
+function configureMainMenuWinner() {
+
+    console.log('Configuring main menu to winner mode...');
+    
+    var menu = $('#menu');
+    
+    // Titles gets painted yellow
+    menu.find('#title').css('color', 'yellow');
+    
+    // Can't start new game
+    menu.find('#options #play').off('click');
+    
+    // It's grey and disabled now
+    menu.find('#options #play').css('color', 'gray');  
+}
+
+function updateRecordMessage() {
+    
+    var message = '';
+    
+    if(currentLevel > maxLevel) {
+        message = messages['menu.record.win'];
+        $('#menu #options #record').css('color', 'yellow');
+    } else {
+        message = messages['menu.record'].format(currentLevel);
+    }
+        
+    $('#menu #options #record').html(message);
 }
 
 function configureTransitionEvents() {
@@ -143,9 +256,24 @@ function configureTransitionEvents() {
     
     var transition = $('#transition');
     
+    transition.find('#options #play').show();
+    
+    // Click on PLAY
     transition.find('#options #play').on('click', function(event) {
+          
         // Flips card to maze side
         cardInfo.flip('toggle');
+    });
+    
+    // Click on MENU
+    transition.find('#options #back').on('click', function(event) {
+        $('#mazes').fadeOut("slow", function() {
+            
+            if(currentLevel > 1)
+                $('#menu #options #play').html(messages['menu.continue']);
+            
+            $('#menu').fadeIn("slow");
+        });
     });
     
     console.log('Transition screen callbacks loaded!');
@@ -159,23 +287,67 @@ function flipDoneCallback () {
         case 0:
             // Let's start game for real!
             startLevel();
-                
-            // TODO: UPDATE TRANSITION TEXT
+            
+            updateTransitionText(STATUS.NEXT, currentLevel+1);
         
             cardStatus = 1;
         break;
             
         // If its moving from maze to transition
         case 1:
+            
             // Load next level
             loadLevel(currentLevel);
             
             cardStatus = 0;
         break;
             
+        // If player lose
         case 2:
             
+            // Load next level
+            loadLevel(currentLevel);
+
+            cardStatus = 0;
         break;
+            
+        // Player Wins!
+        case 3:        
+        break;
+    }
+}
+
+function updateTransitionText(status, l) {
+    
+    console.log('Setting transition messages to {0}...'.format(status));
+    
+    var level = l == undefined ? currentLevel : l,
+        messagePattern = 'transition.{0}.{1}',
+        time = levels[level-1] ? levels[level-1].timer : 0;
+    
+    transition.title.html(
+        messages[messagePattern.format(status, 'title')]
+    );
+    
+    transition.msg1.html(
+        messages[messagePattern.format(status, 'msg1')].format(level)
+    );
+    
+    transition.msg2.html(
+        messages[messagePattern.format(status, 'msg2')].format(time)
+    );
+    
+    transition.stars.find('#star1').hide();
+    transition.stars.find('#star2').hide();
+    transition.stars.find('#star3').hide();
+    transition.stars.find('#gameover').hide();
+    
+    if(status == STATUS.NEXT) {     
+        transition.stars.find('#star1').show();
+        transition.stars.find('#star2').show();
+        transition.stars.find('#star3').show();
+    } else if(status == STATUS.LOSE) {
+        transition.stars.find('#gameover').show();
     }
 }
 
@@ -217,7 +389,7 @@ function loadLevel(level) {
     console.log('Level {0} loaded with success!'.format(level));
 }
 
-function winLevel(element) {
+function winLevel() {
     
     console.log('Victory level {0}'.format(currentLevel));
     
@@ -227,21 +399,23 @@ function winLevel(element) {
     // Cleans and resets timer
     resetTimer();
     
+    // Advances level (no params adds 1)    
+    updateCurrentLevel();
+    
+    // Update record message
+    updateRecordMessage();
+    
     // Win the game!
-    if(currentLevel == maxLevel) {
-        console.log('Player win last level!');
-        alert('You win! :)');
+    if(currentLevel > maxLevel) {
+        gameOver();
         return;
     }
-    
-    console.log('Upgrading level - going to: {0}'.format(currentLevel+1));
-    currentLevel++;
     
     // Wait until flip
     setTimeout(function() {
         
         // Clear green painting
-        $(element).trigger('cleanAll');
+         $('#mazemap area').trigger('cleanAll');
         
         // Clear level number during transition
         levelInfo.hide();
@@ -251,6 +425,44 @@ function winLevel(element) {
         
     }, 1000); 
 } 
+
+function gameOver() {
+
+    console.log('Player win last level ({0})!'.format(currentLevel));
+    
+    // Paints screen in green
+    cardInfo.css('background-color', 'rgba(0, 200, 0, 0.5)');
+    
+    // You Win when flip ends!
+    cardStatus = 3;
+    
+    // Changes to screen when winner:
+    // 1 - not more levels to play
+    transition.play.hide();
+    
+    // 2 - Menu is now different
+    configureMainMenuWinner();
+ 
+    // You Win message!
+    updateTransitionText(STATUS.WIN);
+
+    // Wait until flip
+    setTimeout(function() {
+        
+        // Clear green painting
+         $('#mazemap area').trigger('cleanAll');
+        
+        // Clear level number during transition
+        levelInfo.hide();
+        
+        // Remove green color effect
+        cardInfo.css('background-color', 'rgba(255, 255, 255, 0)');
+        
+        // Flips to next level (already preloaded)
+        cardInfo.flip('toggle');
+        
+    }, 3000); 
+}
 
 function loseLevel() { 
     
@@ -268,6 +480,14 @@ function loseLevel() {
     // Cleans and resets timer
     resetTimer();
     
+    updateTransitionText(STATUS.LOSE);
+    
+    // Goes to back to level 1
+    updateCurrentLevel(1);
+    
+    // Update record message
+    updateRecordMessage();
+    
     // Wait until flip
     setTimeout(function() {
         
@@ -279,6 +499,9 @@ function loseLevel() {
         
         // Flips to next level (already preloaded)
         cardInfo.flip('toggle');
+        
+        // Paints screen in white again
+        cardInfo.css('background-color', 'rgba(0, 0, 0, 0)');
         
     }, 2000); 
 }
@@ -319,16 +542,6 @@ function startTimer(seconds) {
             timerInfo.css('background-color', 'red');
             loseLevel();
         });    
-    
-    /* timerInfo.animate({
-        top: '0'
-    },{
-        duration: seconds*1000,
-        complete: function() {
-            timerInfo.css('background-color', 'red');
-            loseLevel();
-        }
-    }); */
 }
 
 function resetTimer() {
@@ -346,8 +559,6 @@ function resetTimer() {
     
     // Turn off callback when animation is completed (not needed when reseting)
     timerInfo.off('transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd');
-    
-    // timerInfo.removeAttr('style');
 }
 
 function addMapClickEvents() {
@@ -356,7 +567,7 @@ function addMapClickEvents() {
 
     // Click on correct position: win
     $('#mazemap area').bind('click', function (event) {
-        winLevel(this);
+        winLevel();
     }); 
     
     // Click anywhere else: lose

@@ -12,11 +12,11 @@
     <allow-intent href="market:*" />
     <preference name="android-minSdkVersion" value="15" />
     <preference name="android-targetSdkVersion" value="19" />
-    <name>Find It</name>
+    <name>Find It!</name>
     <description>
         Innovative maze game
     </description>
-    <author email="dev@cordova.apache.org" href="http://cordova.io">
+    <author email="ricardofagodoy@gmail.com" href="http://ricardofagodoy.com">
         Ricardo Godoy
     </author>
     <content src="index.html" />
