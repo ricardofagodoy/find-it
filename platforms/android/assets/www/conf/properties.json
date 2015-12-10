@@ -1,5 +1,5 @@
 {
-    "maxLevel": 2,
+    "maxLevel": 6,
     "imageWidth": 780,
     "imageHeight": 1346,
     "imageFilesPath": "images/level{0}.png",
@@ -39,7 +39,8 @@
         "menu.record.win": "YOU WIN 'EM ALL",
         
         "menu.new": "New Game",
-        "menu.continue": "Continue"
+        "menu.continue": "Continue",
+        "menu.reset": "Reset"
     },
     
     "levels": [

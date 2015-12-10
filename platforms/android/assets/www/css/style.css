@@ -18,6 +18,43 @@ html, body{
 @media (min-width: 600px) { html { font-size: 28px; } }
 @media (min-width: 720px) { html { font-size: 30px; } }
 
+#reset {
+    position: relative;
+    width: 70%;
+    color: #fff;
+    background-color: rgba(0, 0, 0, 0.9);
+    border: 2px solid white;
+    margin:0 auto;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+#reset #title {
+    padding-top: 15%;
+    padding-bottom: 15%;
+    font-size: 1.5rem;
+}
+
+#reset #options {
+    position: relative;
+}
+
+#reset #options div {
+    position: relative;
+    display: block;
+    min-height: 15%;
+    padding-bottom: 10%;
+    font-size: 0.7rem;
+}
+
+#reset #options #yes {
+    color: forestgreen;
+}
+
+#reset #options #no {
+    color: crimson;
+}
+
 #transition {
     position: relative;
     width: 100%;

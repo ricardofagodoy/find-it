@@ -17,7 +17,7 @@ if (!String.prototype.format) {
 
 var STATUS = { NEW: 'new', RESUME: 'resume', NEXT: 'next', LOSE: 'lose', WIN: 'win' };
 
-var propertiesDeffered = $.Deferred(),
+var propertiesDeffered = null,
     windowWidth = 0,
     windowHeight = 0,
     imageFilesPath = '',
@@ -25,7 +25,6 @@ var propertiesDeffered = $.Deferred(),
     heightScale = 0,
     maxLevel = 0,
     timerColor = '',
-    properties = {},
     messages = {},
     levels = {},
     mapHighlightProps = {},
@@ -41,6 +40,8 @@ var propertiesDeffered = $.Deferred(),
 function init() {
 
     console.log('Starting to init...');
+    
+    propertiesDeffered = $.Deferred();
     
     // Get window size
     windowWidth = $(window).width();
@@ -66,6 +67,7 @@ function init() {
     transition.msg2 = $('#transition #msg2');
     transition.stars = $('#transition #stars');
     transition.play = $('#transition #play');
+    transition.back = $('#transition #back');
     transition.stars = $('#transition #stars');
     
     // Load general properties
@@ -95,28 +97,20 @@ function init() {
         
         console.log('Starting properties loaded callback...');
         
+        // Reads user's current level from storage
+        retrievePlayerCurrentLevel();
+        
         // Load main menu
         configureMainMenuEvents();
 
         // Load transition screen
         configureTransitionEvents();
-        
-        // Reads user's current level from storage
-        retrievePlayerCurrentLevel();
-    
+
         // Update record massage based on level
         updateRecordMessage();
-    
-        // If menu's option is NEW GAME or CONTINUE
-        if(currentLevel > 1)
-            $('#menu #options #play').html(messages['menu.continue']);
-    
-        // If he's already won, different layout
-        if(currentLevel > maxLevel)
-            configureMainMenuWinner();
         
         // Hide splashscreen
-        //navigator.splashscreen.hide();
+        navigator.splashscreen.hide();
           
         // Set up flip to work manually
         cardInfo.flip({trigger: 'manual', speed: 700});
@@ -140,6 +134,9 @@ function updateCurrentLevel(level) {
     
     console.log('Saving level {0} to local storage...'.format(currentLevel));
     localStorage.setItem('level', currentLevel);
+    
+    // Update record message regarding new level
+    updateRecordMessage();
 }
 
 function retrievePlayerCurrentLevel() {
@@ -158,30 +155,18 @@ function retrievePlayerCurrentLevel() {
 
 function resetLevels() {
 
-    var menu = $('#menu');
-    
-    // Loses winner layout
-    if(currentLevel > maxLevel) {
-  
-        // Paints record white again
-        menu.find('#options #record').css('color', '#FFF');
-    
-        // Titles gets painted white again
-        menu.find('#title').css('color', '#FFF');
-    
-        // It's white again
-        menu.find('#options #play').css('color', '#FFF');
+    console.log('Reseting game to level 1...');
         
-        // Add events again
-        configureMainMenuEvents();
-    }
-    
-    // New Game instead of Continue
-    menu.find('#options #play').html(messages['menu.new']);
-    
+    // Resets level 1, actually
     updateCurrentLevel(1);
-    cardStatus = 0;
-    transition.play.show();
+    
+    // Setup Transition to original state
+    configureTransitionEvents();
+    
+    // Setup Menu to original state
+    configureMainMenuEvents();
+    
+    updateRecordMessage();
 }
 
 function configureMainMenuEvents() {
@@ -190,7 +175,7 @@ function configureMainMenuEvents() {
     
     var menu = $('#menu');
     
-    menu.find('#options #play').on('click', function(event) {
+    menu.find('#options #play').off('click').on('click', function(event) {
         
         menu.fadeOut("slow", function() {
             
@@ -209,13 +194,21 @@ function configureMainMenuEvents() {
             levelInfo.html(currentLevel);
             levelInfo.css('top', (windowHeight/2 - levelInfo.height()/2) + 'px');
         }); 
-        
-    });
+    }).html(messages['menu.new']);
     
-    menu.find('#options #record').on('click', function(event) {
-        resetLevels();
-        updateRecordMessage();
-    });
+    // Paints record in white
+    menu.find('#options #record').css('color', '#FFF');
+    
+    // Titles gets painted white
+    menu.find('#title').css('color', '#FFF');
+    
+    // If menu's option is NEW GAME or CONTINUE
+    if(currentLevel > 1)
+        menu.find('#options #play').html(messages['menu.continue']);
+    
+    // If he's already won, different layout
+    if(currentLevel > maxLevel)
+        configureMainMenuWinner();
     
     console.log('Main Menu loaded!');
 }
@@ -226,26 +219,45 @@ function configureMainMenuWinner() {
     
     var menu = $('#menu');
     
+    // Record is painted yellow too
+    $('#menu #options #record').css('color', 'yellow');
+    
     // Titles gets painted yellow
     menu.find('#title').css('color', 'yellow');
     
-    // Can't start new game
-    menu.find('#options #play').off('click');
-    
-    // It's grey and disabled now
-    menu.find('#options #play').css('color', 'gray');  
+    // Click on Reset button
+    menu.find('#options #play').off('click').
+    on('click', function(event) {  
+        
+        console.log('Clicking on reset button...');
+
+        var reset = $('#reset');
+        
+        // Show dialog to confirm
+        reset.show();
+        
+        // If clicks no, just close it
+        reset.find('#no').on('click', function(event) {
+            reset.hide();
+        });
+        
+        // If accepts, resets and closes
+        reset.find('#yes').on('click', function(event) {
+            resetLevels();
+            reset.hide();
+        });
+        
+    }).html(messages['menu.reset']);
 }
 
 function updateRecordMessage() {
     
     var message = '';
     
-    if(currentLevel > maxLevel) {
-        message = messages['menu.record.win'];
-        $('#menu #options #record').css('color', 'yellow');
-    } else {
+    if(currentLevel > maxLevel)
+        message = messages['menu.record.win'];  
+    else
         message = messages['menu.record'].format(currentLevel);
-    }
         
     $('#menu #options #record').html(message);
 }
@@ -254,22 +266,24 @@ function configureTransitionEvents() {
     
     console.log('Loading transition (adding listeners)...');
     
-    var transition = $('#transition');
+    // Shows Play button is case it was hidden
+    transition.play.show();
     
-    transition.find('#options #play').show();
+    // Initial state, when flipped maze is expected
+    cardStatus = 0;
     
     // Click on PLAY
-    transition.find('#options #play').on('click', function(event) {
-          
+    transition.play.on('click', function(event) {  
+        console.log('Flipping card...');
         // Flips card to maze side
         cardInfo.flip('toggle');
     });
     
-    // Click on MENU
-    transition.find('#options #back').on('click', function(event) {
+    // Click on back to MENU
+    transition.back.on('click', function(event) {
         $('#mazes').fadeOut("slow", function() {
             
-            if(currentLevel > 1)
+            if(currentLevel > 1 && currentLevel <= maxLevel)
                 $('#menu #options #play').html(messages['menu.continue']);
             
             $('#menu').fadeIn("slow");
@@ -337,6 +351,8 @@ function updateTransitionText(status, l) {
         messages[messagePattern.format(status, 'msg2')].format(time)
     );
     
+    // TODO: STARS AND GAME OVER
+    // Stars and Game Over message on transition
     transition.stars.find('#star1').hide();
     transition.stars.find('#star2').hide();
     transition.stars.find('#star3').hide();
@@ -402,9 +418,6 @@ function winLevel() {
     // Advances level (no params adds 1)    
     updateCurrentLevel();
     
-    // Update record message
-    updateRecordMessage();
-    
     // Win the game!
     if(currentLevel > maxLevel) {
         gameOver();
@@ -433,18 +446,17 @@ function gameOver() {
     // Paints screen in green
     cardInfo.css('background-color', 'rgba(0, 200, 0, 0.5)');
     
+    // You Win message!
+    updateTransitionText(STATUS.WIN);
+    
     // You Win when flip ends!
     cardStatus = 3;
     
-    // Changes to screen when winner:
-    // 1 - not more levels to play
+    // No more levels to play
     transition.play.hide();
     
-    // 2 - Menu is now different
+    // Menu is now different
     configureMainMenuWinner();
- 
-    // You Win message!
-    updateTransitionText(STATUS.WIN);
 
     // Wait until flip
     setTimeout(function() {
@@ -480,22 +492,20 @@ function loseLevel() {
     // Cleans and resets timer
     resetTimer();
     
+    // You lose when flip ends!
+    cardStatus = 2;
+    
+    // You lose message prepared
     updateTransitionText(STATUS.LOSE);
     
     // Goes to back to level 1
-    updateCurrentLevel(1);
-    
-    // Update record message
-    updateRecordMessage();
+    resetLevels();
     
     // Wait until flip
     setTimeout(function() {
         
         // Clear level number during transition
         levelInfo.hide();
-        
-        // You lose when flip ends!
-        cardStatus = 2;
         
         // Flips to next level (already preloaded)
         cardInfo.flip('toggle');
