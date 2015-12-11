@@ -35,8 +35,8 @@
         "transition.lose.msg1": "You've failed level {0}",
         "transition.lose.msg2": "Start all over?",
         
-        "menu.record": "Best: Level {0}",
-        "menu.record.win": "YOU WIN 'EM ALL",
+        "menu.status": "Best: Level {0}",
+        "menu.status.win": "YOU WIN 'EM ALL",
         
         "menu.new": "New Game",
         "menu.continue": "Continue",

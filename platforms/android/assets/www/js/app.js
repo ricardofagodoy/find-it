@@ -125,6 +125,18 @@ function init() {
     console.log('Init method reached its end');
 }
 
+var MainMenu = {
+};
+
+var Transition = {
+};
+
+var Mazes = {
+};
+
+var Timer = {
+};
+
 function updateCurrentLevel(level) {
     
     console.log('Updating level {0} to {1}'.format
