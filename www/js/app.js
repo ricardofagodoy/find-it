@@ -141,7 +141,7 @@ var Menu = {
         // Play button
         this.dom.play.off('click').on('click', function(event) {
         
-            Menu.dom.self.fadeOut("slow", function() {
+            Menu.dom.self.fadeOut("fast", function() {
             
                 if(level > 1)
                     Transition.updateText(STATUS.RESUME);
@@ -149,7 +149,7 @@ var Menu = {
                     Transition.updateText(STATUS.NEW);
             
                 // Slowly cards
-                Mazes.dom.self.fadeIn("slow");
+                Mazes.dom.self.fadeIn("fast");
             
                 // Load "first" level
                 Mazes.loadLevel();
@@ -250,13 +250,13 @@ var Transition = {
         // Click on back to MENU
         this.dom.back.off('click').on('click', function(event) {
             
-            Mazes.dom.self.fadeOut("slow", function() {
+            Mazes.dom.self.fadeOut("fast", function() {
 
                 // Check if change New game to Continue
                 if(level > 1 && level <= maxLevel)
                     Menu.dom.play.html(messages['menu.continue']);
 
-                Menu.dom.self.fadeIn("slow");
+                Menu.dom.self.fadeIn("fast");
             });
         });
 
@@ -290,15 +290,28 @@ var Transition = {
         this.dom.stars.find('#star3').hide();
         this.dom.stars.find('#gameover').hide();
         this.dom.stars.find('#ready').hide()
+         this.dom.stars.find('#trophy').hide();
 
-        if(status == STATUS.NEXT) {     
-            this.dom.stars.find('#star1').show();
-            this.dom.stars.find('#star2').show();
-            this.dom.stars.find('#star3').show();
-        } else if(status == STATUS.LOSE) {
-            this.dom.stars.find('#gameover').show();
-        } else {
-             this.dom.stars.find('#ready').show();
+        switch (status) {
+        
+            case STATUS.NEXT:
+                this.dom.stars.find('#star1').show();
+                this.dom.stars.find('#star2').show();
+                this.dom.stars.find('#star3').show();
+            break;
+                
+            case STATUS.LOSE:
+                this.dom.stars.find('#gameover').show();
+            break;
+            
+            case STATUS.RESUME:
+            case STATUS.NEW:
+                this.dom.stars.find('#ready').show();
+            break;
+                
+            case STATUS.WIN:
+                this.dom.stars.find('#trophy').show();
+            break;
         }
     }
 };
@@ -466,7 +479,7 @@ var Mazes = {
             // Flips to next level (already preloaded)
             Card.dom.flip('toggle');
 
-        }, 3000); 
+        }, 2000); 
     },
     
     addMazeEvents: function() {

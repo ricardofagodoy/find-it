@@ -1,5 +1,5 @@
 {
-    "maxLevel": 6,
+    "maxLevel": 1,
     "imageWidth": 780,
     "imageHeight": 1346,
     "imageFilesPath": "images/level{0}.png",
@@ -19,7 +19,7 @@
         "transition.new.msg1": "Ready to level {0}?",
         "transition.new.msg2": "Time: {0} seconds",
         
-        "transition.resume.title": "Let's keep going",
+        "transition.resume.title": "Let's Continue",
         "transition.resume.msg1": "Next level is {0}",
         "transition.resume.msg2": "Time: {0} seconds",
         
