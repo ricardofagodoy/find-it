@@ -19,7 +19,7 @@
         "transition.new.msg1": "Ready to level {0}?",
         "transition.new.msg2": "Time: {0} seconds",
         
-        "transition.resume.title": "Let's continue",
+        "transition.resume.title": "Let's keep going",
         "transition.resume.msg1": "Next level is {0}",
         "transition.resume.msg2": "Time: {0} seconds",
         

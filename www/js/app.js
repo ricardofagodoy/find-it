@@ -117,7 +117,9 @@ function init() {
         Card.configure();
         
         // Hide splashscreen
-        //navigator.splashscreen.hide();
+        setTimeout(function() {
+            navigator.splashscreen.hide();
+        }, 1000);
     });
     
     console.log('Init method reached its end');
@@ -141,7 +143,10 @@ var Menu = {
         
             Menu.dom.self.fadeOut("slow", function() {
             
-                Transition.updateText(STATUS.NEW);
+                if(level > 1)
+                    Transition.updateText(STATUS.RESUME);
+                else
+                    Transition.updateText(STATUS.NEW);
             
                 // Slowly cards
                 Mazes.dom.self.fadeIn("slow");
@@ -184,27 +189,27 @@ var Menu = {
         // Status is painted yellow too
         this.dom.status.css('color', 'yellow');
 
+        // TODO: FIX THIS SHIT
+        var resetConfirmation = $('#reset');
+
+        // If clicks no, just close it
+        resetConfirmation.find('#no').off('click').on('click', function(event) {
+            resetConfirmation.hide();
+        });
+
+        // If accepts, resets and closes
+        resetConfirmation.find('#yes').off('click').on('click', function(event) {
+            resetGame();
+            resetConfirmation.hide();
+        });
+        
         // Click on Reset button
         this.dom.play.off('click').on('click', function(event) {  
 
             console.log('Clicking on reset button...');
 
-            // TODO: FIX THIS SHIT
-            var reset = $('#reset');
-
             // Show dialog to confirm
-            reset.show();
-
-            // If clicks no, just close it
-            reset.find('#no').on('click', function(event) {
-                reset.hide();
-            });
-
-            // If accepts, resets and closes
-            reset.find('#yes').on('click', function(event) {
-                resetGame();
-                reset.hide();
-            });
+            resetConfirmation.show();
 
         }).html(messages['menu.reset']);
     },
@@ -284,6 +289,7 @@ var Transition = {
         this.dom.stars.find('#star2').hide();
         this.dom.stars.find('#star3').hide();
         this.dom.stars.find('#gameover').hide();
+        this.dom.stars.find('#ready').hide()
 
         if(status == STATUS.NEXT) {     
             this.dom.stars.find('#star1').show();
@@ -291,6 +297,8 @@ var Transition = {
             this.dom.stars.find('#star3').show();
         } else if(status == STATUS.LOSE) {
             this.dom.stars.find('#gameover').show();
+        } else {
+             this.dom.stars.find('#ready').show();
         }
     }
 };
@@ -400,14 +408,14 @@ var Mazes = {
         // Cleans and resets timer
         Timer.resetTimer();
 
-        // You lose when flip ends!
-        Card.status = STATUS.LOSE;
-
         // You lose message prepared
         Transition.updateText(STATUS.LOSE);
 
         // Goes to back to level 1
         resetGame();
+        
+        // You lose when flip ends!
+        Card.status = STATUS.LOSE;
 
         // Wait until flip
         setTimeout(function() {

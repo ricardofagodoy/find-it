@@ -19,7 +19,7 @@
         "transition.new.msg1": "Ready to level {0}?",
         "transition.new.msg2": "Time: {0} seconds",
         
-        "transition.resume.title": "Let's continue",
+        "transition.resume.title": "Let's keep going",
         "transition.resume.msg1": "Next level is {0}",
         "transition.resume.msg2": "Time: {0} seconds",
         
@@ -35,8 +35,8 @@
         "transition.lose.msg1": "You've failed level {0}",
         "transition.lose.msg2": "Start all over?",
         
-        "menu.record": "Best: Level {0}",
-        "menu.record.win": "YOU WIN 'EM ALL",
+        "menu.status": "Best: Level {0}",
+        "menu.status.win": "YOU WIN 'EM ALL",
         
         "menu.new": "New Game",
         "menu.continue": "Continue",
