@@ -513,9 +513,6 @@ var Mazes = {
     
         console.log('Lose level {0}'.format(level));
 
-        // Paints screen in red
-        Mazes.dom.self.css('background-color', messages['transition.lose.bg']);
-
         // Remove solution from maze
         this.dom.mapTarget.find('area').remove();
 
@@ -550,17 +547,14 @@ var Mazes = {
 
         console.log('Player win last level ({0})!'.format(level));
 
-        // Paints screen in green
-        Mazes.dom.self.css('background-color', 'rgba(0, 200, 0, 0.5)');
-
         // You Win message!
         Transition.updateText(STATUS.WIN);
 
         // You Win when flip ends!
         Card.status = STATUS.WIN;
-
-        // No more levels to play
-        Transition.dom.play.hide();
+        
+        // Loooong flip :)
+        Card.timeToFlip = 2000;
 
         // Menu is now different
         Menu.configureWinner();
@@ -608,12 +602,13 @@ var Mazes = {
 var Card = {
 
     dom: null,
+    timeToFlip: 700,
     status: STATUS.NEW,
     
     configure: function() {
     
         // Set up flip to work manually
-        this.dom.flip({trigger: 'manual', speed: 700});
+        this.dom.flip({trigger: 'manual', speed: Card.timeToFlip});
         
         // When flip is done - callback
         this.dom.on('flip:done', this.flipDoneCallback);
@@ -650,7 +645,9 @@ var Card = {
                 Card.status = STATUS.NEW;
             break;
 
-           // case STATUS.WIN: break;
+            case STATUS.WIN: 
+                Card.timeToFlip = 700;    
+            break;
         }
     },
     

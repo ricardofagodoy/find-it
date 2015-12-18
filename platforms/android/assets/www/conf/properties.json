@@ -18,11 +18,13 @@
         "transition.new.title": "Let's start",
         "transition.new.msg1": "Ready to level {0}?",
         "transition.new.msg2": "Time: {0} seconds",
+        "transition.new.special": "ARE YOU READY?",
         "transition.new.play": "Start",
         
         "transition.resume.title": "Let's Continue",
         "transition.resume.msg1": "Next level: {0}",
         "transition.resume.msg2": "Time: {0} seconds",
+        "transition.resume.special": "ARE YOU READY?",
         "transition.resume.play": "Start",
         
         "transition.next.title": "Well done!",
@@ -32,17 +34,18 @@
         
         "transition.win.title": "You Win!",
         "transition.win.msg1": "Congratulations!",
-        "transition.win.msg2": "",
+        "transition.win.msg2": "YOU DID IT!",
         "transition.win.play": "Start",
         "transition.win.bg": "rgba(75, 171, 38, 1)",
         
         "transition.lose.title": "You Lose",
-        "transition.lose.msg1": "You've failed level {0}",
+        "transition.lose.msg1": "You've failed!",
         "transition.lose.msg2": "Start all over?",
         "transition.lose.play": "Restart",
+        "transition.lose.special": "DON'T GIVE UP!",
         "transition.lose.bg": "rgba(230, 20, 20, 1)",
         
-        "menu.status": "Best: Level {0}",
+        "menu.status": "Next: Level {0}",
         "menu.status.win": "YOU WIN 'EM ALL",
         
         "menu.new": "New Game",
