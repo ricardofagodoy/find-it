@@ -24,9 +24,8 @@ html, body{
     position: absolute;
     width: 100%;
     height: 100%;
-    background-size: 100%; 
-    background-image: url("../images/nightsky.gif-c200");
-    color: white;
+    background-size: cover; 
+    background-image: url("../images/bg.jpg");  
 }
 
 #menu #title {
@@ -37,6 +36,7 @@ html, body{
 
 #menu #options {
     position: relative;
+    color: #000;
     height: 40%;
 }
 
@@ -46,6 +46,14 @@ html, body{
     min-height: 20%;
     margin-bottom: 5%;
     font-size: 1rem;
+}
+
+#menu #options div span {
+    padding: 2%;
+    border: 2px double #000;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 5px 5px 5px 5px;
+    -webkit-border-radius: 5px 5px 5px 5px;
 }
 
 /*** TRANSITION STYLES ***/
@@ -73,6 +81,14 @@ html, body{
     min-height: 15%;
     margin-bottom: 3%;
     font-size: 1rem;
+}
+
+#transition #options #play,  #transition #options #back{
+    padding: 2%;
+    border: 2px double #000;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 5px 5px 5px 5px;
+    -webkit-border-radius: 5px 5px 5px 5px;
 }
 
 /*** RESET CONFIRMATION STYLES ***/
@@ -120,6 +136,11 @@ html, body{
     position: absolute;
     width: 100%;
     height: 100%;
+    -webkit-transform: translate3d(0px,0px,0px);
+    -webkit-transition: background-color 1s ease-out;
+    -moz-transition: background-color 1s ease-out;
+    -o-transition: background-color 1s ease-out;
+    transition: background-color 1s ease-out;
 }
 
 #card {
@@ -133,7 +154,7 @@ html, body{
 #levelInfo {
     position: absolute;
     display: none;
-    font-size: 7rem;
+    font-size: 8rem;
     width: 100%;
     opacity: 0.1;
 }
@@ -144,6 +165,6 @@ html, body{
     position: absolute;
     width: 100%;
     height: 100%;
-    opacity: 0.4;
+    opacity: 0.2;
     transition-timing-function: linear;
 }

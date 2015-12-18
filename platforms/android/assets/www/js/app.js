@@ -17,7 +17,15 @@ if (!String.prototype.format) {
   };
 }
 
-var STATUS = { NEW: 'new', RESUME: 'resume', NEXT: 'next', LOSE: 'lose', WIN: 'win' };
+var STATUS = { NEW: 'new', RESUME: 'resume', NEXT: 'next', LOSE: 'lose', WIN: 'win' },
+    BASE_COLORS = [
+        {r: 255, g:  90, b: 0,   offset: 16},    // Level 0-10  (orange going to yellow)
+        {r: 255, g: 255, b: 0,   offset: 25},    // Level 10-20 (yellow going to green)
+        {r:  0,  g: 255, b: 0,   offset: 25},    // Level 20-30 (green going to blue)
+        {r:  0,  g:   0, b: 255, offset: 25},    // Level 30-40 (blue going to purple)
+        {r: 255, g:   0, b: 255, offset: 25},    // Level 40-50 (purple going to white)
+        {r: 255, g: 255, b: 255, offset: 25}     // Level 50 - white
+    ];
 
 var propertiesDeffered = $.Deferred(),
     windowWidth = 0,
@@ -58,7 +66,8 @@ function init() {
     };
     
     Transition.dom = {
-        self: $('#game'),
+        parent: $('#game'),
+        self: $('#game #transition'),
         title: $('#game #transition #title'),
         msg1: $('#game #transition #msg1'),
         msg2: $('#game #transition #msg2'),
@@ -116,9 +125,12 @@ function init() {
         // Configure some card properties
         Card.configure();
         
+        // When pressing BACK button
+        document.addEventListener("backbutton", onBackButtonPress, false);
+        
         // Hide splashscreen
         setTimeout(function() {
-            navigator.splashscreen.hide();
+            //navigator.splashscreen.hide();
         }, 1000);
     });
     
@@ -136,8 +148,8 @@ var Menu = {
         console.log('Loading original main menu...');
         
         // Titles gets painted white
-       this.dom.title.css('color', '#FFF');
-    
+        this.dom.title.css({"color": "#000", "text-shadow": "0.2rem 0.2rem 0.1rem #aaa"});
+        
         // Play button
         this.dom.play.off('click').on('click', function(event) {
         
@@ -166,7 +178,7 @@ var Menu = {
         }).html(messages['menu.new']);
     
         // Paints status in white
-        this.dom.status.css('color', '#FFF');
+        this.dom.status.css('color', '#000');
 
         // If menu's option is NEW GAME or CONTINUE
         if(level > 1)
@@ -184,7 +196,7 @@ var Menu = {
         console.log('Configuring main menu to winner mode...');
 
         // Titles gets painted yellow
-        this.dom.title.css('color', 'yellow');
+        this.dom.title.css({"color": "#ff0", "text-shadow": "0.2rem 0.2rem 0.1rem #000"});
         
         // Status is painted yellow too
         this.dom.status.css('color', 'yellow');
@@ -269,19 +281,27 @@ var Transition = {
 
         var newLevel = l == undefined ? level : l,
             messagePattern = 'transition.{0}.{1}',
-            time = levels[level-1] ? levels[level-1].timer : 0;
+            time = levels[newLevel-1] ? levels[newLevel-1].timer : 0,
+            bg = '#FFF';
 
         this.dom.title.html(
             messages[messagePattern.format(status, 'title')]
         );
 
         this.dom.msg1.html(
-            messages[messagePattern.format(status, 'msg1')].format(level)
+            messages[messagePattern.format(status, 'msg1')].format(newLevel)
         );
 
         this.dom.msg2.html(
             messages[messagePattern.format(status, 'msg2')].format(time)
         );
+        
+        this.dom.play.html(
+            messages[messagePattern.format(status, 'play')]
+        );
+        
+        // TODO: Background color is based on level
+        bg = this.calculateBgColor(newLevel);
 
         // TODO: STARS AND GAME OVER
         // Stars and Game Over message on transition
@@ -290,7 +310,7 @@ var Transition = {
         this.dom.stars.find('#star3').hide();
         this.dom.stars.find('#gameover').hide();
         this.dom.stars.find('#ready').hide()
-         this.dom.stars.find('#trophy').hide();
+        this.dom.stars.find('#trophy').hide();
 
         switch (status) {
         
@@ -302,17 +322,77 @@ var Transition = {
                 
             case STATUS.LOSE:
                 this.dom.stars.find('#gameover').show();
+                bg = messages[messagePattern.format(status, 'bg')];
             break;
             
             case STATUS.RESUME:
             case STATUS.NEW:
-                this.dom.stars.find('#ready').show();
+                // TODO: status on game
             break;
                 
             case STATUS.WIN:
                 this.dom.stars.find('#trophy').show();
+                bg = messages[messagePattern.format(status, 'bg')];
             break;
         }
+        
+        // Realy paints background
+        this.dom.parent.css('background-color', bg);
+    },
+    
+    calculateBgColor: function(specificLevel) {
+        
+        console.log('Calculating next level color...');
+        
+        specificLevel = specificLevel == undefined ? level : specificLevel;
+        
+        var base = BASE_COLORS[Math.floor(specificLevel/10)],
+            relativeOffset = (specificLevel%10) * base.offset,
+            opacity = 0.8;
+        
+        // Copy that color options
+        base = $.extend({}, base);
+        
+        console.log('Base color {0} and offset {1}'.
+                    format(Math.floor(specificLevel/10), relativeOffset));
+        
+        switch(Math.floor(specificLevel/10)) {
+        
+            case 0: 
+                base.g += relativeOffset;
+            break;
+                
+            case 1: 
+                base.r -= relativeOffset;
+            break;
+                
+            case 2: 
+                base.g -= relativeOffset;
+                base.b += relativeOffset;
+            break;
+                
+            case 3: 
+                base.r += relativeOffset;
+            break;
+                
+            case 4: 
+                base.g += relativeOffset;
+            break;
+        }
+        
+        // Fix outbounds
+        base.r = base.r > 255 ? 255 : base.r;
+        base.g = base.g > 255 ? 255 : base.g;
+        base.b = base.b > 255 ? 255 : base.b;
+        
+        base.r = base.r < 0 ? 0 : base.r;
+        base.g = base.g < 0 ? 0 : base.g;
+        base.b = base.b < 0 ? 0 : base.b;
+        
+        var resultColor = 'rgba({0}, {1}, {2}, {3})'.format(base.r, base.g, base.b, opacity);
+        
+        console.log('Color result: ' + resultColor);
+        return resultColor;
     }
 };
 
@@ -389,6 +469,9 @@ var Mazes = {
             this.gameOver();
             return;
         }
+        
+        // Load next level transition screen
+        Transition.updateText(STATUS.NEXT);
 
         // Wait until flip
         setTimeout(function() {
@@ -410,7 +493,7 @@ var Mazes = {
         console.log('Lose level {0}'.format(level));
 
         // Paints screen in red
-        Card.dom.css('background-color', 'rgba(255, 0, 0, 0.5)');
+        Transition.dom.parent.css('background-color', messages['transition.lose.bg']);
 
         // Remove solution from maze
         this.dom.mapTarget.find('area').remove();
@@ -439,9 +522,6 @@ var Mazes = {
             // Flips to next level (already preloaded)
             Card.flip();
 
-            // Paints screen in white again
-            Card.dom.css('background-color', 'rgba(0, 0, 0, 0)');
-
         }, 2000); 
     },
     
@@ -450,7 +530,7 @@ var Mazes = {
         console.log('Player win last level ({0})!'.format(level));
 
         // Paints screen in green
-        Card.dom.css('background-color', 'rgba(0, 200, 0, 0.5)');
+        Transition.dom.parent.css('background-color', 'rgba(0, 200, 0, 0.5)');
 
         // You Win message!
         Transition.updateText(STATUS.WIN);
@@ -472,9 +552,6 @@ var Mazes = {
 
             // Clear level number during transition
             Mazes.dom.levelInfo.hide();
-
-            // Remove green color effect
-            Card.dom.css('background-color', 'rgba(255, 255, 255, 0)');
 
             // Flips to next level (already preloaded)
             Card.dom.flip('toggle');
@@ -536,8 +613,6 @@ var Card = {
                 // Let's start game for real!
                 Mazes.startLevel();
 
-                Transition.updateText(STATUS.NEXT, level+1);
-
                 Card.status = STATUS.NEXT;
             break;
 
@@ -547,11 +622,14 @@ var Card = {
 
                 // Load next level
                 Mazes.loadLevel();
+                
+                // Change bg color from RED to level 1 color
+                Transition.dom.parent.css('background-color', Transition.calculateBgColor());
 
                 Card.status = STATUS.NEW;
             break;
 
-           // case STATUS.WIN:        break;
+           // case STATUS.WIN: break;
         }
     },
     
@@ -650,4 +728,10 @@ function resetGame() {
     
     // Setup Transition to original state
     Transition.configure();
+}
+function onBackButtonPress() {
+    
+    console.log('Pressed back button');
+    
+    //navigator.app.exitApp();  
 }
