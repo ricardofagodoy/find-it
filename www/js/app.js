@@ -72,8 +72,14 @@ function init() {
         msg1: $('#game #transition #msg1'),
         msg2: $('#game #transition #msg2'),
         play: $('#game #transition #play'),
+        playWrapper: $('#game #transition #playWrapper'),
         back: $('#game #transition #back'),
         stars: $('#game #transition #stars'),
+        progress: $('#game #transition #progress'),
+        marker: $('#game #transition #progress #marker'),
+        special: $('#game #transition #specialMsg'),
+        specialWrapper: $('#game #transition #specialMsgWrapper'),
+        trophy: $('#game #transition #trophyWrapper')
     };
     
     Mazes.dom = {
@@ -130,7 +136,7 @@ function init() {
         
         // Hide splashscreen
         setTimeout(function() {
-            //navigator.splashscreen.hide();
+            navigator.splashscreen.hide();
         }, 1000);
     });
     
@@ -248,7 +254,7 @@ var Transition = {
         console.log('Loading transition...');
 
         // Shows Play button is case it was hidden
-        this.dom.play.show();
+        this.dom.playWrapper.show();
         
         // Resets transition card status
         Card.status = STATUS.NEW;
@@ -292,41 +298,64 @@ var Transition = {
             messages[messagePattern.format(status, 'play')]
         );
         
-        // TODO: Background color is based on level
+        // Background color is based on level
         bg = this.calculateBgColor(newLevel);
 
-        // TODO: STARS AND GAME OVER
-        // Stars and Game Over message on transition
+        // Stars, special message and progress bar
+        this.dom.stars.hide();
         this.dom.stars.find('#star1').hide();
         this.dom.stars.find('#star2').hide();
         this.dom.stars.find('#star3').hide();
-        this.dom.stars.find('#gameover').hide();
-        this.dom.stars.find('#ready').hide()
-        this.dom.stars.find('#trophy').hide();
-
+        this.dom.progress.hide();
+        this.dom.trophy.hide();
+        this.dom.specialWrapper.hide();
+        
         switch (status) {
         
             case STATUS.NEXT:
-                this.dom.stars.find('#star1').show();
-                this.dom.stars.find('#star2').show();
+                
+                var timePassedLevel = levels[newLevel-2].timer;
+                
+                console.log('Level {0} had {1}s to complete and took {2}s'.
+                            format(newLevel-1, timePassedLevel, Timer.secondsPassed));
+                
+                // If finished in less or equal 20% of time
+                if(Timer.secondsPassed <= timePassedLevel*0.2)
+                    this.dom.stars.find('#star1').show();
+                
+                // If finished in less or equal 60% of time
+                if(Timer.secondsPassed <= timePassedLevel*0.6)
+                    this.dom.stars.find('#star2').show();
+
                 this.dom.stars.find('#star3').show();
+                this.dom.stars.show();
+                
+                this.dom.progress.show();
             break;
                 
             case STATUS.LOSE:
-                this.dom.stars.find('#gameover').show();
+                this.dom.progress.show();
+                this.dom.special.html(messages[messagePattern.format(status, 'special')]);
+                this.dom.specialWrapper.show();
                 bg = messages[messagePattern.format(status, 'bg')];
             break;
             
             case STATUS.RESUME:
             case STATUS.NEW:
-                // TODO: status on game
+                this.dom.progress.show();
+                this.dom.special.html(messages[messagePattern.format(status, 'special')]);
+                this.dom.specialWrapper.show();
             break;
                 
             case STATUS.WIN:
-                this.dom.stars.find('#trophy').show();
+                this.dom.trophy.show();
+                this.dom.playWrapper.hide();
                 bg = messages[messagePattern.format(status, 'bg')];
             break;
         }
+        
+        // Adjust progress marker
+        this.dom.marker.css('margin-left', (newLevel-1)*2 + '%');
         
         // Realy paints background
         this.dom.parent.css('background-color', bg);
@@ -495,13 +524,13 @@ var Mazes = {
 
         // Cleans and resets timer
         Timer.resetTimer();
+        
+        // Goes to back to level 1
+        resetGame();
 
         // You lose message prepared
         Transition.updateText(STATUS.LOSE);
 
-        // Goes to back to level 1
-        resetGame();
-        
         // You lose when flip ends!
         Card.status = STATUS.LOSE;
 
@@ -514,7 +543,7 @@ var Mazes = {
             // Flips to next level (already preloaded)
             Card.flip();
 
-        }, 2000); 
+        }, 1700); 
     },
     
     gameOver: function() {
@@ -635,6 +664,8 @@ var Timer = {
     
     dom: null,
     color: 'null',
+    secondsPassed: 0,
+    secondsIntervalRef: null,
     
     startTimer: function() {
 
@@ -650,6 +681,12 @@ var Timer = {
 
         // This starts the animation, bringing the div down to 0
         this.dom.css('top', 0);
+        
+        // Calculate seconds taken to finsish level
+        this.secondsPassed = 0;
+        this.secondsIntervalRef = setInterval(function() {
+            Timer.secondsPassed++;
+        }, 1000);
 
         // Callback when animation ends
         this.dom.one('transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd',
@@ -664,6 +701,9 @@ var Timer = {
     resetTimer: function() {
     
         console.log('Reseting timer...');
+        
+        // Stops counting time taken to finish maze
+        clearInterval(this.secondsIntervalRef);
 
         // Prevents timer to animate when reseting
         this.dom.css('transition-property', 'none');

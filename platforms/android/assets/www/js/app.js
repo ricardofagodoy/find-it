@@ -261,15 +261,7 @@ var Transition = {
 
         // Click on back to MENU
         this.dom.back.off('click').on('click', function(event) {
-            
-            Mazes.dom.self.fadeOut("fast", function() {
-
-                // Check if change New game to Continue
-                if(level > 1 && level <= maxLevel)
-                    Menu.dom.play.html(messages['menu.continue']);
-
-                Menu.dom.self.fadeIn("fast");
-            });
+            onBackButtonPress();
         });
 
         console.log('Transition screen callbacks loaded!');
@@ -493,7 +485,7 @@ var Mazes = {
         console.log('Lose level {0}'.format(level));
 
         // Paints screen in red
-        Transition.dom.parent.css('background-color', messages['transition.lose.bg']);
+        Mazes.dom.self.css('background-color', messages['transition.lose.bg']);
 
         // Remove solution from maze
         this.dom.mapTarget.find('area').remove();
@@ -530,7 +522,7 @@ var Mazes = {
         console.log('Player win last level ({0})!'.format(level));
 
         // Paints screen in green
-        Transition.dom.parent.css('background-color', 'rgba(0, 200, 0, 0.5)');
+        Mazes.dom.self.css('background-color', 'rgba(0, 200, 0, 0.5)');
 
         // You Win message!
         Transition.updateText(STATUS.WIN);
@@ -624,7 +616,7 @@ var Card = {
                 Mazes.loadLevel();
                 
                 // Change bg color from RED to level 1 color
-                Transition.dom.parent.css('background-color', Transition.calculateBgColor());
+                Mazes.dom.self.css('background-color', Transition.calculateBgColor());
 
                 Card.status = STATUS.NEW;
             break;
@@ -733,5 +725,18 @@ function onBackButtonPress() {
     
     console.log('Pressed back button');
     
-    //navigator.app.exitApp();  
+    if(Card.status == STATUS.NEXT || Card.status == STATUS.LOSE)
+        return;
+    
+    if (Mazes.dom.self.is(':visible')) {
+        Mazes.dom.self.fadeOut("fast", function() {
+
+            // Check if change New game to Continue
+            if(level > 1 && level <= maxLevel)
+                Menu.dom.play.html(messages['menu.continue']);
+
+            Menu.dom.self.fadeIn("fast");
+        });
+    } else 
+        navigator.app.exitApp(); 
 }
