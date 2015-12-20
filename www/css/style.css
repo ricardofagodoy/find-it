@@ -92,32 +92,13 @@ html, body{
 #transition #options #stars {
     height: 15%;
     margin-top: 2%;
-    margin-bottom: 5%;
+    margin-bottom: 10%;
 }
 
 #transition #options #trophyWrapper {
     height: 35%;
     margin-top: 3%;
     margin-bottom: 6%;
-}
-
-#transition #options #progress {
-    width: 80%;
-    height: 15%;
-    margin: 0 auto;
-    margin-top: 5%;
-    margin-bottom: 5%;
-    background: linear-gradient(to right, rgba(255, 90, 0, 1), rgba(255, 255, 0, 1), rgba(0, 255, 0, 1), rgba(0, 0, 255, 1), rgba(255, 0, 255, 1), rgba(255, 255, 255, 1));
-    border: 1px solid #000; 
-    border-radius: 5px 5px 5px 5px;
-    -webkit-border-radius: 5px 5px 5px 5px;
-}
-
-#transition #options #progress #marker {
-    display: block;
-    width: 2%;
-    height: 100%;
-    border-left: 2px solid #000;
 }
 
 #transition #options #specialMsg {
@@ -204,7 +185,7 @@ html, body{
 #card {
     width: 100%;
     height: 100%;
-    -webkit-transform: translate3d(0px,0px,0px);
+    transform: translate3d(0px,0px,0px);
 }
 
 /*** LEVEL INFORMATION STYLE ***/
@@ -221,6 +202,7 @@ html, body{
 
 #timerInfo {
     position: absolute;
+    transform: translate3d(0px,0px,0px);
     width: 100%;
     height: 100%;
     opacity: 0.2;

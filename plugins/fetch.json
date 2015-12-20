@@ -14,5 +14,37 @@
         },
         "is_top_level": true,
         "variables": {}
+    },
+    "com.admob.plugin": {
+        "source": {
+            "type": "registry",
+            "id": "com.admob.plugin@3.0.0"
+        },
+        "is_top_level": true,
+        "variables": {}
+    },
+    "cordova-connectivity-monitor": {
+        "source": {
+            "type": "registry",
+            "id": "cordova-connectivity-monitor"
+        },
+        "is_top_level": false,
+        "variables": {}
+    },
+    "cordova-google-play-services": {
+        "source": {
+            "type": "registry",
+            "id": "cordova-google-play-services"
+        },
+        "is_top_level": false,
+        "variables": {}
+    },
+    "cordova-admob": {
+        "source": {
+            "type": "registry",
+            "id": "cordova-admob"
+        },
+        "is_top_level": true,
+        "variables": {}
     }
 }

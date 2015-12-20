@@ -17,6 +17,8 @@
     <preference name="AutoHideSplashScreen" value="false" />
     
     <plugin name="cordova-plugin-whitelist" version="1" />
+    <plugin name="cordova-admob" source="npm"/>
+    
     <access origin="*" />
     <allow-intent href="http://*/*" />
     <allow-intent href="https://*/*" />
