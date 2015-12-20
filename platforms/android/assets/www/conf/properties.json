@@ -14,9 +14,6 @@
     "adOptions": {
         "bannerId": "ca-app-pub-2813072672105928/4159360894",
         "interstitialId": "ca-app-pub-2813072672105928/2543026891",
-        "autoShow": false,
-        "adSize": "SMART_BANNER",
-        "overlap": true, 
         "isTesting": true
     },
     "levelColors": [

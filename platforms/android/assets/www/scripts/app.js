@@ -185,7 +185,7 @@ var Menu = {
         console.log('Configuring main menu to winner mode...');
 
         // Titles gets painted yellow
-        this.dom.title.css({"color": "#ff0", "text-shadow": "0.2rem 0.2rem 0.1rem #000"});
+        this.dom.title.css({"color": "#FF0"});
         
         // Status is painted yellow too
         this.dom.status.css('color', 'yellow');
@@ -636,12 +636,12 @@ var Card = {
 
             // If it's flipping from transition to maze
             case STATUS.NEW:
+                
+                // No ad during maze
+                Ads.hideBanner();
 
                 // Let's start game for real!
                 Maze.startLevel();
-                
-                // Hide ad when playing
-                Ads.hideBanner();
 
                 Card.status = STATUS.NEXT;
             break;
@@ -649,14 +649,14 @@ var Card = {
             // If its moving from maze to transition
             case STATUS.NEXT:
                 
-                // Shows banner that was hidden
-                Ads.showBanner();
-                
                 // Load next level
                 Maze.loadLevel();
                 
                 // Change bg color from RED to level 1 color
                 Maze.dom.self.css('background-color', Transition.calculateBgColor());
+                
+                // Transition gets an ad!
+                Ads.showBanner();
 
                 Card.status = STATUS.NEW;   
             break;
@@ -676,7 +676,8 @@ var Card = {
             break;
 
             case STATUS.WIN: 
-                Card.timeToFlip = 700;    
+                // Show BIG ad
+                Ads.showInterstitial();   
             break;
         }
     },
@@ -752,34 +753,44 @@ var Timer = {
 };
 
 var Ads = {
+    
+    bannerVisible: false,
 
     init: function() {
         
         if(window.AdMob) {
-            AdMob.setOptions(adOptions);
-
-            AdMob.createBanner({position: AdMob.AD_POSITION.BOTTOM_CENTER});
-            AdMob.prepareInterstitial();
             
+            AdMob.setOptions(adOptions);
+ 
+            AdMob.prepareInterstitial();
             this.showBanner();
         }
     },
     
     showBanner: function() {
-        if(window.AdMob)
-             AdMob.showBanner();
+        if(window.AdMob && !this.bannerVisible) {
+           AdMob.createBanner({
+                adId : adOptions.bannerId,
+                position : AdMob.AD_POSITION.BOTTOM_CENTER,
+                autoShow : true,
+               overlap: true
+            });
+            
+            this.bannerVisible = true;
+        }
     },
     
     hideBanner: function() {
-        if(window.AdMob)
-            AdMob.showBanner();
+        if(window.AdMob && this.bannerVisible) {
+            AdMob.removeBanner();
+            this.bannerVisible = false;
+        }
     },
     
     showInterstitial: function() {
         if(window.AdMob)
             AdMob.showInterstitial();
     }
-
 };
 
 // ****** Some util functions ******
@@ -837,10 +848,11 @@ function onBackButtonPress() {
             // Check if change New game to Continue
             if(level > 1 && level <= maxLevel)
                 Menu.dom.play.html(messages['menu.continue']);
-            
-            Ads.showBanner();
 
             Menu.dom.self.fadeIn("fast");
+            
+            // Show banner again (it's hidden from transition screen)
+            Ads.showBanner();
         });
     } else 
         navigator.app.exitApp(); 

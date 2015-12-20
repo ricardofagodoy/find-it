@@ -11,11 +11,13 @@
     <content src="index.html" />
     
     <icon src="icon.png" />
+    
     <preference name="Orientation" value="portrait" />
     <preference name="SplashScreen" value="icon" />
     <preference name="AutoHideSplashScreen" value="false" />
 
     <preference name="android-build-tool" value="gradle" /> 
+    
     
     <plugin name="cordova-plugin-admobpro" source="npm" />
 
