@@ -12,20 +12,13 @@
     
     <icon src="icon.png" />
     <preference name="Orientation" value="portrait" />
-    
     <preference name="SplashScreen" value="icon" />
     <preference name="AutoHideSplashScreen" value="false" />
+
+    <preference name="android-build-tool" value="gradle" /> 
     
-    <plugin name="cordova-plugin-whitelist" version="1" />
-    <plugin name="cordova-admob" source="npm"/>
-    
-    <access origin="*" />
-    <allow-intent href="http://*/*" />
-    <allow-intent href="https://*/*" />
-    <allow-intent href="tel:*" />
-    <allow-intent href="sms:*" />
-    <allow-intent href="mailto:*" />
-    <allow-intent href="geo:*" />
+    <plugin name="cordova-plugin-admobpro" source="npm" />
+
     <platform name="android">
         <allow-intent href="market:*" />
         <preference name="android-minSdkVersion" value="15" />

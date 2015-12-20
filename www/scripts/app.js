@@ -17,15 +17,7 @@ if (!String.prototype.format) {
   };
 }
 
-var STATUS = { NEW: 'new', RESUME: 'resume', NEXT: 'next', LOSE: 'lose', WIN: 'win' },
-    BASE_COLORS = [
-        {r: 255, g:  90, b: 0,   offset: 16},    // Level 0-10  (orange going to yellow)
-        {r: 255, g: 255, b: 0,   offset: 25},    // Level 10-20 (yellow going to green)
-        {r:  0,  g: 255, b: 0,   offset: 25},    // Level 20-30 (green going to blue)
-        {r:  0,  g:   0, b: 255, offset: 25},    // Level 30-40 (blue going to purple)
-        {r: 255, g:   0, b: 255, offset: 25},    // Level 40-50 (purple going to white)
-        {r: 255, g: 255, b: 255, offset: 25}     // Level 50 - white
-    ];
+var STATUS = { NEW: 'new', RESUME: 'resume', NEXT: 'next', LOSE: 'lose', WIN: 'win' };
 
 var propertiesDeffered = $.Deferred(),
     windowWidth = 0,
@@ -37,6 +29,8 @@ var propertiesDeffered = $.Deferred(),
     messages = {},
     levels = {},
     mapHighlightProps = {},
+    levelColors = [],
+    adOptions = {},
     level = 1;
     
 function init() {
@@ -55,41 +49,6 @@ function init() {
     // Initilize fast click to prevent click delay
     Origami.fastclick(document.body);
     
-    // Initialize link to DOM elements
-    Menu.dom = {
-        self: $('#menu'),
-        title: $('#menu #title'),
-        play: $('#menu #options #play'),
-        instructions: $('#menu #options #instructions'),
-        status: $('#menu #options #status'),
-        credits: $('#menu #options #credits')
-    };
-    
-    Transition.dom = {
-        parent: $('#game'),
-        self: $('#game #transition'),
-        title: $('#game #transition #title'),
-        msg1: $('#game #transition #msg1'),
-        msg2: $('#game #transition #msg2'),
-        play: $('#game #transition #play'),
-        playWrapper: $('#game #transition #playWrapper'),
-        back: $('#game #transition #back'),
-        stars: $('#game #transition #stars'),
-        special: $('#game #transition #specialMsg'),
-        specialWrapper: $('#game #transition #specialMsgWrapper'),
-        trophy: $('#game #transition #trophyWrapper')
-    };
-    
-    Mazes.dom = {
-        self: $('#game'),
-        target: $('#game #mazes #maze'),
-        mapTarget: $('#game #mazes #mazemap'),
-        levelInfo: $('#game #levelInfo')
-    };
-    
-    Card.dom = $("#card");
-    Timer.dom = $('#timerInfo');
-    
     // Load properties
     $.getJSON('conf/properties.json').done(function (json) {
         
@@ -100,8 +59,11 @@ function init() {
         
         maxLevel = json['maxLevel'];
         mapHighlightProps = json['mapHighlightProps'];
+        levelColors = json['levelColors'];
         imageFilesPath = json['imageFilesPath'];
         Timer.color = json['timerColor'];
+        
+        adOptions = json['adOptions'];
         
         widthScale = json['imageWidth'] / windowWidth;
         heightScale = json['imageHeight'] / windowHeight;
@@ -117,27 +79,34 @@ function init() {
         
         console.log('Starting properties loaded callback...');
         
+        // Init menu module
+        Menu.init();
+        
         // Reads user's current level from storage
         retrievePlayerLevel();
-        
-        // Load main menu
-        Menu.configure();
 
-        // Load transition screen
-        Transition.configure();
+        // Init transition module
+        Transition.init();
         
-        // Configure some card properties
-        Card.configure();
+        // Init maze module
+        Maze.init();
+        
+        // Init card module
+        Card.init();
+        
+        // Init timer module
+        Timer.init();
         
         // When pressing BACK button
         document.addEventListener("backbutton", onBackButtonPress, false);
         
-        // Hide splashscreen
+        // Hide splashscreen after 1s
         setTimeout(function() {
-            //navigator.splashscreen.hide();
+            navigator.splashscreen.hide();
         }, 1000);
         
-        loadAds();                   
+        // Init ads module
+        Ads.init();  
       });
     
     console.log('Init method reached its end');
@@ -148,6 +117,20 @@ function init() {
 var Menu = {
     
     dom: null,
+    
+    init: function() {
+        
+        this.dom = {
+            self: $('#menu'),
+            title: $('#menu #title'),
+            play: $('#menu #options #play'),
+            instructions: $('#menu #options #instructions'),
+            status: $('#menu #options #status'),
+            credits: $('#menu #options #credits')
+        };
+        
+        this.configure();
+    },
     
     configure: function() {
     
@@ -167,18 +150,18 @@ var Menu = {
                     Transition.updateText(STATUS.NEW);
             
                 // Slowly cards
-                Mazes.dom.self.fadeIn("fast");
+                Maze.dom.self.fadeIn("fast");
             
                 // Load "first" level
-                Mazes.loadLevel();
+                Maze.loadLevel();
             
                 // Resets timer - ready to play!
                 Timer.resetTimer(); 
             
                 // Position correctly level indicator
-                Mazes.dom.levelInfo.html(level);
-                Mazes.dom.levelInfo.css('top', 
-                                (windowHeight/2 - Mazes.dom.levelInfo.height()/2) + 'px');
+                Maze.dom.levelInfo.html(level);
+                Maze.dom.levelInfo.css('top', 
+                                (windowHeight/2 - Maze.dom.levelInfo.height()/2) + 'px');
             });
 
         }).html(messages['menu.new']);
@@ -248,6 +231,25 @@ var Menu = {
 var Transition = {
     
     dom: null,
+    
+    init: function() {
+    
+        this.dom = {
+            self: $('#game #transition'),
+            title: $('#game #transition #title'),
+            msg1: $('#game #transition #msg1'),
+            msg2: $('#game #transition #msg2'),
+            play: $('#game #transition #play'),
+            playWrapper: $('#game #transition #playWrapper'),
+            back: $('#game #transition #back'),
+            stars: $('#game #transition #stars'),
+            special: $('#game #transition #specialMsg'),
+            specialWrapper: $('#game #transition #specialMsgWrapper'),
+            trophy: $('#game #transition #trophyWrapper')
+        };
+        
+        this.configure();
+    },
     
     configure: function() {
     
@@ -351,7 +353,7 @@ var Transition = {
         }
         
         // Realy paints background
-        this.dom.parent.css('background-color', bg);
+        Maze.dom.self.css('background-color', bg);
     },
     
     calculateBgColor: function(specificLevel) {
@@ -360,7 +362,7 @@ var Transition = {
         
         specificLevel = specificLevel == undefined ? level : specificLevel;
         
-        var base = BASE_COLORS[Math.floor(specificLevel/10)],
+        var base = levelColors[Math.floor(specificLevel/10)],
             relativeOffset = (specificLevel%10) * base.offset,
             opacity = 0.8;
         
@@ -410,8 +412,20 @@ var Transition = {
     }
 };
 
-var Mazes = {
+var Maze = {
+    
     dom: null,
+    
+    init: function() {
+        
+        // Link to DOM nodes
+        this.dom = {
+            self: $('#game'),
+            target: $('#game #mazes #maze'),
+            mapTarget: $('#game #mazes #mazemap'),
+            levelInfo: $('#game #levelInfo')
+        };
+    },
     
     loadLevel: function() {
     
@@ -491,10 +505,10 @@ var Mazes = {
         setTimeout(function() {
 
             // Clear green painting
-            Mazes.dom.mapTarget.find('area').trigger('cleanAll');
+            Maze.dom.mapTarget.find('area').trigger('cleanAll');
 
             // Clear level number during transition
-            Mazes.dom.levelInfo.hide();
+            Maze.dom.levelInfo.hide();
 
             // Flips to next level (already preloaded)
             Card.flip();
@@ -528,7 +542,7 @@ var Mazes = {
         setTimeout(function() {
 
             // Clear level number during transition
-            Mazes.dom.levelInfo.hide();
+            Maze.dom.levelInfo.hide();
 
             // Flips to next level (already preloaded)
             Card.flip();
@@ -545,9 +559,6 @@ var Mazes = {
 
         // You Win when flip ends!
         Card.status = STATUS.WIN;
-        
-        // Loooong flip :)
-        Card.timeToFlip = 2000;
 
         // Menu is now different
         Menu.configureWinner();
@@ -556,10 +567,10 @@ var Mazes = {
         setTimeout(function() {
 
             // Clear green painting
-            Mazes.dom.mapTarget.find('area').trigger('cleanAll');
+            Maze.dom.mapTarget.find('area').trigger('cleanAll');
 
             // Clear level number during transition
-            Mazes.dom.levelInfo.hide();
+            Maze.dom.levelInfo.hide();
 
             // Flips to next level (already preloaded)
             Card.dom.flip('toggle');
@@ -572,14 +583,14 @@ var Mazes = {
         console.log('Binding maze click events...');
 
         // Click on correct position: win
-        Mazes.dom.mapTarget.find('area').bind('click', function (event) {
-            Mazes.winLevel();
+        Maze.dom.mapTarget.find('area').bind('click', function (event) {
+            Maze.winLevel();
         }); 
 
         // Click anywhere else: lose
         Card.dom.bind('click', function(event) { 
             if(event.target.nodeName != 'AREA')
-                Mazes.loseLevel();
+                Maze.loseLevel();
         });   
     },
         
@@ -595,13 +606,20 @@ var Mazes = {
 var Card = {
 
     dom: null,
-    timeToFlip: 700,
-    status: STATUS.NEW,
+    status: null,
+    
+    init: function() {
+        
+        this.dom = $("#card");
+        this.status = STATUS.NEW;
+        
+        this.configure();
+    },
     
     configure: function() {
     
         // Set up flip to work manually
-        this.dom.flip({trigger: 'manual', speed: Card.timeToFlip});
+        this.dom.flip({trigger: 'manual', speed: 700});
         
         // When flip is done - callback
         this.dom.on('flip:done', this.flipDoneCallback);
@@ -620,20 +638,39 @@ var Card = {
             case STATUS.NEW:
 
                 // Let's start game for real!
-                Mazes.startLevel();
+                Maze.startLevel();
+                
+                // Hide ad when playing
+                Ads.hideBanner();
 
                 Card.status = STATUS.NEXT;
             break;
 
             // If its moving from maze to transition
             case STATUS.NEXT:
-            case STATUS.LOSE:
-
+                
+                // Shows banner that was hidden
+                Ads.showBanner();
+                
                 // Load next level
-                Mazes.loadLevel();
+                Maze.loadLevel();
                 
                 // Change bg color from RED to level 1 color
-                Mazes.dom.self.css('background-color', Transition.calculateBgColor());
+                Maze.dom.self.css('background-color', Transition.calculateBgColor());
+
+                Card.status = STATUS.NEW;   
+            break;
+                
+            case STATUS.LOSE:
+                
+                // Show BIG ad
+                Ads.showInterstitial();
+
+                // Load next level
+                Maze.loadLevel();
+                
+                // Change bg color from RED to level 1 color
+                Maze.dom.self.css('background-color', Transition.calculateBgColor());
 
                 Card.status = STATUS.NEW;
             break;
@@ -656,6 +693,11 @@ var Timer = {
     color: 'null',
     secondsPassed: 0,
     secondsIntervalRef: null,
+    
+    init: function() {
+        this.dom = $('#timerInfo');
+        this.secondsPassed = 0;
+    },
     
     startTimer: function() {
 
@@ -684,7 +726,7 @@ var Timer = {
                 console.log('Timer animation ended: {0} seconds passed'.format(seconds));
 
                 Timer.dom.css('background-color', 'red');
-                Mazes.loseLevel();
+                Maze.loseLevel();
             });    
     },
     
@@ -707,6 +749,37 @@ var Timer = {
         // Turn off callback when animation is completed (not needed when reseting)
         this.dom.off('transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd');
     }
+};
+
+var Ads = {
+
+    init: function() {
+        
+        if(window.AdMob) {
+            AdMob.setOptions(adOptions);
+
+            AdMob.createBanner({position: AdMob.AD_POSITION.BOTTOM_CENTER});
+            AdMob.prepareInterstitial();
+            
+            this.showBanner();
+        }
+    },
+    
+    showBanner: function() {
+        if(window.AdMob)
+             AdMob.showBanner();
+    },
+    
+    hideBanner: function() {
+        if(window.AdMob)
+            AdMob.showBanner();
+    },
+    
+    showInterstitial: function() {
+        if(window.AdMob)
+            AdMob.showInterstitial();
+    }
+
 };
 
 // ****** Some util functions ******
@@ -758,47 +831,17 @@ function onBackButtonPress() {
     if(Card.status == STATUS.NEXT || Card.status == STATUS.LOSE)
         return;
     
-    if (Mazes.dom.self.is(':visible')) {
-        Mazes.dom.self.fadeOut("fast", function() {
+    if (Maze.dom.self.is(':visible')) {
+        Maze.dom.self.fadeOut("fast", function() {
 
             // Check if change New game to Continue
             if(level > 1 && level <= maxLevel)
                 Menu.dom.play.html(messages['menu.continue']);
+            
+            Ads.showBanner();
 
             Menu.dom.self.fadeIn("fast");
         });
     } else 
         navigator.app.exitApp(); 
-}
-function loadAds() {
-
-    var isAndroid = (/(android)/i.test(navigator.userAgent));
-    var adPublisherIds = {
-      ios : {
-        banner: 'ca-app-pub-9863325511078756/5232547029',
-        interstitial: 'ca-app-pub-9863325511078756/6709280228'
-      },
-      android : {
-        banner: 'ca-app-pub-2813072672105928/4159360894',
-        interstitial: 'ca-app-pub-2813072672105928/2543026891'
-      }
-    };
-
-    var admobid;
-    if (isAndroid) {
-      admobid = adPublisherIds.android;
-    } else {
-      admobid = adPublisherIds.ios;
-    }
-
-    admob.setOptions({
-      publisherId: admobid.banner,
-      interstitialAdId: admobid.interstitial,
-      bannerAtTop: false,
-      overlap: false, 
-      offsetStatusBar: true, 
-      isTesting: true,
-      autoShowBanner: true,
-      autoShowInterstitial: false
-    });
 }

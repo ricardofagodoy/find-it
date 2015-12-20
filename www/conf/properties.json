@@ -11,7 +11,22 @@
 	                        "strokeOpacity": 1,
 	                        "strokeWidth": 2
     },
-    
+    "adOptions": {
+        "bannerId": "ca-app-pub-2813072672105928/4159360894",
+        "interstitialId": "ca-app-pub-2813072672105928/2543026891",
+        "autoShow": false,
+        "adSize": "SMART_BANNER",
+        "overlap": true, 
+        "isTesting": true
+    },
+    "levelColors": [
+        {"r": 255, "g":  90, "b": 0,   "offset": 16},
+        {"r": 255, "g": 255, "b": 0,   "offset": 25},
+        {"r":  0,  "g": 255, "b": 0,   "offset": 25},
+        {"r":  0,  "g":   0, "b": 255, "offset": 25},
+        {"r": 255, "g":   0, "b": 255, "offset": 25},
+        {"r": 255, "g": 255, "b": 255, "offset": 25}
+    ],
     "messages": {
         "error.fatal": "Fatal error: ",
         
