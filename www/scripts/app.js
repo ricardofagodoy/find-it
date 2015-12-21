@@ -22,16 +22,11 @@ var STATUS = { NEW: 'new', RESUME: 'resume', NEXT: 'next', LOSE: 'lose', WIN: 'w
 var propertiesDeffered = $.Deferred(),
     windowWidth = 0,
     windowHeight = 0,
-    imageFilesPath = '',
-    widthScale = 0,
-    heightScale = 0,
-    maxLevel = 0,
-    messages = {},
+    properties = undefined,
+    messages = null,
     levels = {},
-    mapHighlightProps = {},
-    levelColors = [],
-    adOptions = {},
-    level = 1;
+    level = 1,
+    levelIndex = 1; // Under each level, there are maxLevelIndex different mazes
     
 function init() {
 
@@ -54,19 +49,15 @@ function init() {
         
         console.log('Properties loaded: {0}'.format(JSON.stringify(json)));
         
+        properties = json;
+        
         messages = json['messages'];
         levels = json['levels'];
         
-        maxLevel = json['maxLevel'];
-        mapHighlightProps = json['mapHighlightProps'];
-        levelColors = json['levelColors'];
-        imageFilesPath = json['imageFilesPath'];
         Timer.color = json['timerColor'];
         
-        adOptions = json['adOptions'];
-        
-        widthScale = json['imageWidth'] / windowWidth;
-        heightScale = json['imageHeight'] / windowHeight;
+        properties['widthScale'] = json['imageWidth'] / windowWidth;
+        properties['heightScale'] = json['imageHeight'] / windowHeight;
         
         propertiesDeffered.resolve();
         
@@ -79,14 +70,12 @@ function init() {
         
         console.log('Starting properties loaded callback...');
     
-        // Init menu module (needed to retrieve level)
-        Menu.init();
-        
         // Reads user's current level from storage
-        retrievePlayerLevel();
+        Persistence.retrievePlayerLevel();
         
-        Menu.configure();
-        
+        // Init menu module
+        Menu.init();
+    
         // Init transition module
         Transition.init();
         
@@ -130,6 +119,8 @@ var Menu = {
             status: $('#menu #options #status'),
             credits: $('#menu #options #credits')
         };
+        
+        this.configure();
     },
     
     configure: function() {
@@ -168,13 +159,16 @@ var Menu = {
     
         // Paints status in white
         this.dom.status.css('color', '#000');
+        
+        // Update status message accoring to current level
+        this.updateStatusMessage();
 
         // If menu's option is NEW GAME or CONTINUE
         if(level > 1)
             this.dom.play.html(messages['menu.continue']);
     
         // If he's already won, different layout
-        if(level > maxLevel)
+        if(level > properties.maxLevel)
             this.configureWinner();
     
         console.log('Main Menu loaded!');
@@ -200,7 +194,7 @@ var Menu = {
 
         // If accepts, resets and closes
         resetConfirmation.find('#yes').off('click').on('click', function(event) {
-            resetGame();
+            Maze.resetGame();
             resetConfirmation.hide();
         });
         
@@ -219,7 +213,7 @@ var Menu = {
     
         var message = '';
 
-        if(level > maxLevel)
+        if(level > properties.maxLevel)
             message = messages['menu.status.win'];  
         else
             message = messages['menu.status'].format(level);
@@ -362,7 +356,7 @@ var Transition = {
         
         specificLevel = specificLevel == undefined ? level : specificLevel;
         
-        var base = levelColors[Math.floor(specificLevel/10)],
+        var base = properties.levelColors[Math.floor(specificLevel/10)],
             relativeOffset = (specificLevel%10) * base.offset,
             opacity = 0.8;
         
@@ -431,7 +425,9 @@ var Maze = {
     
         console.log('Starting to load level {0}...'.format(level));
     
-        var levelProps = levels[level-1];
+        var levelProps = levels[level-1],  // Array stars on 0
+            levelIndex = Persistence.retrieveLevelIndex(),
+            fileName = properties.imageFilesPath.format(level, levelIndex);
     
         // If level does not exist (error)
         if(levelProps == undefined) {
@@ -439,27 +435,30 @@ var Maze = {
             return;
         }
     
-        console.log('About to load {0}...'.format(imageFilesPath.format(level)));
+        console.log('About to load {0}...'.format(fileName));
     
         // Load image from file
-        this.dom.target.attr('src', imageFilesPath.format(level));
+        this.dom.target.attr('src', fileName);
 
         // Fits image to use all screen size
         this.dom.target.width(windowWidth).height(windowHeight);
     
         // Remove previous area
         this.dom.mapTarget.find('area').remove();
+        
+        var widthScale = properties.widthScale,
+            heightScale = properties.heightScale;
     
         // Position to correct click
         var area = $('<area>', {
             shape: 'poly',
-            coords: levelProps.coords.map(function(value, index) {
+            coords: levelProps.coords[levelIndex-1].map(function(value, index) {
                 return Math.floor(index%2 ? value/heightScale : value/widthScale);
             }).join(', ')
         }).appendTo(this.dom.mapTarget);
     
         // Initialize jquery maphilight to current maze
-        this.dom.target.maphilight(mapHighlightProps);
+        this.dom.target.maphilight(properties.mapHighlightProps);
     
         console.log('Level {0} loaded with success!'.format(level));
     },
@@ -477,6 +476,9 @@ var Maze = {
 
         // Start timer for current level
         Timer.startTimer();
+        
+        // User has already seen this level now, next time is different!
+        Persistence.updateLevelIndex();
     },
     
     winLevel: function() {
@@ -490,10 +492,10 @@ var Maze = {
         Timer.resetTimer();
 
         // Advances level (no params adds 1)    
-        updateLevel();
+        Persistence.updateLevel();
 
         // Win the game!
-        if(level > maxLevel) {
+        if(level > properties.maxLevel) {
             this.gameOver();
             return;
         }
@@ -530,14 +532,19 @@ var Maze = {
         Timer.resetTimer();
         
         // Goes to back to level 1
-        resetGame();
+        Maze.resetGame();
 
         // You lose message prepared
         Transition.updateText(STATUS.LOSE);
 
         // You lose when flip ends!
         Card.status = STATUS.LOSE;
-
+        
+        // Show BIG ad after 1s of losing
+        setTimeout(function() {
+            Ads.showInterstitial();
+        }, 1000);
+            
         // Wait until flip
         setTimeout(function() {
 
@@ -560,9 +567,6 @@ var Maze = {
         // You Win when flip ends!
         Card.status = STATUS.WIN;
 
-        // Menu is now different
-        Menu.configureWinner();
-
         // Wait until flip
         setTimeout(function() {
 
@@ -576,6 +580,20 @@ var Maze = {
             Card.dom.flip('toggle');
 
         }, 2000); 
+    },
+    
+    resetGame: function() {
+
+        console.log('Reseting game to level 1...');
+
+        // Resets level 1, actually
+        Persistence.updateLevel(1);
+    
+        // Setup Menu to original state
+        Menu.configure();
+
+        // Setup Transition to original state
+        Transition.configure();
     },
     
     addMazeEvents: function() {
@@ -619,7 +637,7 @@ var Card = {
     configure: function() {
     
         // Set up flip to work manually
-        this.dom.flip({trigger: 'manual', speed: 700});
+        this.dom.flip({trigger: 'manual', speed: 500});
         
         // When flip is done - callback
         this.dom.on('flip:done', this.flipDoneCallback);
@@ -663,9 +681,6 @@ var Card = {
                 
             case STATUS.LOSE:
                 
-                // Show BIG ad
-                Ads.showInterstitial();
-
                 // Load next level
                 Maze.loadLevel();
                 
@@ -677,7 +692,13 @@ var Card = {
 
             case STATUS.WIN: 
                 // Show BIG ad
-                Ads.showInterstitial();   
+                Ads.showInterstitial();  
+                
+                // Menu is now different
+                Menu.configureWinner();
+                
+                // Reset all indexes to all levels
+                Persistence.resetLevelIndexes();
             break;
         }
     },
@@ -760,7 +781,7 @@ var Ads = {
         
         if(window.AdMob) {
             
-            AdMob.setOptions(adOptions);
+            AdMob.setOptions(properties.adOptions);
  
             AdMob.prepareInterstitial();
             this.showBanner();
@@ -770,7 +791,7 @@ var Ads = {
     showBanner: function() {
         if(window.AdMob && !this.bannerVisible) {
            AdMob.createBanner({
-                adId : adOptions.bannerId,
+                adId : properties.adOptions.bannerId,
                 position : AdMob.AD_POSITION.BOTTOM_CENTER,
                 autoShow : true,
                overlap: true
@@ -793,48 +814,80 @@ var Ads = {
     }
 };
 
-// ****** Some util functions ******
-
-function updateLevel(newLevel) {
+var Persistence = {
     
-    console.log('Updating level {0} to {1}'.format
-                (level, newLevel ? newLevel : level+1));
-    
-    level = newLevel ? newLevel : level + 1;
-    
-    console.log('Saving level {0} to local storage...'.format(level));
-    
-    localStorage.setItem('level', level);
-    
-    // Update status message regarding new level
-    Menu.updateStatusMessage();
-}
-function retrievePlayerLevel() {
-
-    console.log('Retrieving level from local storage...');
-
-    var storedLevel = localStorage.getItem('level');
+    retrieveLevelIndex: function() {
         
-    if(storedLevel === null || storedLevel.length === 0)
-        storedLevel = 1;
+        console.log('Retrieving level index from local storage to level {0}...'.
+                    format(level));
         
-    updateLevel(parseInt(storedLevel)); 
+        var storedLevelIndex = localStorage.getItem(level);
+        
+        if(storedLevelIndex === null || storedLevelIndex.length === 0 
+           || storedLevelIndex > properties.maxLevelIndex)
+            storedLevelIndex = 1;
+        
+        levelIndex = storedLevelIndex;
+        
+        console.log('Retrieved level index {0} from local storage to level {1}.'.
+                    format(storedLevelIndex, level));
+        
+        return storedLevelIndex;
+    },
     
-    console.log('Retrieved level {0} from local storage.'.format(level));
-}
-function resetGame() {
+    updateLevelIndex: function() {
+        
+        console.log('Updating level index from level {0}...'.format(level));
+        
+        // Goes from 1 to max, then becomes 1 again...
+        levelIndex = (levelIndex % properties.maxLevelIndex) + 1;
+        
+        localStorage.setItem(level, levelIndex);
+        
+        console.log('Saving level index {0} to level {1}...'.format(levelIndex, level));
+    },
+    
+    resetLevelIndexes: function() {
+        
+        console.log('Reseting all level indexes to all {0} levels...'
+                    .format(properties.maxLevel));
+        
+        for(i = 1; i <= properties.maxLevel; i++) {
+             localStorage.setItem(i, 1);
+            console.log('Level {0} ... Index: {0}'.format(i, 1));
+        }
+        
+        console.log('All indexes reseted!');
+    },
 
-    console.log('Reseting game to level 1...');
-        
-    // Resets level 1, actually
-    updateLevel(1);
+    updateLevel: function(newLevel) {
     
-    // Setup Menu to original state
-    Menu.configure();
+        console.log('Updating level {0} to {1}'.format
+                    (level, newLevel ? newLevel : level+1));
+
+        // Default is add 1 to level
+        level = newLevel ? newLevel : level + 1;
+
+        console.log('Saving level {0} to local storage...'.format(level));
+
+        localStorage.setItem('level', level);
+    },
     
-    // Setup Transition to original state
-    Transition.configure();
-}
+    retrievePlayerLevel: function() {
+
+        console.log('Retrieving level from local storage...');
+
+        var storedLevel = localStorage.getItem('level');
+
+        if(storedLevel === null || storedLevel.length === 0)
+            storedLevel = 1;
+
+        this.updateLevel(parseInt(storedLevel)); 
+
+        console.log('Retrieved level {0} from local storage.'.format(level));
+    }
+};
+
 function onBackButtonPress() {
     
     console.log('Pressed back button');
@@ -846,8 +899,11 @@ function onBackButtonPress() {
         Maze.dom.self.fadeOut("fast", function() {
 
             // Check if change New game to Continue
-            if(level > 1 && level <= maxLevel)
+            if(level > 1 && level <= properties.maxLevel)
                 Menu.dom.play.html(messages['menu.continue']);
+            
+            // Update status message regarding new level
+            Menu.updateStatusMessage();
 
             Menu.dom.self.fadeIn("fast");
             
