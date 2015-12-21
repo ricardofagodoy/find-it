@@ -117,13 +117,29 @@ var Menu = {
             play: $('#menu #options #play'),
             instructions: $('#menu #options #instructions'),
             status: $('#menu #options #status'),
-            credits: $('#menu #options #credits')
+            credits: $('#menu #options #credits'),
+            creditsScreen: $('#credits')
         };
         
-        this.configure();
+        // If menu's option is NEW GAME or CONTINUE
+        if(level > 1)
+            this.dom.play.html(messages['menu.continue']);
+    
+        // If he's already won, different layout
+        if(level > properties.maxLevel)
+            this.configureWinner();
+        else
+            this.configureOriginal();
+        
+        // Click on credits
+        this.dom.credits.off('click').on('click', function(event) {
+            Menu.dom.self.fadeOut("fast", function() {
+                Maze.dom.creditsScreen.fadeIn("fast");
+            });
+        });
     },
     
-    configure: function() {
+    configureOriginal: function() {
     
         console.log('Loading original main menu...');
         
@@ -156,21 +172,13 @@ var Menu = {
             });
 
         }).html(messages['menu.new']);
-    
+        
         // Paints status in white
         this.dom.status.css('color', '#000');
         
         // Update status message accoring to current level
         this.updateStatusMessage();
-
-        // If menu's option is NEW GAME or CONTINUE
-        if(level > 1)
-            this.dom.play.html(messages['menu.continue']);
-    
-        // If he's already won, different layout
-        if(level > properties.maxLevel)
-            this.configureWinner();
-    
+        
         console.log('Main Menu loaded!');
     },
     
@@ -590,7 +598,7 @@ var Maze = {
         Persistence.updateLevel(1);
     
         // Setup Menu to original state
-        Menu.configure();
+        Menu.configureOriginal();
 
         // Setup Transition to original state
         Transition.configure();

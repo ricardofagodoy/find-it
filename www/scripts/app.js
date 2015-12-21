@@ -117,13 +117,34 @@ var Menu = {
             play: $('#menu #options #play'),
             instructions: $('#menu #options #instructions'),
             status: $('#menu #options #status'),
-            credits: $('#menu #options #credits')
+            credits: $('#menu #options #credits'),
+            creditsScreen: $('#creditsScreen'),
+            creditsScreenBack: $('#creditsScreen #thanks')
         };
         
-        this.configure();
+        // If he's already won, different layout
+        if(level > properties.maxLevel)
+            this.configureWinner();
+        else
+            this.configureOriginal();
+        
+        // If menu's option is NEW GAME or CONTINUE
+        if(level > 1 && level <= properties.maxLevel)
+            this.dom.play.html(messages['menu.continue']);
+        
+        // Click on credits
+        this.dom.credits.off('click').on('click', function(event) {
+            Menu.dom.self.fadeOut("fast", function() {
+                Menu.dom.creditsScreen.fadeIn("fast");
+            });
+        });
+        
+        this.dom.creditsScreenBack.off('click').on('click', function(event) {
+            onBackButtonPress();
+        });
     },
     
-    configure: function() {
+    configureOriginal: function() {
     
         console.log('Loading original main menu...');
         
@@ -156,21 +177,13 @@ var Menu = {
             });
 
         }).html(messages['menu.new']);
-    
+        
         // Paints status in white
         this.dom.status.css('color', '#000');
         
         // Update status message accoring to current level
         this.updateStatusMessage();
-
-        // If menu's option is NEW GAME or CONTINUE
-        if(level > 1)
-            this.dom.play.html(messages['menu.continue']);
-    
-        // If he's already won, different layout
-        if(level > properties.maxLevel)
-            this.configureWinner();
-    
+        
         console.log('Main Menu loaded!');
     },
     
@@ -590,7 +603,7 @@ var Maze = {
         Persistence.updateLevel(1);
     
         // Setup Menu to original state
-        Menu.configure();
+        Menu.configureOriginal();
 
         // Setup Transition to original state
         Transition.configure();
@@ -895,7 +908,13 @@ function onBackButtonPress() {
     if(Card.status == STATUS.NEXT || Card.status == STATUS.LOSE)
         return;
     
-    if (Maze.dom.self.is(':visible')) {
+    if (Menu.dom.creditsScreen.is(':visible')) {
+        
+        Menu.dom.creditsScreen.fadeOut("fast", function() {
+            Menu.dom.self.fadeIn("fast");
+        });
+        
+    } else if (Maze.dom.self.is(':visible')) {
         Maze.dom.self.fadeOut("fast", function() {
 
             // Check if change New game to Continue

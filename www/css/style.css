@@ -84,8 +84,9 @@ html, body{
 
 #transition #options div {
     display: inline-block;
-    width: 100%;
-    height: 10%;
+    width: 90%;
+    min-height: 6%;
+    padding: 3% 0 3% 0;
     font-size: 1rem;
 }
 
@@ -114,12 +115,14 @@ html, body{
 
 #transition #options #playWrapper {
     height: 8%;
-    margin-top: 5%;
+    margin-top: 4%;
+    padding: 0;
 }
 
 #transition #options #backWrapper {
     height: 8%;
-    margin-top: 6%;
+    margin-top: 5%;
+    padding: 0;
 }
 
 #transition #options #play,  #transition #options #back{
@@ -186,6 +189,50 @@ html, body{
     width: 100%;
     height: 100%;
     transform: translate3d(0px,0px,0px);
+}
+
+/***** CREDITS SCREEN *****/
+
+#creditsScreen {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-image: url("../images/bg.jpg");
+    color: #000;
+    font-size: 0.7rem;
+}
+
+#creditsScreen div {
+    display: block;
+    padding: 2% 5% 2% 5%;
+    min-height: 6%;
+}
+
+#creditsScreen #title {
+    font-size: 1.8rem;
+    margin-top: 10%;
+    margin-bottom: 5%;
+    max-height: 20%;
+}
+
+#creditsScreen #subtitle {
+    font-size: 1.2rem;
+    max-height: 10%;
+}
+
+#creditsScreen #normaltext {
+    font-style: italic;
+    max-height: 5%;
+}
+
+#creditsScreen #thanks {
+    width: 70%;
+    font-size: 1rem;
+    margin: 1% auto 0 auto;
+    border: 2px double #000;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 5px 5px 5px 5px;
+    -webkit-border-radius: 5px 5px 5px 5px;
 }
 
 /*** LEVEL INFORMATION STYLE ***/
