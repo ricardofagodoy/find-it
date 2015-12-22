@@ -58,7 +58,7 @@
         "transition.lose.special": "DON'T GIVE UP!",
         "transition.lose.bg": "rgba(230, 20, 20, 1)",
         
-        "menu.status": "Next: Level {0}",
+        "menu.status": "Next level: {0}",
         "menu.status.win": "YOU WIN 'EM ALL",
         
         "menu.new": "New Game",

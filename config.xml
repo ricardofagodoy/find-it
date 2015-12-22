@@ -13,7 +13,7 @@
     <icon src="icon.png" />
     
     <preference name="Orientation" value="portrait" />
-    <preference name="SplashScreen" value="icon" />
+    <preference name="SplashScreen" value="splash" />
     <preference name="AutoHideSplashScreen" value="false" />
 
     <preference name="android-build-tool" value="gradle" /> 

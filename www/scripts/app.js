@@ -119,7 +119,8 @@ var Menu = {
             status: $('#menu #options #status'),
             credits: $('#menu #options #credits'),
             creditsScreen: $('#creditsScreen'),
-            creditsScreenBack: $('#creditsScreen #thanks')
+            creditsScreenBack: $('#creditsScreen #thanks'),
+            instructionScreen: $('#instructionScreen')
         };
         
         // If he's already won, different layout
@@ -141,6 +142,17 @@ var Menu = {
         
         this.dom.creditsScreenBack.off('click').on('click', function(event) {
             onBackButtonPress();
+        });
+        
+        // TODO: finish this feature
+        this.dom.instructions.off('click').on('click', function(event) {
+            Menu.dom.self.fadeOut("fast", function() {
+                Menu.dom.instructionScreen.fadeIn("fast");
+                
+                setTimeout(function() {
+                    Menu.dom.instructionScreen.find('#pointer').addClass('pointerAction');
+                }, 1000);
+            });
         });
     },
     

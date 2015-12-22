@@ -57,6 +57,13 @@ html, body{
     -webkit-border-radius: 5px 5px 5px 5px;
 }
 
+#menu #options #status {
+    border: 2px double #000;
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 0px 0px 0px 0px;
+    -webkit-border-radius: 0px 0px 0px 0px;
+}
+
 /*** TRANSITION STYLES ***/
 
 #transition {
@@ -233,6 +240,43 @@ html, body{
     background-color: rgba(0, 0, 0, 0.2);
     border-radius: 5px 5px 5px 5px;
     -webkit-border-radius: 5px 5px 5px 5px;
+}
+
+/*** INSTRUCTION SCREEN ****/
+
+#instructionScreen {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-image: url("../images/instructions1.png");
+    background-size: cover; 
+}
+
+#instructionScreen #textual {
+    position: absolute;
+    margin: 0 auto;
+    font-size: 1rem;
+    color: yellow;
+    padding: 10% 5%;
+    line-height: 200%;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+#instructionScreen #pointer {
+    position: absolute;
+    top: 200px;
+    left: 100px;
+    background-image: url("../images/handpointer.png");
+    width: 30%;
+    height: 20%;
+    background-size: cover; 
+    -webkit-transition: 2s ease-in-out;
+    transition: 2s ease-in-out;
+}
+
+.pointerAction {
+    transform: translate(-100px, -200px);
 }
 
 /*** LEVEL INFORMATION STYLE ***/
