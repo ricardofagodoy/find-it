@@ -20,6 +20,7 @@
     
     
     <plugin name="cordova-plugin-admobpro" source="npm" />
+    <plugin name="org.apache.cordova.media" />
 
     <platform name="android">
         <allow-intent href="market:*" />

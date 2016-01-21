@@ -73,6 +73,9 @@ function init() {
         // Reads user's current level from storage
         Persistence.retrievePlayerLevel();
         
+        // Init sounds modules
+        Sound.init();
+        
         // Init menu module
         Menu.init();
     
@@ -96,8 +99,12 @@ function init() {
             navigator.splashscreen.hide();
         }, 1000);
         
+        // Start playing loaded sound
+        Sound.playMenu();
+        
         // Init ads module
         Ads.init();  
+        
       });
     
     console.log('Init method reached its end');
@@ -144,16 +151,17 @@ var Menu = {
             onBackButtonPress();
         });
         
-        // TODO: finish this feature
+        // Instructions
         this.dom.instructions.off('click').on('click', function(event) {
+            
+            // Write first instruction message
+            Menu.dom.instructionScreen.find('#textual').
+                        html(messages['instructions.default']);
+            
             Menu.dom.self.fadeOut("fast", function() {
-                Menu.dom.instructionScreen.fadeIn("fast");
-                
-                setTimeout(function() {
-                    Menu.dom.instructionScreen.find('#pointer').addClass('pointerAction');
-                }, 1000);
+                Menu.showInstructions();
             });
-        });
+        });   
     },
     
     configureOriginal: function() {
@@ -223,6 +231,9 @@ var Menu = {
             resetConfirmation.hide();
         });
         
+        // Win them all
+        this.updateStatusMessage();
+        
         // Click on Reset button
         this.dom.play.off('click').on('click', function(event) {  
 
@@ -244,7 +255,76 @@ var Menu = {
             message = messages['menu.status'].format(level);
 
         this.dom.status.html(message);
-    } 
+    },
+    
+    showInstructions: function() {
+        
+        Menu.dom.instructionScreen.fadeIn("fast");
+                
+        var correctX = properties['instructionsCorrectX'] / properties.widthScale,
+            correctY = properties['instructionsCorrectY'] / properties.heightScale,
+            numberClick = 0,
+            instruction2 = new Image();
+        
+        instruction2.src = 'images/instructions2.png';
+                
+        // Clicks on screen to activate animation
+        Menu.dom.instructionScreen.find('#textual').off('click').on('click', function(event) {
+                
+           switch (numberClick) {
+                   
+                case 0:
+                   
+                   // Block until animation ends
+                   numberClick = 5;
+                   
+                    Menu.dom.instructionScreen.find('#pointer').animate({
+                        left: correctX,
+                        top: correctY
+                    }, 1000, "linear", function() {
+
+                        Menu.dom.instructionScreen.
+                            css('background-image', 'url("'+ instruction2.src +'")');
+
+                        Menu.dom.instructionScreen.find('#textual').
+                            html(messages['instructions.done1']);
+                        
+                        numberClick = 1;
+                    });
+                break;
+                   
+                case 1:
+                   Menu.dom.instructionScreen.find('#textual').
+                        html(messages['instructions.done2']);
+                break;
+                   
+                case 2:
+                   Menu.dom.instructionScreen.find('#textual').
+                        html(messages['instructions.done3']);
+                break;
+                   
+                case 3:
+                   Menu.dom.instructionScreen.fadeOut("fast", function() {
+                       
+                       Menu.dom.self.fadeIn("fast");
+                       
+                       Menu.dom.instructionScreen.find('#pointer').css({
+                           top: '10%',
+                           left: '65%'
+                       });
+                       
+                       Menu.dom.instructionScreen.find('#textual').
+                        html(messages['instructions.default']);
+                       
+                       Menu.dom.instructionScreen.
+                        css('background-image', 'url("images/instructions1.png")');
+                   });
+                break;
+            }
+            
+            numberClick++;
+        });                          
+    }
 };
 
 var Transition = {
@@ -518,6 +598,9 @@ var Maze = {
 
         // Advances level (no params adds 1)    
         Persistence.updateLevel();
+        
+        // Found the shape sound!
+        Sound.playEffect();
 
         // Win the game!
         if(level > properties.maxLevel) {
@@ -540,7 +623,7 @@ var Maze = {
             // Flips to next level (already preloaded)
             Card.flip();
 
-        }, 1000); 
+        }, 1500); 
     },
     
     loseLevel: function() { 
@@ -555,6 +638,10 @@ var Maze = {
 
         // Cleans and resets timer
         Timer.resetTimer();
+        
+        // Lose sound
+        Sound.switchEffectType('lose');
+        Sound.playEffect();
         
         // Goes to back to level 1
         Maze.resetGame();
@@ -591,6 +678,9 @@ var Maze = {
 
         // You Win when flip ends!
         Card.status = STATUS.WIN;
+        
+        Sound.switchEffectType('win');
+        Sound.playEffect();
 
         // Wait until flip
         setTimeout(function() {
@@ -604,7 +694,7 @@ var Maze = {
             // Flips to next level (already preloaded)
             Card.dom.flip('toggle');
 
-        }, 2000); 
+        }, 4000); 
     },
     
     resetGame: function() {
@@ -619,6 +709,9 @@ var Maze = {
 
         // Setup Transition to original state
         Transition.configure();
+        
+        // Set original effetc to correct
+        Sound.switchEffectType('correct');
     },
     
     addMazeEvents: function() {
@@ -682,6 +775,9 @@ var Card = {
                 
                 // No ad during maze
                 Ads.hideBanner();
+                
+                // Plays level sound already!
+                Sound.playLevel();
 
                 // Let's start game for real!
                 Maze.startLevel();
@@ -694,6 +790,9 @@ var Card = {
                 
                 // Load next level
                 Maze.loadLevel();
+                
+                // Back to menu sound
+                Sound.playMenu();
                 
                 // Change bg color from RED to level 1 color
                 Maze.dom.self.css('background-color', Transition.calculateBgColor());
@@ -709,6 +808,8 @@ var Card = {
                 // Load next level
                 Maze.loadLevel();
                 
+                Sound.playMenu();
+                
                 // Change bg color from RED to level 1 color
                 Maze.dom.self.css('background-color', Transition.calculateBgColor());
 
@@ -718,6 +819,8 @@ var Card = {
             case STATUS.WIN: 
                 // Show BIG ad
                 Ads.showInterstitial();  
+                
+                // TODO: WINNER SONG!!
                 
                 // Menu is now different
                 Menu.configureWinner();
@@ -839,6 +942,103 @@ var Ads = {
     }
 };
 
+var Sound = {
+
+    media: {
+        menu: null,
+        level: null,
+        effect: null,
+    },
+    
+    soundLevel: null,
+    
+    effectType: null,
+    
+    root: null,
+    
+    init: function() {
+        
+        var devicePath = window.location.pathname;
+        
+        this.root = devicePath.substring(0, devicePath.lastIndexOf('/')) + '/sounds/';
+        this.soundLevel = 0;
+        this.effectType = 'correct';
+        
+        // Load default sounds
+        this.loadAudio('menu', properties['sounds']['menu']);
+        this.loadAudio('level', properties.sounds['level'].format(this.soundLevel));
+        this.loadAudio('effect', properties.sounds[this.effectType]);
+        
+        console.log('Background sound loaded ok!');
+    },
+    
+    playMenu: function() {
+        
+        this.stopLevel();
+        this.stopEffect();
+        
+        if(this.media.menu != null)
+            this.media.menu.play();
+    },
+    
+    playLevel: function() {
+        
+        this.stopMenu();
+        this.stopEffect();
+        
+        if(this.media.level != null) {
+            
+            if(parseInt(level / 10) != this.soundLevel) {
+                this.soundLevel = parseInt(level / 10);
+                this.loadAudio('level', properties.sounds['level'].format(this.soundLevel));
+            }
+            
+            this.media.level.play();
+        }
+    },
+    
+    playEffect: function() {
+        
+        this.stopMenu();
+        this.stopLevel();
+        
+        if(this.media.effect != null)
+            this.media.effect.play();
+    },
+    
+    stopMenu: function() {
+        if(this.media.menu != null)
+             this.media.menu.stop();
+    },
+    
+    stopLevel: function() {
+        if(this.media.level != null)
+             this.media.level.stop();
+    },
+    
+    stopEffect: function() {
+        if(this.media.effect != null)
+             this.media.effect.stop();
+    },
+    
+    switchEffectType: function(type) {
+        this.effectType = type;
+        this.loadAudio('effect', properties.sounds[this.effectType]);
+    },
+    
+    loadAudio: function(media, audio) {
+        
+        //TODO: working for android only
+        if(window.device.platform === 'Android')
+            this.media[media] = new Media(this.root + audio,
+                function () { console.log("Audio Success"); },
+                function (err) { console.log("Audio Error: " + JSON.stringify(err)); }
+            );
+        
+        // this.media[media] = new Audio(this.root + audio);   
+    }
+};
+
 var Persistence = {
     
     retrieveLevelIndex: function() {
@@ -920,7 +1120,13 @@ function onBackButtonPress() {
     if(Card.status == STATUS.NEXT || Card.status == STATUS.LOSE)
         return;
     
-    if (Menu.dom.creditsScreen.is(':visible')) {
+    if (Menu.dom.instructionScreen.is(':visible')) {
+        
+        Menu.dom.instructionScreen.fadeOut("fast", function() {
+            Menu.dom.self.fadeIn("fast");
+        });
+        
+    } else if (Menu.dom.creditsScreen.is(':visible')) {
         
         Menu.dom.creditsScreen.fadeOut("fast", function() {
             Menu.dom.self.fadeIn("fast");
@@ -937,6 +1143,9 @@ function onBackButtonPress() {
             Menu.updateStatusMessage();
 
             Menu.dom.self.fadeIn("fast");
+            
+            // Music again
+            Sound.playMenu();
             
             // Show banner again (it's hidden from transition screen)
             Ads.showBanner();

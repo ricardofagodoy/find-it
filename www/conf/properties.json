@@ -12,10 +12,19 @@
 	                        "strokeOpacity": 1,
 	                        "strokeWidth": 2
     },
+    "instructionsCorrectX": 230,
+    "instructionsCorrectY": 280,
     "adOptions": {
         "bannerId": "ca-app-pub-2813072672105928/4159360894",
         "interstitialId": "ca-app-pub-2813072672105928/2543026891",
         "isTesting": true
+    },
+    "sounds": {
+        "menu": "menubg.mp3",
+        "level": "level{0}.wav",
+        "correct": "found.wav",
+        "win": "win.mp3",
+        "lose": "lose.wav"
     },
     "levelColors": [
         {"r": 255, "g":  90, "b": 0,   "offset": 16},
@@ -58,12 +67,18 @@
         "transition.lose.special": "DON'T GIVE UP!",
         "transition.lose.bg": "rgba(230, 20, 20, 1)",
         
+        "instructions.default": "Your goal is to find closed shape (all edges connected)",
+        "instructions.done1": "Like that! <br/>Looks pretty easy, doesn't it?",
+        "instructions.done2": "Things will get much more difficult, less time too",
+        "instructions.done3": "Well, you will figure that out!<br/>Good luck!!",
+        
         "menu.status": "Next level: {0}",
         "menu.status.win": "YOU WIN 'EM ALL",
         
         "menu.new": "New Game",
         "menu.continue": "Continue",
-        "menu.reset": "Reset"
+        "menu.reset": "Reset",
+        "menu.audio": "sounds/menubg.mp3"
     },
     
     "levels": [
