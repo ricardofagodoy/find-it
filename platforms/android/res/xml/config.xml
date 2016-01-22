@@ -16,6 +16,9 @@
     <feature name="Media">
         <param name="android-package" value="org.apache.cordova.media.AudioHandler" />
     </feature>
+    <feature name="Device">
+        <param name="android-package" value="org.apache.cordova.device.Device" />
+    </feature>
     <allow-intent href="market:*" />
     <preference name="android-minSdkVersion" value="15" />
     <preference name="android-targetSdkVersion" value="19" />

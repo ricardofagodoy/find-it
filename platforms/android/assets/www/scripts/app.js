@@ -104,7 +104,6 @@ function init() {
         
         // Init ads module
         Ads.init();  
-        
       });
     
     console.log('Init method reached its end');

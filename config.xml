@@ -18,9 +18,9 @@
 
     <preference name="android-build-tool" value="gradle" /> 
     
-    
     <plugin name="cordova-plugin-admobpro" source="npm" />
     <plugin name="org.apache.cordova.media" />
+    <plugin name="cordova-plugin-device" />
 
     <platform name="android">
         <allow-intent href="market:*" />

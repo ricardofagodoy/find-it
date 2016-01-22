@@ -77,8 +77,7 @@
         
         "menu.new": "New Game",
         "menu.continue": "Continue",
-        "menu.reset": "Reset",
-        "menu.audio": "sounds/menubg.mp3"
+        "menu.reset": "Reset"
     },
     
     "levels": [

@@ -29,6 +29,13 @@ module.exports = [
         ]
     },
     {
+        "file": "plugins/cordova-plugin-device/www/device.js",
+        "id": "cordova-plugin-device.device",
+        "clobbers": [
+            "device"
+        ]
+    },
+    {
         "file": "plugins/org.apache.cordova.file/www/DirectoryEntry.js",
         "id": "org.apache.cordova.file.DirectoryEntry",
         "clobbers": [
@@ -181,6 +188,7 @@ module.exports.metadata =
     "cordova-plugin-splashscreen": "2.1.0",
     "cordova-plugin-admobpro": "2.10.0",
     "org.apache.cordova.media": "0.2.16",
+    "cordova-plugin-device": "1.1.1",
     "cordova-plugin-extension": "1.2.3",
     "org.apache.cordova.file": "1.3.3"
 }

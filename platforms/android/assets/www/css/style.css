@@ -268,9 +268,10 @@ html, body{
     top: 10%;
     left: 65%;
     background-image: url("../images/handpointer.png");
-    width: 25%;
+    background-size: 100%;
+    background-repeat: no-repeat;
+    width: 20%;
     height: 15%;
-    background-size: cover; 
 }
 
 /*** LEVEL INFORMATION STYLE ***/
