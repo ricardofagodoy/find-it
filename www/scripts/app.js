@@ -94,6 +94,14 @@ function init() {
         // When pressing BACK button
         document.addEventListener("backbutton", onBackButtonPress, false);
         
+        // Preload images
+        preloadImages([
+            properties.instructionsImages[0], 
+            properties.instructionsImages[1],
+            'images/trophy.png',
+            'images/star.png'
+        ]);
+        
         // Hide splashscreen after 1s
         setTimeout(function() {
             navigator.splashscreen.hide();
@@ -103,7 +111,7 @@ function init() {
         Sound.playMenu();
         
         // Init ads module
-        Ads.init();  
+        Ads.init(); 
       });
     
     console.log('Init method reached its end');
@@ -141,9 +149,7 @@ var Menu = {
         
         // Click on credits
         this.dom.credits.off('click').on('click', function(event) {
-            Menu.dom.self.fadeOut("fast", function() {
-                Menu.dom.creditsScreen.fadeIn("fast");
-            });
+            Menu.dom.creditsScreen.show();
         });
         
         this.dom.creditsScreenBack.off('click').on('click', function(event) {
@@ -152,14 +158,7 @@ var Menu = {
         
         // Instructions
         this.dom.instructions.off('click').on('click', function(event) {
-            
-            // Write first instruction message
-            Menu.dom.instructionScreen.find('#textual').
-                        html(messages['instructions.default']);
-            
-            Menu.dom.self.fadeOut("fast", function() {
-                Menu.showInstructions();
-            });
+            Menu.showInstructions();
         });   
     },
     
@@ -172,29 +171,32 @@ var Menu = {
         
         // Play button
         this.dom.play.off('click').on('click', function(event) {
-        
-            Menu.dom.self.fadeOut("fast", function() {
             
+            
+            
+            // Change cards
+            Menu.dom.self.fadeOut('fast', function() {
+                
                 if(level > 1)
                     Transition.updateText(STATUS.RESUME);
                 else
                     Transition.updateText(STATUS.NEW);
-            
-                // Change cards
+                
                 Maze.dom.self.fadeIn("fast");
-            
+                
                 // Load "first" level
                 Maze.loadLevel();
-            
+
                 // Resets timer - ready to play!
                 Timer.resetTimer(); 
-            
+
                 // Position correctly level indicator
                 Maze.dom.levelInfo.html(level);
                 Maze.dom.levelInfo.css('top', 
                                 (windowHeight/2 - Maze.dom.levelInfo.height()/2) + 'px');
+                
             });
-
+             
         }).html(messages['menu.new']);
         
         // Paints status in white
@@ -258,15 +260,15 @@ var Menu = {
     
     showInstructions: function() {
         
+        // Write first instruction message
+        Menu.dom.instructionScreen.find('#textual').html(messages['instructions.default']);
+        
         Menu.dom.instructionScreen.fadeIn("fast");
                 
         var correctX = properties['instructionsCorrectX'] / properties.widthScale,
             correctY = properties['instructionsCorrectY'] / properties.heightScale,
-            numberClick = 0,
-            instruction2 = new Image();
-        
-        instruction2.src = 'images/instructions2.png';
-                
+            numberClick = 0;
+   
         // Clicks on screen to activate animation
         Menu.dom.instructionScreen.find('#textual').off('click').on('click', function(event) {
                 
@@ -282,13 +284,25 @@ var Menu = {
                         top: correctY
                     }, 1000, "linear", function() {
 
-                        Menu.dom.instructionScreen.
-                            css('background-image', 'url("'+ instruction2.src +'")');
-
-                        Menu.dom.instructionScreen.find('#textual').
-                            html(messages['instructions.done1']);
+                        setTimeout(function() {
+                            
+                            Sound.playEffect();
+                            
+                            Menu.dom.instructionScreen.
+                            css('background-image', 
+                                'url("'+ properties.instructionsImages[1] +'")');
+                            
+                            Menu.dom.instructionScreen.find('#textual').
+                                html(messages['instructions.done1']);
+                            
+                            setTimeout(function() {
+                                Sound.playMenu();
+                            }, 2000);
+                            
+                            numberClick = 1;
+                            
+                        }, 30);
                         
-                        numberClick = 1;
                     });
                 break;
                    
@@ -303,21 +317,7 @@ var Menu = {
                 break;
                    
                 case 3:
-                   Menu.dom.instructionScreen.fadeOut("fast", function() {
-                       
-                       Menu.dom.self.fadeIn("fast");
-                       
-                       Menu.dom.instructionScreen.find('#pointer').css({
-                           top: '10%',
-                           left: '65%'
-                       });
-                       
-                       Menu.dom.instructionScreen.find('#textual').
-                        html(messages['instructions.default']);
-                       
-                       Menu.dom.instructionScreen.
-                        css('background-image', 'url("images/instructions1.png")');
-                   });
+                   onBackButtonPress();
                 break;
             }
             
@@ -1121,27 +1121,39 @@ function onBackButtonPress() {
     
     if (Menu.dom.instructionScreen.is(':visible')) {
         
+        // Hide instructions
         Menu.dom.instructionScreen.fadeOut("fast", function() {
-            Menu.dom.self.fadeIn("fast");
+                       
+            Menu.dom.instructionScreen.find('#pointer').css({
+                top: '10%',
+                left: '65%'
+            });
+                       
+            Menu.dom.instructionScreen.find('#textual').
+                html(messages['instructions.default']);
+                       
+            Menu.dom.instructionScreen.
+                css('background-image', 'url("'+ properties.instructionsImages[0] +'")');
         });
         
     } else if (Menu.dom.creditsScreen.is(':visible')) {
         
-        Menu.dom.creditsScreen.fadeOut("fast", function() {
-            Menu.dom.self.fadeIn("fast");
-        });
+        // Hide credits
+        Menu.dom.creditsScreen.hide();
         
     } else if (Maze.dom.self.is(':visible')) {
-        Maze.dom.self.fadeOut("fast", function() {
-
-            // Check if change New game to Continue
-            if(level > 1 && level <= properties.maxLevel)
-                Menu.dom.play.html(messages['menu.continue']);
+        
+        // Check if change New game to Continue
+        if(level > 1 && level <= properties.maxLevel)
+            Menu.dom.play.html(messages['menu.continue']);
             
-            // Update status message regarding new level
-            Menu.updateStatusMessage();
-
-            Menu.dom.self.fadeIn("fast");
+        // Update status message regarding new level
+        Menu.updateStatusMessage();
+        
+        Maze.dom.self.fadeOut("fast", function() {
+            
+            // Show menu again
+            Menu.dom.self.show();
             
             // Music again
             Sound.playMenu();
@@ -1151,4 +1163,20 @@ function onBackButtonPress() {
         });
     } else 
         navigator.app.exitApp(); 
+}
+
+function preloadImages(array) {
+    
+    if (!preloadImages.list)
+        preloadImages.list = [];
+    
+    var list = preloadImages.list;
+    
+    for (var i = 0; i < array.length; i++) {
+        
+        var img = new Image();
+        
+        list.push(img);
+        img.src = array[i];
+    }
 }

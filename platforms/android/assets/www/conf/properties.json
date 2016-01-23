@@ -14,6 +14,7 @@
     },
     "instructionsCorrectX": 230,
     "instructionsCorrectY": 280,
+    "instructionsImages": ["images/instructions1.png", "images/instructions2.png"],
     "adOptions": {
         "bannerId": "ca-app-pub-2813072672105928/4159360894",
         "interstitialId": "ca-app-pub-2813072672105928/2543026891",
@@ -96,7 +97,7 @@
         },
         
         {
-            "timer": 10,
+            "timer": 1000,
             "coords": [
                 [219, 747, 288, 747, 288, 1057, 430, 1059, 430, 1129, 219, 1127],
                 [351, 219, 351, 219, 562, 219, 560, 599, 492, 599, 492, 287, 350, 287],

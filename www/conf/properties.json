@@ -14,6 +14,7 @@
     },
     "instructionsCorrectX": 230,
     "instructionsCorrectY": 280,
+    "instructionsImages": ["images/instructions1.png", "images/instructions2.png"],
     "adOptions": {
         "bannerId": "ca-app-pub-2813072672105928/4159360894",
         "interstitialId": "ca-app-pub-2813072672105928/2543026891",
