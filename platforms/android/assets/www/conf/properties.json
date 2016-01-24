@@ -1,5 +1,5 @@
 {
-    "maxLevel": 9,
+    "maxLevel": 1,
     "maxLevelIndex": 8,
     "imageWidth": 780,
     "imageHeight": 1346,
@@ -22,10 +22,12 @@
     },
     "sounds": {
         "menu": "menubg.mp3",
+        "menuwin": "menubgwin.wav",
         "level": "level{0}.wav",
         "correct": "found.wav",
         "win": "win.mp3",
-        "lose": "lose.wav"
+        "lose": "lose.wav",
+        "click": "click.wav"
     },
     "levelColors": [
         {"r": 255, "g":  90, "b": 0,   "offset": 16},
@@ -97,7 +99,7 @@
         },
         
         {
-            "timer": 1000,
+            "timer": 10,
             "coords": [
                 [219, 747, 288, 747, 288, 1057, 430, 1059, 430, 1129, 219, 1127],
                 [351, 219, 351, 219, 562, 219, 560, 599, 492, 599, 492, 287, 350, 287],

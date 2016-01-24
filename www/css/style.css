@@ -28,6 +28,17 @@ html, body{
     background-image: url("../images/bg.jpg");  
 }
 
+#menu #mute {
+    position: fixed;
+    top: 1%;
+    left: 3%;
+    background-image: url('../images/sound.png');
+    background-repeat: no-repeat;
+    background-size: 15px 30px;
+    width: 15px;
+    height: 30px;
+}
+
 #menu #title {
     padding-top: 15%;
     padding-bottom: 15%;

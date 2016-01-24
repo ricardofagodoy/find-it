@@ -24,6 +24,7 @@ var propertiesDeffered = $.Deferred(),
     windowHeight = 0,
     properties = undefined,
     messages = null,
+    preloadedImagesList = [],
     levels = {},
     level = 1,
     levelIndex = 1; // Under each level, there are maxLevelIndex different mazes
@@ -99,7 +100,7 @@ function init() {
             properties.instructionsImages[0], 
             properties.instructionsImages[1],
             'images/trophy.png',
-            'images/star.png'
+            'images/star.gif'
         ]);
         
         // Hide splashscreen after 1s
@@ -134,7 +135,8 @@ var Menu = {
             credits: $('#menu #options #credits'),
             creditsScreen: $('#creditsScreen'),
             creditsScreenBack: $('#creditsScreen #thanks'),
-            instructionScreen: $('#instructionScreen')
+            instructionScreen: $('#instructionScreen'),
+            mute: $('#menu #mute')
         };
         
         // If he's already won, different layout
@@ -149,6 +151,7 @@ var Menu = {
         
         // Click on credits
         this.dom.credits.off('click').on('click', function(event) {
+            Sound.playClick();
             Menu.dom.creditsScreen.show();
         });
         
@@ -158,8 +161,21 @@ var Menu = {
         
         // Instructions
         this.dom.instructions.off('click').on('click', function(event) {
+            Sound.playClick();
             Menu.showInstructions();
-        });   
+        });  
+        
+        this.dom.mute.off('click').on('click', function(event) {
+            
+            // TODO: Improve this
+            Sound.toggleMute();
+            
+            if(Sound.isMuted)
+                Sound.stopMenu();
+            else
+                Sound.playMenu();
+                
+        });
     },
     
     configureOriginal: function() {
@@ -171,8 +187,8 @@ var Menu = {
         
         // Play button
         this.dom.play.off('click').on('click', function(event) {
-            
-            
+ 
+            Sound.playClick();
             
             // Change cards
             Menu.dom.self.fadeOut('fast', function() {
@@ -223,13 +239,19 @@ var Menu = {
 
         // If clicks no, just close it
         resetConfirmation.find('#no').off('click').on('click', function(event) {
+            Sound.playClick();
             resetConfirmation.hide();
         });
 
         // If accepts, resets and closes
         resetConfirmation.find('#yes').off('click').on('click', function(event) {
+            Sound.playClick();
             Maze.resetGame();
             resetConfirmation.hide();
+            
+            // Original bg menu music, since you're at menu
+            Sound.loadMenuSound();
+            Sound.playMenu();
         });
         
         // Win them all
@@ -239,6 +261,8 @@ var Menu = {
         this.dom.play.off('click').on('click', function(event) {  
 
             console.log('Clicking on reset button...');
+            
+            Sound.playClick();
 
             // Show dialog to confirm
             resetConfirmation.show();
@@ -262,6 +286,7 @@ var Menu = {
         
         // Write first instruction message
         Menu.dom.instructionScreen.find('#textual').html(messages['instructions.default']);
+        Menu.dom.instructionScreen.find('#pointer').hide();
         
         Menu.dom.instructionScreen.fadeIn("fast");
                 
@@ -279,6 +304,8 @@ var Menu = {
                    // Block until animation ends
                    numberClick = 5;
                    
+                   Menu.dom.instructionScreen.find('#pointer').fadeIn("fast");
+                   
                     Menu.dom.instructionScreen.find('#pointer').animate({
                         left: correctX,
                         top: correctY
@@ -286,6 +313,7 @@ var Menu = {
 
                         setTimeout(function() {
                             
+                            Sound.switchEffectType('correct');
                             Sound.playEffect();
                             
                             Menu.dom.instructionScreen.
@@ -361,6 +389,9 @@ var Transition = {
 
         // Click on PLAY
         this.dom.play.off('click').on('click', function(event) { 
+            
+            Sound.playClick();
+            
             // Flips card to maze side
             Card.flip();
         });
@@ -444,8 +475,8 @@ var Transition = {
             break;
                 
             case STATUS.WIN:
-                this.dom.trophy.show();
                 this.dom.playWrapper.hide();
+                this.dom.trophy.show();
                 bg = messages[messagePattern.format(status, 'bg')];
             break;
         }
@@ -599,6 +630,7 @@ var Maze = {
         Persistence.updateLevel();
         
         // Found the shape sound!
+        Sound.switchEffectType('correct');
         Sound.playEffect();
 
         // Win the game!
@@ -672,14 +704,14 @@ var Maze = {
 
         console.log('Player win last level ({0})!'.format(level));
 
-        // You Win message!
-        Transition.updateText(STATUS.WIN);
-
         // You Win when flip ends!
         Card.status = STATUS.WIN;
         
         Sound.switchEffectType('win');
         Sound.playEffect();
+        
+        // You Win message!
+        Transition.updateText(STATUS.WIN);
 
         // Wait until flip
         setTimeout(function() {
@@ -819,7 +851,9 @@ var Card = {
                 // Show BIG ad
                 Ads.showInterstitial();  
                 
-                // TODO: WINNER SONG!!
+                // Victory sound
+                Sound.loadMenuSound();
+                Sound.playMenu();
                 
                 // Menu is now different
                 Menu.configureWinner();
@@ -947,13 +981,12 @@ var Sound = {
         menu: null,
         level: null,
         effect: null,
+        click: null
     },
-    
     soundLevel: null,
-    
     effectType: null,
-    
     root: null,
+    isMuted: null,
     
     init: function() {
         
@@ -961,14 +994,35 @@ var Sound = {
         
         this.root = devicePath.substring(0, devicePath.lastIndexOf('/')) + '/sounds/';
         this.soundLevel = 0;
+        this.isMuted = 0;
         this.effectType = 'correct';
         
-        // Load default sounds
-        this.loadAudio('menu', properties['sounds']['menu']);
-        this.loadAudio('level', properties.sounds['level'].format(this.soundLevel));
-        this.loadAudio('effect', properties.sounds[this.effectType]);
+        this.loadMenuSound();
+        
+        this.loadAudio('level', properties.sounds['level'].format(this.soundLevel), null);
+        this.loadAudio('effect', properties.sounds[this.effectType], null);
+        this.loadAudio('click', properties.sounds['click'], null);
         
         console.log('Background sound loaded ok!');
+    },
+    
+    loadMenuSound: function() {
+    
+        var menuSound = null;
+        
+        if(level > properties.maxLevel)
+            menuSound = properties['sounds']['menuwin'];
+        else
+            menuSound = properties['sounds']['menu'];
+            
+        if(this.media.menu != null)
+            this.media.menu.release();
+        
+        // Load default sounds
+        this.loadAudio('menu', menuSound, function (status) {
+            if (status === Media.MEDIA_STOPPED)
+                Sound.playMenu();
+        });
     },
     
     playMenu: function() {
@@ -976,7 +1030,7 @@ var Sound = {
         this.stopLevel();
         this.stopEffect();
         
-        if(this.media.menu != null)
+        if(this.media.menu != null && !this.isMuted)
             this.media.menu.play();
     },
     
@@ -985,7 +1039,7 @@ var Sound = {
         this.stopMenu();
         this.stopEffect();
         
-        if(this.media.level != null) {
+        if(this.media.level != null && !this.isMuted) {
             
             if(parseInt(level / 10) != this.soundLevel) {
                 this.soundLevel = parseInt(level / 10);
@@ -1007,7 +1061,7 @@ var Sound = {
     
     stopMenu: function() {
         if(this.media.menu != null)
-             this.media.menu.stop();
+             this.media.menu.pause();
     },
     
     stopLevel: function() {
@@ -1020,18 +1074,28 @@ var Sound = {
              this.media.effect.stop();
     },
     
+    playClick: function() {
+        if(this.media.click != null)
+            this.media.click.play();
+    },
+    
     switchEffectType: function(type) {
         this.effectType = type;
         this.loadAudio('effect', properties.sounds[this.effectType]);
     },
     
-    loadAudio: function(media, audio) {
+    toggleMute: function() {
+        this.isMuted = this.isMuted ? 0 : 1;
+    },
+    
+    loadAudio: function(media, audio, state) {
         
         //TODO: working for android only
         if(window.device.platform === 'Android')
             this.media[media] = new Media(this.root + audio,
                 function () { console.log("Audio Success"); },
-                function (err) { console.log("Audio Error: " + JSON.stringify(err)); }
+                function (err) { console.log("Audio Error: " + JSON.stringify(err)); },
+                state
             );
         
         // this.media[media] = new Audio(this.root + audio);   
@@ -1163,20 +1227,17 @@ function onBackButtonPress() {
         });
     } else 
         navigator.app.exitApp(); 
+    
+    Sound.playClick();
 }
 
 function preloadImages(array) {
-    
-    if (!preloadImages.list)
-        preloadImages.list = [];
-    
-    var list = preloadImages.list;
     
     for (var i = 0; i < array.length; i++) {
         
         var img = new Image();
         
-        list.push(img);
+        preloadedImagesList.push(img);
         img.src = array[i];
     }
 }
