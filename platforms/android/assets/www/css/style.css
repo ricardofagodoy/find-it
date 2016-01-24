@@ -9,6 +9,7 @@ html, body{
     text-align: center;
     font-family: square;
     overflow: hidden;
+    -webkit-user-select: none;
 }
 
 @media (min-width: 320px) { html { font-size: 18px; } }
@@ -26,6 +27,17 @@ html, body{
     height: 100%;
     background-size: cover; 
     background-image: url("../images/bg.jpg");  
+}
+
+#menu #mute {
+    position: fixed;
+    top: 1%;
+    left: 3%;
+    background-image: url('../images/sound.png');
+    background-repeat: no-repeat;
+    background-size: 15px 30px;
+    width: 15px;
+    height: 30px;
 }
 
 #menu #title {

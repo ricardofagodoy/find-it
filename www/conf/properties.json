@@ -1,5 +1,5 @@
 {
-    "maxLevel": 2,
+    "maxLevel": 9,
     "maxLevelIndex": 8,
     "imageWidth": 780,
     "imageHeight": 1346,
@@ -22,12 +22,12 @@
     },
     "sounds": {
         "menu": "menubg.mp3",
-        "menuwin": "menubgwin.wav",
-        "level": "level{0}.wav",
-        "correct": "found.wav",
+        "menuwin": "menubgwin.mp3",
+        "level": "level{0}.mp3",
+        "correct": "found.mp3",
         "win": "win.mp3",
-        "lose": "lose.wav",
-        "click": "click.wav"
+        "lose": "lose.mp3",
+        "click": "click.mp3"
     },
     "levelColors": [
         {"r": 255, "g":  90, "b": 0,   "offset": 16},

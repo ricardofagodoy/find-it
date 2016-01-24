@@ -170,10 +170,13 @@ var Menu = {
             // TODO: Improve this
             Sound.toggleMute();
             
-            if(Sound.isMuted)
+            if(Sound.isMuted) {
                 Sound.stopMenu();
-            else
+                Menu.dom.mute.css('background-image', 'url("images/muted.png")');
+            } else {
                 Sound.playMenu();
+                Menu.dom.mute.css('background-image', 'url("images/sound.png")');
+            }
                 
         });
     },
@@ -288,7 +291,7 @@ var Menu = {
         Menu.dom.instructionScreen.find('#textual').html(messages['instructions.default']);
         Menu.dom.instructionScreen.find('#pointer').hide();
         
-        Menu.dom.instructionScreen.fadeIn("fast");
+        Menu.dom.instructionScreen.show();
                 
         var correctX = properties['instructionsCorrectX'] / properties.widthScale,
             correctY = properties['instructionsCorrectY'] / properties.heightScale,

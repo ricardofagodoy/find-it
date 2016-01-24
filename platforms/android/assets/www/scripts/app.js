@@ -135,7 +135,8 @@ var Menu = {
             credits: $('#menu #options #credits'),
             creditsScreen: $('#creditsScreen'),
             creditsScreenBack: $('#creditsScreen #thanks'),
-            instructionScreen: $('#instructionScreen')
+            instructionScreen: $('#instructionScreen'),
+            mute: $('#menu #mute')
         };
         
         // If he's already won, different layout
@@ -162,7 +163,22 @@ var Menu = {
         this.dom.instructions.off('click').on('click', function(event) {
             Sound.playClick();
             Menu.showInstructions();
-        });   
+        });  
+        
+        this.dom.mute.off('click').on('click', function(event) {
+            
+            // TODO: Improve this
+            Sound.toggleMute();
+            
+            if(Sound.isMuted) {
+                Sound.stopMenu();
+                Menu.dom.mute.css('background-image', 'url("images/muted.png")');
+            } else {
+                Sound.playMenu();
+                Menu.dom.mute.css('background-image', 'url("images/sound.png")');
+            }
+                
+        });
     },
     
     configureOriginal: function() {
@@ -235,6 +251,10 @@ var Menu = {
             Sound.playClick();
             Maze.resetGame();
             resetConfirmation.hide();
+            
+            // Original bg menu music, since you're at menu
+            Sound.loadMenuSound();
+            Sound.playMenu();
         });
         
         // Win them all
@@ -271,7 +291,7 @@ var Menu = {
         Menu.dom.instructionScreen.find('#textual').html(messages['instructions.default']);
         Menu.dom.instructionScreen.find('#pointer').hide();
         
-        Menu.dom.instructionScreen.fadeIn("fast");
+        Menu.dom.instructionScreen.show();
                 
         var correctX = properties['instructionsCorrectX'] / properties.widthScale,
             correctY = properties['instructionsCorrectY'] / properties.heightScale,
@@ -966,12 +986,10 @@ var Sound = {
         effect: null,
         click: null
     },
-    
     soundLevel: null,
-    
     effectType: null,
-    
     root: null,
+    isMuted: null,
     
     init: function() {
         
@@ -979,6 +997,7 @@ var Sound = {
         
         this.root = devicePath.substring(0, devicePath.lastIndexOf('/')) + '/sounds/';
         this.soundLevel = 0;
+        this.isMuted = 0;
         this.effectType = 'correct';
         
         this.loadMenuSound();
@@ -995,10 +1014,13 @@ var Sound = {
         var menuSound = null;
         
         if(level > properties.maxLevel)
-            menuSound = properties['sounds']['menu'];
-        else
             menuSound = properties['sounds']['menuwin'];
+        else
+            menuSound = properties['sounds']['menu'];
             
+        if(this.media.menu != null)
+            this.media.menu.release();
+        
         // Load default sounds
         this.loadAudio('menu', menuSound, function (status) {
             if (status === Media.MEDIA_STOPPED)
@@ -1011,7 +1033,7 @@ var Sound = {
         this.stopLevel();
         this.stopEffect();
         
-        if(this.media.menu != null)
+        if(this.media.menu != null && !this.isMuted)
             this.media.menu.play();
     },
     
@@ -1020,7 +1042,7 @@ var Sound = {
         this.stopMenu();
         this.stopEffect();
         
-        if(this.media.level != null) {
+        if(this.media.level != null && !this.isMuted) {
             
             if(parseInt(level / 10) != this.soundLevel) {
                 this.soundLevel = parseInt(level / 10);
@@ -1063,6 +1085,10 @@ var Sound = {
     switchEffectType: function(type) {
         this.effectType = type;
         this.loadAudio('effect', properties.sounds[this.effectType]);
+    },
+    
+    toggleMute: function() {
+        this.isMuted = this.isMuted ? 0 : 1;
     },
     
     loadAudio: function(media, audio, state) {

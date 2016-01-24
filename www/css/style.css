@@ -9,6 +9,7 @@ html, body{
     text-align: center;
     font-family: square;
     overflow: hidden;
+    -webkit-user-select: none;
 }
 
 @media (min-width: 320px) { html { font-size: 18px; } }
