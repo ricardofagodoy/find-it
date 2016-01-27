@@ -18,3 +18,17 @@ Here some information might be useful in future times:
 - Level 30-40 (blue going to purple)
 - Level 40-50 (purple going to white)
 - Level 50 - white
+
+{
+        "timer": 10,
+        "coords": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ]
+        },
