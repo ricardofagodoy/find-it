@@ -26,6 +26,7 @@ var propertiesDeffered = $.Deferred(),
     messages = null,
     preloadedImagesList = [],
     levels = {},
+    startingLevel = 1,
     level = 1,
     levelIndex = 1; // Under each level, there are maxLevelIndex different mazes
     
@@ -1171,7 +1172,7 @@ var Persistence = {
         var storedLevel = localStorage.getItem('level');
 
         if(storedLevel === null || storedLevel.length === 0)
-            storedLevel = 1;
+            storedLevel = startingLevel;
 
         this.updateLevel(parseInt(storedLevel)); 
 
