@@ -10,6 +10,7 @@ html, body{
     font-family: square;
     overflow: hidden;
     -webkit-user-select: none;
+    user-select: none;
 }
 
 @media (min-width: 320px) { html { font-size: 18px; } }
@@ -123,7 +124,7 @@ html, body{
 
 #transition #options #specialMsg {
     font-size: 1.2rem;
-    color: yellow;
+    color: black;
 }
 
 #transition #options #specialMsgWrapper {
@@ -199,6 +200,7 @@ html, body{
     width: 100%;
     height: 100%;
     -webkit-transform: translate3d(0px,0px,0px);
+    transform: translate3d(0px,0px,0px);
     -webkit-transition: background-color 2s ease-out;
     transition: background-color 2s ease-out;
 }
@@ -207,6 +209,7 @@ html, body{
     width: 100%;
     height: 100%;
     transform: translate3d(0px,0px,0px);
+    -webkit-transform: translate3d(0px,0px,0px);
 }
 
 /***** CREDITS SCREEN *****/
@@ -287,6 +290,7 @@ html, body{
     transition-timing-function: linear;
     -webkit-transition-timing-function: linear;
     -webkit-transform: translate3d(0px,0px,0px);
+    transform: translate3d(0px,0px,0px);
 }
 
 /*** LEVEL INFORMATION STYLE ***/
@@ -309,4 +313,5 @@ html, body{
     opacity: 0.2;
     transition-timing-function: linear;
     -webkit-transition-timing-function: linear;
+    transform: translate3d(0px,0px,0px);
 }

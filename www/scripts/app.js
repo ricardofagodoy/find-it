@@ -26,7 +26,6 @@ var propertiesDeffered = $.Deferred(),
     messages = null,
     preloadedImagesList = [],
     levels = {},
-    startingLevel = 1,
     level = 1,
     levelIndex = 1; // Under each level, there are maxLevelIndex different mazes
     
@@ -187,12 +186,10 @@ var Menu = {
         console.log('Loading original main menu...');
         
         // Titles gets painted white
-        this.dom.title.css('color', '#000');
+        //this.dom.title.css('color', '#000');
         
         // Play button
         this.dom.play.off('click').on('click', function(event) {
- 
-            Sound.playClick();
             
             // Change cards
             Menu.dom.self.fadeOut('fast', function() {
@@ -216,6 +213,8 @@ var Menu = {
                                 (windowHeight/2 - Maze.dom.levelInfo.height()/2) + 'px');
                 
             });
+            
+            Sound.playClick();
              
         }).html(messages['menu.new']);
         
@@ -232,8 +231,8 @@ var Menu = {
     
         console.log('Configuring main menu to winner mode...');
 
-        // Titles gets painted yellow
-        this.dom.title.css('color', '#FF0');
+        // TODO: Titles gets painted yellow
+        //this.dom.title.css('color', '#000');
         
         // Status is painted yellow too
         this.dom.status.css('color', '#FF0');
@@ -949,6 +948,7 @@ var Ads = {
             AdMob.setOptions(properties.adOptions);
  
             AdMob.prepareInterstitial();
+            
             this.showBanner();
         }
     },
@@ -959,7 +959,7 @@ var Ads = {
                 adId : properties.adOptions.bannerId,
                 position : AdMob.AD_POSITION.BOTTOM_CENTER,
                 autoShow : true,
-               overlap: true
+                overlap: true
             });
             
             this.bannerVisible = true;
@@ -993,8 +993,10 @@ var Sound = {
     isMuted: null,
     
     init: function() {
-        
+    
         var devicePath = window.location.pathname;
+        
+        console.log(devicePath);
         
         this.root = devicePath.substring(0, devicePath.lastIndexOf('/')) + '/sounds/';
         this.soundLevel = 0;
@@ -1146,7 +1148,7 @@ var Persistence = {
         
         for(i = 1; i <= properties.maxLevel; i++) {
              localStorage.setItem(i, 1);
-            console.log('Level {0} ... Index: {0}'.format(i, 1));
+            console.log('Level {0} ... Index: {1}'.format(i, 1));
         }
         
         console.log('All indexes reseted!');
@@ -1160,7 +1162,7 @@ var Persistence = {
         // Default is add 1 to level
         level = newLevel ? newLevel : level + 1;
 
-        console.log('Saving level {0} to local storage...'.format(level));
+        console.log('Saving level {0} to local storage'.format(level));
 
         localStorage.setItem('level', level);
     },
@@ -1172,7 +1174,7 @@ var Persistence = {
         var storedLevel = localStorage.getItem('level');
 
         if(storedLevel === null || storedLevel.length === 0)
-            storedLevel = startingLevel;
+            storedLevel = properties['startingLevel'];
 
         this.updateLevel(parseInt(storedLevel)); 
 

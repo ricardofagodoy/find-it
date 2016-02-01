@@ -232,8 +232,8 @@ var Menu = {
     
         console.log('Configuring main menu to winner mode...');
 
-        // Titles gets painted yellow
-        this.dom.title.css('color', '#FF0');
+        // TODO: Titles gets painted yellow
+        this.dom.title.css('color', '#000');
         
         // Status is painted yellow too
         this.dom.status.css('color', '#FF0');
@@ -1146,7 +1146,7 @@ var Persistence = {
         
         for(i = 1; i <= properties.maxLevel; i++) {
              localStorage.setItem(i, 1);
-            console.log('Level {0} ... Index: {0}'.format(i, 1));
+            console.log('Level {0} ... Index: {1}'.format(i, 1));
         }
         
         console.log('All indexes reseted!');

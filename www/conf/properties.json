@@ -1,6 +1,7 @@
 {
     "maxLevel": 51,
     "maxLevelIndex": 8,
+    "startingLevel": 1,
     "imageWidth": 780,
     "imageHeight": 1346,
     "imageFilesPath": "images/levels/level{0}-{1}.png",
@@ -76,7 +77,7 @@
         "instructions.done3": "Well, you will figure that out!<br/>Good luck!!",
         
         "menu.status": "Next level: {0}",
-        "menu.status.win": "YOU WIN 'EM ALL",
+        "menu.status.win": "{0} stars",
         
         "menu.new": "New Game",
         "menu.continue": "Continue",
