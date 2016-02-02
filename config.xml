@@ -7,28 +7,40 @@
     <author email="ricardofagodoy@gmail.com" href="http://ricardofagodoy.com">
         Ricardo Godoy
     </author>
-    
     <content src="index.html" />
-    
     <icon src="icon.png" />
-    
     <preference name="Orientation" value="portrait" />
     <preference name="SplashScreen" value="splash" />
     <preference name="AutoHideSplashScreen" value="false" />
-
-    <preference name="android-build-tool" value="gradle" /> 
-    
+    <preference name="android-build-tool" value="gradle" />
     <plugin name="cordova-plugin-admobpro" source="npm" />
     <plugin name="org.apache.cordova.media" />
     <plugin name="cordova-plugin-device" />
-
     <platform name="android">
+        <splash src="splash.png" platform="android" qualifier="ldpi" />
+        <splash src="splash.png" platform="android" qualifier="mdpi" />
+        <splash src="splash.png" platform="android" qualifier="hdpi" />
+        <splash src="splash.png" platform="android" qualifier="xhdpi" />
+        <splash src="splash.png" platform="android" qualifier="fr-xhdpi" />
+        <splash src="splash.png" platform="android" qualifier="port-xxhdpi" />
+        <splash src="splash.png" platform="android" qualifier="land-xxhdpi" />
         <allow-intent href="market:*" />
         <preference name="android-minSdkVersion" value="15" />
         <preference name="android-targetSdkVersion" value="19" />
     </platform>
     <platform name="ios">
+       <splash src="splash.png" width="320" height="480"/>
+        <splash src="splash.png" width="640" height="960"/>
+        <splash src="splash.png" width="768" height="1024"/>
+        <splash src="splash.png" width="1536" height="2048"/>
+        <splash src="splash.png" width="1024" height="768"/>
+        <splash src="splash.png" width="2048" height="1536"/>
+        <splash src="splash.png" width="640" height="1136"/>
+        <splash src="splash.png" width="750" height="1334"/>
+        <splash src="splash.png" width="1242" height="2208"/>
+        <splash src="splash.png" width="2208" height="1242"/>
         <allow-intent href="itms:*" />
         <allow-intent href="itms-apps:*" />
     </platform>
+    <engine name="ios" spec="~3.9.2" />
 </widget>

@@ -1,0 +1,30 @@
+{
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "4D19284A1C5A4B52575553E473A52D04001BFAA3",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "5835A7712E86DAB2939DA6B6F1411D48D2A63A8D" : 0,
+    "4D19284A1C5A4B52575553E473A52D04001BFAA3" : 0
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "77EDC0EF-50AF-4820-ACE8-AFC8713E6D96",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "5835A7712E86DAB2939DA6B6F1411D48D2A63A8D" : "",
+    "4D19284A1C5A4B52575553E473A52D04001BFAA3" : "find-it\/"
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "Find It!",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "platforms\/ios\/Find It!.xcodeproj",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/ricardofagodoy\/find-it.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "4D19284A1C5A4B52575553E473A52D04001BFAA3"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/ricardofagodoy\/distance-alarm.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "5835A7712E86DAB2939DA6B6F1411D48D2A63A8D"
+    }
+  ]
+}

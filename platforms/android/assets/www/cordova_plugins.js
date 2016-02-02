@@ -1,13 +1,6 @@
 cordova.define('cordova/plugin_list', function(require, exports, module) {
 module.exports = [
     {
-        "file": "plugins/cordova-plugin-splashscreen/www/splashscreen.js",
-        "id": "cordova-plugin-splashscreen.SplashScreen",
-        "clobbers": [
-            "navigator.splashscreen"
-        ]
-    },
-    {
         "file": "plugins/cordova-plugin-admobpro/www/AdMob.js",
         "id": "cordova-plugin-admobpro.AdMob",
         "clobbers": [
@@ -15,24 +8,17 @@ module.exports = [
         ]
     },
     {
-        "file": "plugins/org.apache.cordova.media/www/MediaError.js",
-        "id": "org.apache.cordova.media.MediaError",
-        "clobbers": [
-            "window.MediaError"
-        ]
-    },
-    {
-        "file": "plugins/org.apache.cordova.media/www/Media.js",
-        "id": "org.apache.cordova.media.Media",
-        "clobbers": [
-            "window.Media"
-        ]
-    },
-    {
         "file": "plugins/cordova-plugin-device/www/device.js",
         "id": "cordova-plugin-device.device",
         "clobbers": [
             "device"
+        ]
+    },
+    {
+        "file": "plugins/cordova-plugin-splashscreen/www/splashscreen.js",
+        "id": "cordova-plugin-splashscreen.SplashScreen",
+        "clobbers": [
+            "navigator.splashscreen"
         ]
     },
     {
@@ -180,17 +166,31 @@ module.exports = [
             "cordova"
         ],
         "runs": true
+    },
+    {
+        "file": "plugins/org.apache.cordova.media/www/MediaError.js",
+        "id": "org.apache.cordova.media.MediaError",
+        "clobbers": [
+            "window.MediaError"
+        ]
+    },
+    {
+        "file": "plugins/org.apache.cordova.media/www/Media.js",
+        "id": "org.apache.cordova.media.Media",
+        "clobbers": [
+            "window.Media"
+        ]
     }
 ];
 module.exports.metadata = 
 // TOP OF METADATA
 {
-    "cordova-plugin-splashscreen": "2.1.0",
     "cordova-plugin-admobpro": "2.10.0",
-    "org.apache.cordova.media": "0.2.16",
     "cordova-plugin-device": "1.1.1",
-    "cordova-plugin-extension": "1.2.3",
-    "org.apache.cordova.file": "1.3.3"
+    "cordova-plugin-splashscreen": "2.1.0",
+    "org.apache.cordova.file": "1.3.3",
+    "org.apache.cordova.media": "0.2.16",
+    "cordova-plugin-extension": "1.2.3"
 }
 // BOTTOM OF METADATA
 });

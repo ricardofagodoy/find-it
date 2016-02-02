@@ -26,7 +26,6 @@ var propertiesDeffered = $.Deferred(),
     messages = null,
     preloadedImagesList = [],
     levels = {},
-    startingLevel = 1,
     level = 1,
     levelIndex = 1; // Under each level, there are maxLevelIndex different mazes
     
@@ -96,6 +95,14 @@ function init() {
         // When pressing BACK button
         document.addEventListener("backbutton", onBackButtonPress, false);
         
+        // When process goes to background, stop sound!
+        document.addEventListener("pause", function() {
+            if(!Sound.isMuted) {
+                Sound.toggleMute();
+                Sound.stopMenu();
+            }
+        }, false);
+        
         // Preload images
         preloadImages([
             properties.instructionsImages[0], 
@@ -106,8 +113,9 @@ function init() {
         
         // Hide splashscreen after 1s
         setTimeout(function() {
-            navigator.splashscreen.hide();
-        }, 1000);
+            if(navigator.splashscreen)
+                navigator.splashscreen.hide();
+        }, 500);
         
         // Start playing loaded sound
         Sound.playMenu();
@@ -187,12 +195,10 @@ var Menu = {
         console.log('Loading original main menu...');
         
         // Titles gets painted white
-        this.dom.title.css('color', '#000');
+        //this.dom.title.css('color', '#000');
         
         // Play button
         this.dom.play.off('click').on('click', function(event) {
- 
-            Sound.playClick();
             
             // Change cards
             Menu.dom.self.fadeOut('fast', function() {
@@ -216,6 +222,8 @@ var Menu = {
                                 (windowHeight/2 - Maze.dom.levelInfo.height()/2) + 'px');
                 
             });
+            
+            Sound.playClick();
              
         }).html(messages['menu.new']);
         
@@ -233,7 +241,7 @@ var Menu = {
         console.log('Configuring main menu to winner mode...');
 
         // TODO: Titles gets painted yellow
-        this.dom.title.css('color', '#000');
+        //this.dom.title.css('color', '#000');
         
         // Status is painted yellow too
         this.dom.status.css('color', '#FF0');
@@ -279,7 +287,7 @@ var Menu = {
         var message = '';
 
         if(level > properties.maxLevel)
-            message = messages['menu.status.win'];  
+            message = messages['menu.status.win'].format(Persistence.retrieveStars());  
         else
             message = messages['menu.status'].format(level);
 
@@ -448,21 +456,28 @@ var Transition = {
         
             case STATUS.NEXT:
                 
-                var timePassedLevel = levels[newLevel-2].timer;
+                var timePassedLevel = levels[newLevel-2].timer,
+                    stars = 1;
                 
                 console.log('Level {0} had {1}s to complete and took {2}s'.
                             format(newLevel-1, timePassedLevel, Timer.secondsPassed));
                 
                 // If finished in less or equal 20% of time
-                if(Timer.secondsPassed <= timePassedLevel*0.2)
+                if(Timer.secondsPassed <= timePassedLevel*0.2) {
                     this.dom.stars.find('#star1').show();
+                    stars++;
+                }
                 
                 // If finished in less or equal 60% of time
-                if(Timer.secondsPassed <= timePassedLevel*0.6)
+                if(Timer.secondsPassed <= timePassedLevel*0.6) {
                     this.dom.stars.find('#star2').show();
+                    stars++;
+                }
 
                 this.dom.stars.find('#star3').show();
                 this.dom.stars.show();
+                
+                Persistence.updateStars(stars);
         
             break;
                 
@@ -737,7 +752,10 @@ var Maze = {
         console.log('Reseting game to level 1...');
 
         // Resets level 1, actually
-        Persistence.updateLevel(1);
+        Persistence.updateLevel(properties['startingLevel']);
+        
+        // Reset to 0 stars
+        Persistence.updateStars(Persistence.retrieveStars()*-1);
     
         // Setup Menu to original state
         Menu.configureOriginal();
@@ -941,25 +959,39 @@ var Timer = {
 var Ads = {
     
     bannerVisible: false,
+    admobid: null,
 
     init: function() {
         
         if(window.AdMob) {
             
+            if( /(android)/i.test(navigator.userAgent) ) {
+                this.admobid = {
+                    banner: properties['bannerIdAndroid'],
+                    interstitial: properties['interstitialIdAndroid']
+                };
+            } else if(/(ipod|iphone|ipad)/i.test(navigator.userAgent)) {
+                this.admobid = {
+                    banner: properties['bannerIdIos'],
+                    interstitial: properties['interstitialIdIos']
+                };
+            }
+            
             AdMob.setOptions(properties.adOptions);
  
-            AdMob.prepareInterstitial();
+            AdMob.prepareInterstitial({adId: this.admobid.interstitial});
+            
             this.showBanner();
         }
     },
     
     showBanner: function() {
-        if(window.AdMob && !this.bannerVisible) {
+        if(window.AdMob && !this.bannerVisible && this.admobid != null) {
            AdMob.createBanner({
-                adId : properties.adOptions.bannerId,
+                adId : this.admobid.banner,
                 position : AdMob.AD_POSITION.BOTTOM_CENTER,
                 autoShow : true,
-               overlap: true
+                overlap: true
             });
             
             this.bannerVisible = true;
@@ -967,14 +999,14 @@ var Ads = {
     },
     
     hideBanner: function() {
-        if(window.AdMob && this.bannerVisible) {
+        if(window.AdMob && this.bannerVisible && this.admobid != null) {
             AdMob.removeBanner();
             this.bannerVisible = false;
         }
     },
     
     showInterstitial: function() {
-        if(window.AdMob)
+        if(window.AdMob && this.admobid != null)
             AdMob.showInterstitial();
     }
 };
@@ -993,21 +1025,24 @@ var Sound = {
     isMuted: null,
     
     init: function() {
-        
+            
         var devicePath = window.location.pathname;
-        
         this.root = devicePath.substring(0, devicePath.lastIndexOf('/')) + '/sounds/';
+        
+        // Fix IOS issue
+        this.root = this.root.replace(/%20/g, ' ');
+
         this.soundLevel = 0;
         this.isMuted = 0;
         this.effectType = 'correct';
-        
+
         this.loadMenuSound();
-        
         this.loadAudio('level', properties.sounds['level'].format(this.soundLevel), null);
-        this.loadAudio('effect', properties.sounds[this.effectType], null);
+            
+        this.loadAudio('effect', properties.sounds[Sound.effectType], null); 
         this.loadAudio('click', properties.sounds['click'], null);
-        
-        console.log('Background sound loaded ok!');
+            
+        console.log('Sound module loaded!'); 
     },
     
     loadMenuSound: function() {
@@ -1094,19 +1129,42 @@ var Sound = {
     
     loadAudio: function(media, audio, state) {
         
-        //TODO: working for android only
-        if(window.device.platform === 'Android')
+        if (window.Media) {
+            
+            //TODO: working for android only
             this.media[media] = new Media(this.root + audio,
                 function () { console.log("Audio Success"); },
-                function (err) { console.log("Audio Error: " + JSON.stringify(err)); },
+                function (err) { console.log("Audio Error: " 
+                                                + audio + ' - ' + JSON.stringify(err)); },
                 state
             );
-        
-        // this.media[media] = new Audio(this.root + audio);   
+        }
     }
 };
 
 var Persistence = {
+    
+    retrieveStars: function() {
+        
+        console.log('Retrieving stars from local storage...');
+
+        var storedStars = localStorage.getItem('stars');
+
+        if(storedStars === null || storedStars.length === 0)
+            storedStars = 0;
+
+        return parseInt(storedStars);
+    },
+    
+    updateStars: function(n) {
+        
+        console.log('Updating stars, adding {0}'.format(n));
+
+        // Default is add 1 to level
+        var stars = this.retrieveStars();
+
+        localStorage.setItem('stars', stars + n);     
+    },    
     
     retrieveLevelIndex: function() {
         
@@ -1160,7 +1218,7 @@ var Persistence = {
         // Default is add 1 to level
         level = newLevel ? newLevel : level + 1;
 
-        console.log('Saving level {0} to local storage...'.format(level));
+        console.log('Saving level {0} to local storage'.format(level));
 
         localStorage.setItem('level', level);
     },
@@ -1172,7 +1230,7 @@ var Persistence = {
         var storedLevel = localStorage.getItem('level');
 
         if(storedLevel === null || storedLevel.length === 0)
-            storedLevel = startingLevel;
+            storedLevel = properties['startingLevel'];
 
         this.updateLevel(parseInt(storedLevel)); 
 

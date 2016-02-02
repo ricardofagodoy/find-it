@@ -1,14 +1,15 @@
 # find-it
 
-Hello everyone, this is Find it! innovative maze game!
+Hello!
+
+This is Find it! innovative maze game!
 Goal is to find the only complete (all edges connected) geometric shape and click it!
 
 Sounds easy? Try it out! :)
 
+_______________________________________________________________________
 
-
-Here some information might be useful in future times:
-
+Here some information might be useful:
 
 ## Level color reference ##
 

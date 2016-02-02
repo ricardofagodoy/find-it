@@ -1,6 +1,7 @@
 {
     "maxLevel": 51,
     "maxLevelIndex": 8,
+    "startingLevel": 1,
     "imageWidth": 780,
     "imageHeight": 1346,
     "imageFilesPath": "images/levels/level{0}-{1}.png",
@@ -16,10 +17,12 @@
     "instructionsCorrectY": 280,
     "instructionsImages": ["images/instructions1.png", "images/instructions2.png"],
     "adOptions": {
-        "bannerId": "ca-app-pub-2813072672105928/4159360894",
-        "interstitialId": "ca-app-pub-2813072672105928/2543026891",
         "isTesting": true
     },
+    "bannerIdAndroid": "ca-app-pub-2813072672105928/4159360894",
+    "interstitialIdAndroid": "ca-app-pub-2813072672105928/2543026891",
+    "bannerIdIos": "ca-app-pub-2813072672105928/1206210093",
+    "interstitialIdIos": "ca-app-pub-2813072672105928/2682943294",
     "sounds": {
         "menu": "menubg.mp3",
         "menuwin": "menubgwin.mp3",
