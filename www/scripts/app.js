@@ -97,9 +97,17 @@ function init() {
         
         // When process goes to background, stop sound!
         document.addEventListener("pause", function() {
-            if(!Sound.isMuted) {
+            if(!Sound.isMuted()) {
+                Sound.muteBackground = 1;
                 Sound.toggleMute();
-                Sound.stopMenu();
+            }
+        }, false);
+        
+        // When somes to foreground again
+        document.addEventListener("resume", function() {
+            if(Sound.muteBackground === 1) {
+                Sound.muteBackground = 0;
+                Sound.toggleMute();
             }
         }, false);
         
@@ -176,17 +184,13 @@ var Menu = {
         
         this.dom.mute.off('click').on('click', function(event) {
             
-            // TODO: Improve this
             Sound.toggleMute();
             
-            if(Sound.isMuted) {
-                Sound.stopMenu();
+            if(Sound.isMuted())
                 Menu.dom.mute.css('background-image', 'url("images/muted.png")');
-            } else {
-                Sound.playMenu();
+            else
                 Menu.dom.mute.css('background-image', 'url("images/sound.png")');
-            }
-                
+     
         });
     },
     
@@ -1022,7 +1026,8 @@ var Sound = {
     soundLevel: null,
     effectType: null,
     root: null,
-    isMuted: null,
+    volume: null,
+    muteBackground: null,
     
     init: function() {
             
@@ -1033,7 +1038,7 @@ var Sound = {
         this.root = this.root.replace(/%20/g, ' ');
 
         this.soundLevel = 0;
-        this.isMuted = 0;
+        this.volume = 1;
         this.effectType = 'correct';
 
         this.loadMenuSound();
@@ -1069,8 +1074,10 @@ var Sound = {
         this.stopLevel();
         this.stopEffect();
         
-        if(this.media.menu != null && !this.isMuted)
+        if(this.media.menu != null) {
             this.media.menu.play();
+            this.media.menu.setVolume(this.volume);
+        }
     },
     
     playLevel: function() {
@@ -1078,7 +1085,7 @@ var Sound = {
         this.stopMenu();
         this.stopEffect();
         
-        if(this.media.level != null && !this.isMuted) {
+        if(this.media.level != null) {
             
             if(parseInt(level / 10) != this.soundLevel) {
                 this.soundLevel = parseInt(level / 10);
@@ -1086,6 +1093,7 @@ var Sound = {
             }
             
             this.media.level.play();
+            this.media.level.setVolume(this.volume);
         }
     },
     
@@ -1124,7 +1132,14 @@ var Sound = {
     },
     
     toggleMute: function() {
-        this.isMuted = this.isMuted ? 0 : 1;
+        this.volume = this.volume ? 0 : 1;
+        
+        this.media.menu.setVolume(this.volume);
+        this.media.level.setVolume(this.volume);
+    },
+    
+    isMuted: function() {
+        return !this.volume;
     },
     
     loadAudio: function(media, audio, state) {
