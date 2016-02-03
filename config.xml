@@ -8,39 +8,43 @@
         Ricardo Godoy
     </author>
     <content src="index.html" />
-    <icon src="icon.png" />
     <preference name="Orientation" value="portrait" />
-    <preference name="SplashScreen" value="splash" />
+    <preference name="SplashScreen" value="screen" />
     <preference name="AutoHideSplashScreen" value="false" />
+    <preference name="ShowSplashScreenSpinner" value="false" />
     <preference name="android-build-tool" value="gradle" />
+    <preference name="StatusBarOverlaysWebView" value="false" />
     <plugin name="cordova-plugin-admobpro" source="npm" />
     <plugin name="org.apache.cordova.media" />
     <plugin name="cordova-plugin-device" />
     <platform name="android">
-        <splash src="splash.png" platform="android" qualifier="ldpi" />
-        <splash src="splash.png" platform="android" qualifier="mdpi" />
-        <splash src="splash.png" platform="android" qualifier="hdpi" />
-        <splash src="splash.png" platform="android" qualifier="xhdpi" />
-        <splash src="splash.png" platform="android" qualifier="fr-xhdpi" />
-        <splash src="splash.png" platform="android" qualifier="port-xxhdpi" />
-        <splash src="splash.png" platform="android" qualifier="land-xxhdpi" />
+        <access origin="*" />
+        <icon density="ldpi" src="iconAndroid.png" />
+        <icon density="mdpi" src="iconAndroid.png" />
+        <icon density="hdpi" src="iconAndroid.png" />
+        <icon density="xhdpi" src="iconAndroid.png" />
+        <splash density="ldpi" platform="android" src="screen.png" />
+        <splash density="mdpi" platform="android" src="screen.png" />
+        <splash density="hdpi" platform="android" src="screen.png" />
+        <splash density="xhdpi" platform="android" src="screen.png" />
+        <splash density="xxhdpi" platform="android" src="screen.png" />
         <allow-intent href="market:*" />
         <preference name="android-minSdkVersion" value="15" />
         <preference name="android-targetSdkVersion" value="19" />
     </platform>
     <platform name="ios">
-       <splash src="splash.png" width="320" height="480"/>
-        <splash src="splash.png" width="640" height="960"/>
-        <splash src="splash.png" width="768" height="1024"/>
-        <splash src="splash.png" width="1536" height="2048"/>
-        <splash src="splash.png" width="1024" height="768"/>
-        <splash src="splash.png" width="2048" height="1536"/>
-        <splash src="splash.png" width="640" height="1136"/>
-        <splash src="splash.png" width="750" height="1334"/>
-        <splash src="splash.png" width="1242" height="2208"/>
-        <splash src="splash.png" width="2208" height="1242"/>
+        <access origin="*" />
+        <icon src="iconApple.png" />
+        <splash height="480" platform="ios" src="screen.png" width="320" />
+        <splash height="960" platform="ios" src="screen.png" width="640" />
+        <splash height="1136" platform="ios" src="screen.png" width="640" />
+        <splash height="1024" platform="ios" src="screen.png" width="768" />
+        <splash height="768" platform="ios" src="screen.png" width="1024" />
+        <splash height="2048" platform="ios" src="screen.png" width="1536" />
+        <splash height="1536" platform="ios" src="screen.png" width="2048" />
         <allow-intent href="itms:*" />
         <allow-intent href="itms-apps:*" />
     </platform>
+    <engine name="android" spec="~4.1.1" />
     <engine name="ios" spec="~3.9.2" />
 </widget>

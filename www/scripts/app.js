@@ -30,7 +30,7 @@ var propertiesDeffered = $.Deferred(),
     levelIndex = 1; // Under each level, there are maxLevelIndex different mazes
     
 function init() {
-
+    
     console.log('Starting to init...');
         
     // Get window size
@@ -75,11 +75,20 @@ function init() {
         Persistence.retrievePlayerLevel();
         
         // Init sounds modules
-        Sound.init();
+        //Sound.init();
         
         // Init menu module
         Menu.init();
-    
+        
+        // Hide splashscreen
+        setTimeout(function() {
+            if(navigator.splashscreen)
+                navigator.splashscreen.hide();
+        }, 600);
+        
+        // Init ads module
+        Ads.init(); 
+        
         // Init transition module
         Transition.init();
         
@@ -119,17 +128,9 @@ function init() {
             'images/star.gif'
         ]);
         
-        // Hide splashscreen after 1s
-        setTimeout(function() {
-            if(navigator.splashscreen)
-                navigator.splashscreen.hide();
-        }, 500);
-        
         // Start playing loaded sound
         Sound.playMenu();
         
-        // Init ads module
-        Ads.init(); 
       });
     
     console.log('Init method reached its end');
@@ -181,6 +182,10 @@ var Menu = {
             Sound.playClick();
             Menu.showInstructions();
         });  
+        
+        // Drags mute buttons a little bit down if iOS 
+        if(/(ipod|iphone|ipad)/i.test(navigator.userAgent))
+            this.dom.mute.css('top', '4%');
         
         this.dom.mute.off('click').on('click', function(event) {
             
@@ -991,6 +996,7 @@ var Ads = {
     
     showBanner: function() {
         if(window.AdMob && !this.bannerVisible && this.admobid != null) {
+
            AdMob.createBanner({
                 adId : this.admobid.banner,
                 position : AdMob.AD_POSITION.BOTTOM_CENTER,
@@ -1042,7 +1048,7 @@ var Sound = {
         this.effectType = 'correct';
 
         this.loadMenuSound();
-        this.loadAudio('level', properties.sounds['level'].format(this.soundLevel), null);
+        this.loadLevelSound();
             
         this.loadAudio('effect', properties.sounds[Sound.effectType], null); 
         this.loadAudio('click', properties.sounds['click'], null);
@@ -1069,6 +1075,15 @@ var Sound = {
         });
     },
     
+    loadLevelSound: function() {
+        
+        this.loadAudio('level', properties.sounds['level'].
+             format(this.soundLevel), function (status) {
+                    if (status === Media.MEDIA_STOPPED)
+                        Sound.playLevel();
+            });
+    },
+    
     playMenu: function() {
         
         this.stopLevel();
@@ -1089,7 +1104,7 @@ var Sound = {
             
             if(parseInt(level / 10) != this.soundLevel) {
                 this.soundLevel = parseInt(level / 10);
-                this.loadAudio('level', properties.sounds['level'].format(this.soundLevel));
+                this.loadLevelSound();
             }
             
             this.media.level.play();
@@ -1113,7 +1128,7 @@ var Sound = {
     
     stopLevel: function() {
         if(this.media.level != null)
-             this.media.level.stop();
+             this.media.level.pause();
     },
     
     stopEffect: function() {

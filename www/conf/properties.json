@@ -43,19 +43,19 @@
     "messages": {
         "error.fatal": "Fatal error: ",
         
-        "transition.new.title": "Let's start",
+        "transition.new.title": "Let's<br/>start",
         "transition.new.msg1": "Ready to level {0}?",
         "transition.new.msg2": "Time: {0} seconds",
         "transition.new.special": "ARE YOU READY?",
         "transition.new.play": "Start",
         
-        "transition.resume.title": "Let's Continue",
+        "transition.resume.title": "Let's<br/>Continue",
         "transition.resume.msg1": "Next level: {0}",
         "transition.resume.msg2": "Time: {0} seconds",
         "transition.resume.special": "ARE YOU READY?",
         "transition.resume.play": "Start",
         
-        "transition.next.title": "Well done!",
+        "transition.next.title": "Well<br/>done!",
         "transition.next.msg1": "Next level: {0}",
         "transition.next.msg2": "Time: {0} seconds",
         "transition.next.play": "Start",
@@ -73,9 +73,9 @@
         "transition.lose.special": "DON'T GIVE UP!",
         "transition.lose.bg": "rgba(230, 20, 20, 1)",
         
-        "instructions.default": "Your goal is to find closed shape (all edges connected)",
-        "instructions.done1": "Like that! <br/>Looks pretty easy, doesn't it?",
-        "instructions.done2": "Things will get much more difficult, less time too",
+        "instructions.default": "Your goal is to find the only closed shape within the maze",
+        "instructions.done1": "Just like that!<br/>Looks pretty easy, doesn't it?",
+        "instructions.done2": "Things will get much more difficult and you'll get less time",
         "instructions.done3": "Well, you will figure that out!<br/>Good luck!!",
         
         "menu.status": "Next level: {0}",

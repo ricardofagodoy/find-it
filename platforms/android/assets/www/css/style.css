@@ -1,10 +1,10 @@
 @font-face {
     font-family: square;
-    src: url("../font/SquareOne.ttf");
+    src: url("../font/SquareOk.ttf");
 }
 
 html, body{
-    font-size: 10px;
+    font-size: 13px;
     margin: 0;
     text-align: center;
     font-family: square;
@@ -13,12 +13,14 @@ html, body{
     user-select: none;
 }
 
-@media (min-width: 320px) { html { font-size: 18px; } }
-@media (min-width: 360px) { html { font-size: 20px; } }
-@media (min-width: 420px) { html { font-size: 22px; } }
-@media (min-width: 520px) { html { font-size: 24px; } }
-@media (min-width: 600px) { html { font-size: 26px; } }
-@media (min-width: 720px) { html { font-size: 28px; } }
+@media (min-width: 320px) { html { font-size: 21px; } }
+@media (min-width: 360px) { html { font-size: 24px; } }
+@media (min-width: 420px) { html { font-size: 26px; } }
+@media (min-width: 520px) { html { font-size: 28px; } }
+@media (min-width: 600px) { html { font-size: 30px; } }
+@media (min-width: 720px) { html { font-size: 34px; } }
+@media (min-width: 740px) { html { font-size: 37px; } }
+@media (min-width: 780px) { html { font-size: 40px; } }
 
 /*** MENU STYLES ***/
 
