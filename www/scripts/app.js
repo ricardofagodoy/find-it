@@ -316,7 +316,7 @@ var Menu = {
             numberClick = 0;
    
         // Clicks on screen to activate animation
-        Menu.dom.instructionScreen.find('#textual').off('click').on('click', function(event) {
+        Menu.dom.instructionScreen.off('click').on('click', function(event) {
                 
            switch (numberClick) {
                    
@@ -519,39 +519,34 @@ var Transition = {
         
         specificLevel = specificLevel == undefined ? level : specificLevel;
         
-        var base = properties.levelColors[Math.floor(specificLevel/10)],
-            relativeOffset = (specificLevel%10) * base.offset,
+        var colorLevel = Math.floor(specificLevel/10),
+            base = properties.levelColors[colorLevel],
+            nextBase = properties.levelColors[colorLevel+1],
+            levelOffset = (specificLevel%10),
             opacity = 0.8;
+        
+        if(specificLevel == properties['maxLevel'])
+            base = properties['lastLevelColor'];
+        else {
+            if(!base['rOffset'])
+                base['rOffset'] = Math.round((nextBase.r - base.r) / 10);
+                base['rOffset'] = Math.round((nextBase.r - base.r) / 10);
+            
+            if(!base['gOffset'])
+                base['gOffset'] = Math.round((nextBase.g - base.g) / 10);
+            
+            if(!base['bOffset'])
+                base['bOffset'] = Math.round((nextBase.b - base.b) / 10);
+        }
         
         // Copy that color options
         base = $.extend({}, base);
         
-        console.log('Base color {0} and offset {1}'.
-                    format(Math.floor(specificLevel/10), relativeOffset));
+        console.log('Base color {0} and offset {1}'.format(colorLevel, levelOffset));
         
-        switch(Math.floor(specificLevel/10)) {
-        
-            case 0: 
-                base.g += relativeOffset;
-            break;
-                
-            case 1: 
-                base.r -= relativeOffset;
-            break;
-                
-            case 2: 
-                base.g -= relativeOffset;
-                base.b += relativeOffset;
-            break;
-                
-            case 3: 
-                base.r += relativeOffset;
-            break;
-                
-            case 4: 
-                base.g += relativeOffset;
-            break;
-        }
+        base.r += base['rOffset'] * levelOffset;
+        base.g += base['gOffset'] * levelOffset;
+        base.b += base['bOffset'] * levelOffset;
         
         // Fix outbounds
         base.r = base.r > 255 ? 255 : base.r;
