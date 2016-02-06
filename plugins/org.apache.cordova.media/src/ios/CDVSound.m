@@ -215,19 +215,22 @@
 
 - (void)create:(CDVInvokedUrlCommand*)command
 {
-    NSString* mediaId = [command argumentAtIndex:0];
-    NSString* resourcePath = [command argumentAtIndex:1];
+    [self.commandDelegate runInBackground:^{
+    
+        NSString* mediaId = [command argumentAtIndex:0];
+        NSString* resourcePath = [command argumentAtIndex:1];
 
-    CDVAudioFile* audioFile = [self audioFileForResource:resourcePath withId:mediaId doValidation:NO forRecording:NO];
+        CDVAudioFile* audioFile = [self audioFileForResource:resourcePath withId:mediaId doValidation:NO forRecording:NO];
 
-    if (audioFile == nil) {
-        NSString* errorMessage = [NSString stringWithFormat:@"Failed to initialize Media file with path %@", resourcePath];
-        NSString* jsString = [NSString stringWithFormat:@"%@(\"%@\",%d,%@);", @"cordova.require('org.apache.cordova.media.Media').onStatus", mediaId, MEDIA_ERROR, [self createMediaErrorWithCode:MEDIA_ERR_ABORTED message:errorMessage]];
-        [self.commandDelegate evalJs:jsString];
-    } else {
-        CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
-        [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
-    }
+        if (audioFile == nil) {
+            NSString* errorMessage = [NSString stringWithFormat:@"Failed to initialize Media file with path %@", resourcePath];
+            NSString* jsString = [NSString stringWithFormat:@"%@(\"%@\",%d,%@);", @"cordova.require('org.apache.cordova.media.Media').onStatus", mediaId, MEDIA_ERROR, [self createMediaErrorWithCode:MEDIA_ERR_ABORTED message:errorMessage]];
+            [self.commandDelegate evalJs:jsString];
+        } else {
+            CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+            [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+        }
+    }];
 }
 
 - (void)setVolume:(CDVInvokedUrlCommand*)command
@@ -254,25 +257,27 @@
 
 - (void)startPlayingAudio:(CDVInvokedUrlCommand*)command
 {
-    NSString* callbackId = command.callbackId;
+    [self.commandDelegate runInBackground:^{
+        
+        NSString* callbackId = command.callbackId;
 
-#pragma unused(callbackId)
-    NSString* mediaId = [command argumentAtIndex:0];
-    NSString* resourcePath = [command argumentAtIndex:1];
-    NSDictionary* options = [command argumentAtIndex:2 withDefault:nil];
+    #pragma unused(callbackId)
+        NSString* mediaId = [command argumentAtIndex:0];
+        NSString* resourcePath = [command argumentAtIndex:1];
+        NSDictionary* options = [command argumentAtIndex:2 withDefault:nil];
 
-    BOOL bError = NO;
-    NSString* jsString = nil;
+        BOOL bError = NO;
+        NSString* jsString = nil;
 
-    CDVAudioFile* audioFile = [self audioFileForResource:resourcePath withId:mediaId doValidation:YES forRecording:NO];
-    if ((audioFile != nil) && (audioFile.resourceURL != nil)) {
-        if (audioFile.player == nil) {
-            bError = [self prepareToPlay:audioFile withId:mediaId];
-        }
-        if (!bError) {
-            // audioFile.player != nil  or player was successfully created
-            // get the audioSession and set the category to allow Playing when device is locked or ring/silent switch engaged
-            if ([self hasAudioSession]) {
+        CDVAudioFile* audioFile = [self audioFileForResource:resourcePath withId:mediaId doValidation:YES forRecording:NO];
+        if ((audioFile != nil) && (audioFile.resourceURL != nil)) {
+            if (audioFile.player == nil) {
+                bError = [self prepareToPlay:audioFile withId:mediaId];
+            }
+            if (!bError) {
+                // audioFile.player != nil  or player was successfully created
+                // get the audioSession and set the category to allow Playing when device is locked or ring/silent switch engaged
+                if ([self hasAudioSession]) {
                 NSError* __autoreleasing err = nil;
                 NSNumber* playAudioWhenScreenIsLocked = [options objectForKey:@"playAudioWhenScreenIsLocked"];
                 BOOL bPlayAudioWhenScreenIsLocked = YES;
@@ -331,6 +336,7 @@
     }
     // else audioFile was nil - error already returned from audioFile for resource
     return;
+    }];
 }
 
 - (BOOL)prepareToPlay:(CDVAudioFile*)audioFile withId:(NSString*)mediaId
@@ -645,9 +651,9 @@
         // jsString = [NSString stringWithFormat: @"%@(\"%@\",%d,%d);", @"cordova.require('org.apache.cordova.media.Media').onStatus", mediaId, MEDIA_ERROR, MEDIA_ERR_DECODE];
         jsString = [NSString stringWithFormat:@"%@(\"%@\",%d,%@);", @"cordova.require('org.apache.cordova.media.Media').onStatus", mediaId, MEDIA_ERROR, [self createMediaErrorWithCode:MEDIA_ERR_DECODE message:nil]];
     }
-    if (self.avSession) {
-        [self.avSession setActive:NO error:nil];
-    }
+    //if (self.avSession) {
+   //     [self.avSession setActive:NO error:nil];
+   // }
     [self.commandDelegate evalJs:jsString];
 }
 

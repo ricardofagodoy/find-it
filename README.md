@@ -8,14 +8,3 @@ Goal is to find the only complete (all edges connected) geometric shape and clic
 Sounds easy? Try it out! :)
 
 _______________________________________________________________________
-
-Here some information might be useful:
-
-## Level color reference ##
-
-- Level 0-10  (orange going to yellow)
-- Level 10-20 (yellow going to green)
-- Level 20-30 (green going to blue)
-- Level 30-40 (blue going to purple)
-- Level 40-50 (purple going to white)
-- Level 50 - white
