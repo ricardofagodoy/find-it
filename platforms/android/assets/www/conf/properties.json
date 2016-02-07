@@ -1,5 +1,5 @@
 {
-    "maxLevel": 4,
+    "maxLevel": 3,
     "maxLevelIndex": 8,
     "startingLevel": 1,
     "imageWidth": 780,
@@ -17,7 +17,7 @@
     "instructionsCorrectY": 280,
     "instructionsImages": ["images/instructions1.png", "images/instructions2.png"],
     "adOptions": {
-        "isTesting": true
+        "isTesting": "yes"
     },
     "bannerIdAndroid": "ca-app-pub-2813072672105928/4159360894",
     "interstitialIdAndroid": "ca-app-pub-2813072672105928/2543026891",
@@ -41,7 +41,7 @@
         {"r": 255, "g": 107, "b": 109},
         {"r": 255, "g": 107, "b": 109}
     ],
-    "lastLevelColor": {"r": 255, "g": 50, "b": 50,
+    "lastLevelColor": {"r": 0, "g": 0, "b": 0,
                        "rOffset": 0, "gOffset": 0, "bOffset": 0},
     "messages": {
         "error.fatal": "Fatal error: ",

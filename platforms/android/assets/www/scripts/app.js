@@ -194,7 +194,7 @@ var Menu = {
         
         console.log('Loading original main menu...');
         
-        this.dom.title.css({color: '#000', 'text-shadow': '0px 0px 0px #000'});
+        this.dom.title.css('color', '#76DB6D');
         
         // Play button
         this.dom.play.off('click').on('click', function(event) {
@@ -229,7 +229,7 @@ var Menu = {
         }).html(messages['menu.new']);
         
         // Paints status in black
-        this.dom.status.css('color', '#000');
+        this.dom.status.css('color', '#76DB6D');
         
         // Update status message accoring to current level
         this.updateStatusMessage();
@@ -975,8 +975,9 @@ var Ads = {
     },
     
     showBanner: function() {
+        
         if(window.AdMob && !this.bannerVisible && this.admobid != null) {
-
+            
            AdMob.createBanner({
                 adId : this.admobid.banner,
                 position : AdMob.AD_POSITION.BOTTOM_CENTER,
@@ -1120,7 +1121,9 @@ var Sound = {
                     this.loadLevelSound();
                 
                 this.stop('menu');
-                workMedia.player.seekTo(1);
+                
+                if(workMedia.player != null)
+                    workMedia.player.seekTo(1);
             break;
                 
             case 'correct': 

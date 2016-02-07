@@ -194,42 +194,40 @@ var Menu = {
         
         console.log('Loading original main menu...');
         
-        this.dom.title.css({color: '#000', 'text-shadow': '0px 0px 0px #000'});
+        // Original title colors
+        this.dom.title.removeClass('menuWinner').addClass('menuOriginal');
         
         // Play button
         this.dom.play.off('click').on('click', function(event) {
             
             // Change cards
-            //Menu.dom.self.fadeOut('fast', function() {
                 
-                Menu.dom.self.hide();
+            Menu.dom.self.hide();
             
-                if(level > 1)
-                    Transition.updateText(STATUS.RESUME);
-                else
-                    Transition.updateText(STATUS.NEW);
+            if(level > 1)
+                Transition.updateText(STATUS.RESUME);
+            else
+                Transition.updateText(STATUS.NEW);
                 
-                Maze.dom.self.fadeIn("fast");
+            Maze.dom.self.fadeIn("fast");
                 
-                // Load "first" level
-                Maze.loadLevel();
+            // Load "first" level
+            Maze.loadLevel();
 
-                // Resets timer - ready to play!
-                Timer.resetTimer(); 
+            // Resets timer - ready to play!
+            Timer.resetTimer(); 
 
-                // Position correctly level indicator
-                Maze.dom.levelInfo.html(level);
-                Maze.dom.levelInfo.css('top', 
-                                (windowHeight/2 - Maze.dom.levelInfo.height()/2) + 'px');
-                
-          //  });
+            // Position correctly level indicator
+            Maze.dom.levelInfo.html(level);
+            Maze.dom.levelInfo.css('top', 
+                            (windowHeight/2 - Maze.dom.levelInfo.height()/2) + 'px');
             
             Sound.play('click');
              
         }).html(messages['menu.new']);
         
-        // Paints status in black
-        this.dom.status.css('color', '#000');
+        // Paints status
+        this.dom.status.css('color', '#76DB6D');
         
         // Update status message accoring to current level
         this.updateStatusMessage();
@@ -241,13 +239,13 @@ var Menu = {
     
         console.log('Configuring main menu to winner mode...');
 
-        // TODO: Titles gets painted yellow
-        this.dom.title.css({color: '#E0BB00', 'text-shadow': '2px 2px 2px #000'});
+        // Title gets painted yellow
+        this.dom.title.removeClass('menuOriginal').addClass('menuWinner');
         
         // Status is painted yellow too
         this.dom.status.css('color', '#E0BB00');
 
-        // TODO: FIX THIS SHIT
+        // FIX THIS SHIT
         var resetConfirmation = $('#reset');
 
         // If clicks no, just close it
@@ -900,13 +898,11 @@ var Timer = {
         console.log('Starting timer for {0} seconds...'.format(seconds));
 
         // Set new time for that level
-        this.dom.css('transition-duration', seconds + 's');
-
         // Set original transition property (top position)
-        this.dom.css('transition-property', 'top');
-
         // This starts the animation, bringing the div down to 0
-        this.dom.css('top', 0);
+        this.dom.css({'transition-duration': seconds + 's',
+                      'transition-property': 'top',
+                      'top': 0 });
         
         // Calculate seconds taken to finsish level
         this.secondsPassed = 0;
@@ -932,13 +928,11 @@ var Timer = {
         clearInterval(this.secondsIntervalRef);
 
         // Prevents timer to animate when reseting
-        this.dom.css('transition-property', 'none');
-
         // Pull back up the div
-        this.dom.css('top', -windowHeight + 'px');
-
         // Set background to original colors
-        this.dom.css('background-color', this.color);
+        this.dom.css({'transition-property': 'none',
+                      'top': -windowHeight + 'px',
+                      'background-color': Timer.color });
 
         // Turn off callback when animation is completed (not needed when reseting)
         this.dom.off('transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd');
@@ -975,8 +969,9 @@ var Ads = {
     },
     
     showBanner: function() {
+        
         if(window.AdMob && !this.bannerVisible && this.admobid != null) {
-
+            
            AdMob.createBanner({
                 adId : this.admobid.banner,
                 position : AdMob.AD_POSITION.BOTTOM_CENTER,
@@ -1120,7 +1115,9 @@ var Sound = {
                     this.loadLevelSound();
                 
                 this.stop('menu');
-                workMedia.player.seekTo(1);
+                
+                if(workMedia.player != null)
+                    workMedia.player.seekTo(1);
             break;
                 
             case 'correct': 

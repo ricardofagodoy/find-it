@@ -29,7 +29,8 @@ html, body{
     width: 100%;
     height: 100%;
     background-size: cover; 
-    background-image: url("../images/bg.jpg");  
+    background-image: url("../images/bg.jpg"); 
+    
 }
 
 #menu #mute {
@@ -39,8 +40,8 @@ html, body{
     background-image: url('../images/sound.png');
     background-repeat: no-repeat;
     background-size: 15px 30px;
-    width: 15px;
-    height: 30px;
+    width: 50px;
+    height: 50px;
 }
 
 #menu #title {
@@ -48,11 +49,22 @@ html, body{
     padding-bottom: 15%;
     max-height: 30%;
     font-size: 4rem;
+    font-weight: bold;
+}
+
+.menuOriginal {
+    color: #000;
+    text-shadow: 2px 2px 2px #76DB6D;
+}
+
+.menuWinner {
+    color: #E0BB00;
+    text-shadow: 2px 2px 2px #000;
 }
 
 #menu #options {
     position: relative;
-    color: #000;
+    color: #76DB6D;
     height: 40%;
 }
 
@@ -67,16 +79,17 @@ html, body{
 #menu #options div span {
     padding: 2%;
     border: 2px double #000;
-    background-color: rgba(0, 0, 0, 0.2);
+    background-color: rgba(0, 0, 0, 0.8);
     border-radius: 5px 5px 5px 5px;
     -webkit-border-radius: 5px 5px 5px 5px;
 }
 
 #menu #options #status {
     border: 2px double #000;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.6);
     border-radius: 0px 0px 0px 0px;
     -webkit-border-radius: 0px 0px 0px 0px;
+    color: #76DB6D;
 }
 
 /*** TRANSITION STYLES ***/
@@ -95,6 +108,8 @@ html, body{
     top: 10%;
     max-height: 15%; 
     font-size: 2rem;
+    color: #76DB6D;
+    text-shadow: 2px 2px 2px #000;
 }
 
 #transition #options {
@@ -150,9 +165,10 @@ html, body{
 #transition #options #play,  #transition #options #back{
     padding: 2%;
     border: 2px double #000;
-    background-color: rgba(0, 0, 0, 0.2);
+    background-color: rgba(0, 0, 0, 0.6);
     border-radius: 5px 5px 5px 5px;
     -webkit-border-radius: 5px 5px 5px 5px;
+    color: #76DB6D;
 }
 
 /*** RESET CONFIRMATION STYLES ***/
@@ -235,8 +251,10 @@ html, body{
 #creditsScreen #title {
     font-size: 1.8rem;
     margin-top: 10%;
-    margin-bottom: 5%;
+    margin-bottom: 7%;
     max-height: 20%;
+    color: #76DB6D;
+    text-shadow: 2px 2px 2px #000;
 }
 
 #creditsScreen #subtitle {
@@ -247,6 +265,8 @@ html, body{
 #creditsScreen #normaltext {
     font-style: italic;
     max-height: 5%;
+    color: #76DB6D;
+    text-shadow: 1px 1px 1px #000;
 }
 
 #creditsScreen #thanks {
@@ -254,9 +274,10 @@ html, body{
     font-size: 1rem;
     margin: 1% auto 0 auto;
     border: 2px double #000;
-    background-color: rgba(0, 0, 0, 0.2);
+    background-color: rgba(0, 0, 0, 0.8);
     border-radius: 5px 5px 5px 5px;
     -webkit-border-radius: 5px 5px 5px 5px;
+    color: #76DB6D;
 }
 
 /*** INSTRUCTION SCREEN ****/
@@ -274,11 +295,12 @@ html, body{
     position: absolute;
     margin: 0 auto;
     font-size: 1rem;
-    color: yellow;
+    color: #76DB6D;
     padding: 10% 5%;
     line-height: 200%;
     bottom: 20%;
     background-color: rgba(0, 0, 0, 0.4);
+    text-shadow: 1px 1px 1px #000;
 }
 
 #instructionScreen #pointer {
