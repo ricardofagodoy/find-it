@@ -106,12 +106,10 @@ function init() {
         
         // When process goes to background, stop sound!
         document.addEventListener("pause", function() {
-          //  Sound.toggleMute();
         }, false);
         
         // When somes to foreground again
         document.addEventListener("resume", function() {
-           // Sound.toggleMute();
         }, false); 
         
         // Preload images
@@ -121,7 +119,6 @@ function init() {
             'images/trophy.png',
             'images/star.gif'
         ]);
-        
       });
     
     console.log('Init method reached its end');
@@ -194,41 +191,39 @@ var Menu = {
         
         console.log('Loading original main menu...');
         
-        this.dom.title.css('color', '#76DB6D');
+        // Original title colors
+        this.dom.title.removeClass('menuWinner').addClass('menuOriginal');
         
         // Play button
         this.dom.play.off('click').on('click', function(event) {
             
             // Change cards
-            //Menu.dom.self.fadeOut('fast', function() {
                 
-                Menu.dom.self.hide();
+            Menu.dom.self.hide();
             
-                if(level > 1)
-                    Transition.updateText(STATUS.RESUME);
-                else
-                    Transition.updateText(STATUS.NEW);
+            if(level > 1)
+                Transition.updateText(STATUS.RESUME);
+            else
+                Transition.updateText(STATUS.NEW);
                 
-                Maze.dom.self.fadeIn("fast");
+            Maze.dom.self.fadeIn("fast");
                 
-                // Load "first" level
-                Maze.loadLevel();
+            // Load "first" level
+            Maze.loadLevel();
 
-                // Resets timer - ready to play!
-                Timer.resetTimer(); 
+            // Resets timer - ready to play!
+            Timer.resetTimer(); 
 
-                // Position correctly level indicator
-                Maze.dom.levelInfo.html(level);
-                Maze.dom.levelInfo.css('top', 
-                                (windowHeight/2 - Maze.dom.levelInfo.height()/2) + 'px');
-                
-          //  });
+            // Position correctly level indicator
+            Maze.dom.levelInfo.html(level);
+            Maze.dom.levelInfo.css('top', 
+                            (windowHeight/2 - Maze.dom.levelInfo.height()/2) + 'px');
             
             Sound.play('click');
              
         }).html(messages['menu.new']);
         
-        // Paints status in black
+        // Paints status
         this.dom.status.css('color', '#76DB6D');
         
         // Update status message accoring to current level
@@ -241,13 +236,13 @@ var Menu = {
     
         console.log('Configuring main menu to winner mode...');
 
-        // TODO: Titles gets painted yellow
-        this.dom.title.css({color: '#E0BB00', 'text-shadow': '2px 2px 2px #000'});
+        // Title gets painted yellow
+        this.dom.title.removeClass('menuOriginal').addClass('menuWinner');
         
         // Status is painted yellow too
         this.dom.status.css('color', '#E0BB00');
 
-        // TODO: FIX THIS SHIT
+        // FIX THIS SHIT
         var resetConfirmation = $('#reset');
 
         // If clicks no, just close it
@@ -560,6 +555,9 @@ var Maze = {
     
     dom: null,
     
+    currentCoords: null,
+    safeRadius: null,
+    
     init: function() {
         
         // Link to DOM nodes
@@ -569,6 +567,8 @@ var Maze = {
             mapTarget: $('#game #mazes #mazemap'),
             levelInfo: $('#game #levelInfo')
         };
+
+        this.safeRadius = properties['safeRadius'];
     },
     
     loadLevel: function() {
@@ -597,15 +597,20 @@ var Maze = {
         this.dom.mapTarget.find('area').remove();
         
         var widthScale = properties.widthScale,
-            heightScale = properties.heightScale;
-    
+            heightScale = properties.heightScale,
+            adjustedCoords = levelProps.coords[levelIndex-1].
+                map(function(value, index) {
+                    return Math.floor(index%2 ? value/heightScale : value/widthScale);
+                });
+            
         // Position to correct click
         var area = $('<area>', {
             shape: 'poly',
-            coords: levelProps.coords[levelIndex-1].map(function(value, index) {
-                return Math.floor(index%2 ? value/heightScale : value/widthScale);
-            }).join(', ')
+            coords: adjustedCoords.join(', ')
         }).appendTo(this.dom.mapTarget);
+        
+        // Load safe click coords
+        this.currentCoords = adjustedCoords;
     
         // Initialize jquery maphilight to current maze
         this.dom.target.maphilight(properties.mapHighlightProps);
@@ -768,8 +773,17 @@ var Maze = {
 
         // Click anywhere else: lose
         Card.dom.bind('click', function(event) { 
-            if(event.target.nodeName != 'AREA')
+            
+            if(event.target.nodeName != 'AREA') {
+                
+                if(Maze.checkSafeClick(event.clientX, event.clientY)) {
+                    Maze.dom.mapTarget.find('area').trigger("click");
+                    return;
+                }
+                    
                 Maze.loseLevel();
+            }
+            
         });   
     },
         
@@ -779,6 +793,29 @@ var Maze = {
 
         this.dom.mapTarget.find('area').unbind('click');
         Card.dom.unbind('click');
+    },
+    
+    checkSafeClick: function(x, y) {
+        
+        console.log('Calling check safe click for x: ' + x + ' | y: ' + y);
+    
+        for(var t = 0; t < this.currentCoords.length-3; t+=4)
+            if (colisionCircleLine(this.currentCoords[t],
+                                   this.currentCoords[t+1],
+                                   this.currentCoords[t+2],
+                                   this.currentCoords[t+3],
+                                   x,
+                                   y,
+                                   this.safeRadius))
+                return 1;
+        
+        return colisionCircleLine(this.currentCoords[this.currentCoords.length-1],
+                                  this.currentCoords[this.currentCoords.length-2],
+                                  this.currentCoords[0],
+                                  this.currentCoords[1],
+                                  x,
+                                  y,
+                                  this.safeRadius);       
     }
 };
 
@@ -900,13 +937,11 @@ var Timer = {
         console.log('Starting timer for {0} seconds...'.format(seconds));
 
         // Set new time for that level
-        this.dom.css('transition-duration', seconds + 's');
-
         // Set original transition property (top position)
-        this.dom.css('transition-property', 'top');
-
         // This starts the animation, bringing the div down to 0
-        this.dom.css('top', 0);
+        this.dom.css({'transition-duration': seconds + 's',
+                      'transition-property': 'top',
+                      'top': 0 });
         
         // Calculate seconds taken to finsish level
         this.secondsPassed = 0;
@@ -932,13 +967,11 @@ var Timer = {
         clearInterval(this.secondsIntervalRef);
 
         // Prevents timer to animate when reseting
-        this.dom.css('transition-property', 'none');
-
         // Pull back up the div
-        this.dom.css('top', -windowHeight + 'px');
-
         // Set background to original colors
-        this.dom.css('background-color', this.color);
+        this.dom.css({'transition-property': 'none',
+                      'top': -windowHeight + 'px',
+                      'background-color': Timer.color });
 
         // Turn off callback when animation is completed (not needed when reseting)
         this.dom.off('transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd');
@@ -1038,6 +1071,15 @@ var Sound = {
         this.loadAudio('click', properties.sounds['click']);
             
         console.log('Sound module loaded!'); 
+    },
+    
+    destroy: function() {
+        
+        for(var i in this.media)
+            if(this.media[i].player != null) {
+                this.stop(i);
+                this.media[i].player.release();
+            }
     },
     
     loadAudio: function(media, audio) {
@@ -1314,21 +1356,21 @@ function onBackButtonPress() {
         // Update status message regarding new level
         Menu.updateStatusMessage();
         
-      //  Maze.dom.self.fadeOut("fast", function() {
+        Maze.dom.self.hide();
+            
+        // Show menu again
+        Menu.dom.self.show();
+            
+        // Music again
+        Sound.play('menu');
+            
+        // Show banner again (it's hidden from transition screen)
+        Ads.showBanner();
         
-            Maze.dom.self.hide();
-            
-            // Show menu again
-            Menu.dom.self.fadeIn('fast');
-            
-            // Music again
-            Sound.play('menu');
-            
-            // Show banner again (it's hidden from transition screen)
-            Ads.showBanner();
-     //   });
-    } else 
+    } else {
+        Sound.destroy();
         navigator.app.exitApp(); 
+    }
     
     Sound.play('click');
 }
@@ -1342,4 +1384,29 @@ function preloadImages(array) {
         preloadedImagesList.push(img);
         img.src = array[i];
     }
+}
+
+function distanceTwoPoints(x1, y1, x2, y2) {
+    return Math.sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2));
+}
+
+function colisionCircleLine(ax, ay, bx, by, cx, cy, r) {
+    
+    console.log('Colision: ax/ay ' + ax + '/' + ay + ' | bx/by ' + bx + '/' + by);
+    
+    var AB = distanceTwoPoints(ax, ay, bx, by),
+        Dx = (bx-ax)/AB,
+        Dy = (by-ay)/AB;
+    
+    // Now the line equation is x = Dx*t + Ax, y = Dy*t + Ay with 0 <= t <= 1
+    
+    // compute the value t of the closest point to the circle center (Cx, Cy)
+    var t = Dx*(cx-ax) + Dy*(cy-ay),
+        Ex = t*Dx+ax,
+        Ey = t*Dy+ay,
+        EC = distanceTwoPoints(Ex, Ey, cx, cy);
+    
+    console.log('Distance from perfect click: ' + EC);
+    
+    return EC <= r;
 }

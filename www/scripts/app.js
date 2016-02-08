@@ -106,12 +106,10 @@ function init() {
         
         // When process goes to background, stop sound!
         document.addEventListener("pause", function() {
-          //  Sound.toggleMute();
         }, false);
         
         // When somes to foreground again
         document.addEventListener("resume", function() {
-           // Sound.toggleMute();
         }, false); 
         
         // Preload images
@@ -121,7 +119,6 @@ function init() {
             'images/trophy.png',
             'images/star.gif'
         ]);
-        
       });
     
     console.log('Init method reached its end');
@@ -558,6 +555,9 @@ var Maze = {
     
     dom: null,
     
+    currentCoords: null,
+    safeRadius: null,
+    
     init: function() {
         
         // Link to DOM nodes
@@ -567,6 +567,8 @@ var Maze = {
             mapTarget: $('#game #mazes #mazemap'),
             levelInfo: $('#game #levelInfo')
         };
+
+        this.safeRadius = properties['safeRadius'];
     },
     
     loadLevel: function() {
@@ -595,15 +597,20 @@ var Maze = {
         this.dom.mapTarget.find('area').remove();
         
         var widthScale = properties.widthScale,
-            heightScale = properties.heightScale;
-    
+            heightScale = properties.heightScale,
+            adjustedCoords = levelProps.coords[levelIndex-1].
+                map(function(value, index) {
+                    return Math.floor(index%2 ? value/heightScale : value/widthScale);
+                });
+            
         // Position to correct click
         var area = $('<area>', {
             shape: 'poly',
-            coords: levelProps.coords[levelIndex-1].map(function(value, index) {
-                return Math.floor(index%2 ? value/heightScale : value/widthScale);
-            }).join(', ')
+            coords: adjustedCoords.join(', ')
         }).appendTo(this.dom.mapTarget);
+        
+        // Load safe click coords
+        this.currentCoords = adjustedCoords;
     
         // Initialize jquery maphilight to current maze
         this.dom.target.maphilight(properties.mapHighlightProps);
@@ -766,8 +773,17 @@ var Maze = {
 
         // Click anywhere else: lose
         Card.dom.bind('click', function(event) { 
-            if(event.target.nodeName != 'AREA')
+            
+            if(event.target.nodeName != 'AREA') {
+                
+                if(Maze.checkSafeClick(event.clientX, event.clientY)) {
+                    Maze.dom.mapTarget.find('area').trigger("click");
+                    return;
+                }
+                    
                 Maze.loseLevel();
+            }
+            
         });   
     },
         
@@ -777,6 +793,29 @@ var Maze = {
 
         this.dom.mapTarget.find('area').unbind('click');
         Card.dom.unbind('click');
+    },
+    
+    checkSafeClick: function(x, y) {
+        
+        console.log('Calling check safe click for x: ' + x + ' | y: ' + y);
+    
+        for(var t = 0; t < this.currentCoords.length-3; t+=4)
+            if (colisionCircleLine(this.currentCoords[t],
+                                   this.currentCoords[t+1],
+                                   this.currentCoords[t+2],
+                                   this.currentCoords[t+3],
+                                   x,
+                                   y,
+                                   this.safeRadius))
+                return 1;
+        
+        return colisionCircleLine(this.currentCoords[this.currentCoords.length-1],
+                                  this.currentCoords[this.currentCoords.length-2],
+                                  this.currentCoords[0],
+                                  this.currentCoords[1],
+                                  x,
+                                  y,
+                                  this.safeRadius);       
     }
 };
 
@@ -1032,6 +1071,15 @@ var Sound = {
         this.loadAudio('click', properties.sounds['click']);
             
         console.log('Sound module loaded!'); 
+    },
+    
+    destroy: function() {
+        
+        for(var i in this.media)
+            if(this.media[i].player != null) {
+                this.stop(i);
+                this.media[i].player.release();
+            }
     },
     
     loadAudio: function(media, audio) {
@@ -1308,21 +1356,21 @@ function onBackButtonPress() {
         // Update status message regarding new level
         Menu.updateStatusMessage();
         
-      //  Maze.dom.self.fadeOut("fast", function() {
+        Maze.dom.self.hide();
+            
+        // Show menu again
+        Menu.dom.self.show();
+            
+        // Music again
+        Sound.play('menu');
+            
+        // Show banner again (it's hidden from transition screen)
+        Ads.showBanner();
         
-            Maze.dom.self.hide();
-            
-            // Show menu again
-            Menu.dom.self.fadeIn('fast');
-            
-            // Music again
-            Sound.play('menu');
-            
-            // Show banner again (it's hidden from transition screen)
-            Ads.showBanner();
-     //   });
-    } else 
+    } else {
+        Sound.destroy();
         navigator.app.exitApp(); 
+    }
     
     Sound.play('click');
 }
@@ -1336,4 +1384,29 @@ function preloadImages(array) {
         preloadedImagesList.push(img);
         img.src = array[i];
     }
+}
+
+function distanceTwoPoints(x1, y1, x2, y2) {
+    return Math.sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2));
+}
+
+function colisionCircleLine(ax, ay, bx, by, cx, cy, r) {
+    
+    console.log('Colision: ax/ay ' + ax + '/' + ay + ' | bx/by ' + bx + '/' + by);
+    
+    var AB = distanceTwoPoints(ax, ay, bx, by),
+        Dx = (bx-ax)/AB,
+        Dy = (by-ay)/AB;
+    
+    // Now the line equation is x = Dx*t + Ax, y = Dy*t + Ay with 0 <= t <= 1
+    
+    // compute the value t of the closest point to the circle center (Cx, Cy)
+    var t = Dx*(cx-ax) + Dy*(cy-ay),
+        Ex = t*Dx+ax,
+        Ey = t*Dy+ay,
+        EC = distanceTwoPoints(Ex, Ey, cx, cy);
+    
+    console.log('Distance from perfect click: ' + EC);
+    
+    return EC <= r;
 }

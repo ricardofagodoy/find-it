@@ -6,6 +6,7 @@
     "imageHeight": 1346,
     "imageFilesPath": "images/levels/level{0}-{1}.png",
     "timerColor": "#5E5E5E",
+    "safeRadius": 10,
     "mapHighlightProps" : { "fill": true,
 	                        "fillColor": "6eff24",
 	                        "fillOpacity": 0.5,
@@ -17,11 +18,11 @@
     "instructionsCorrectY": 280,
     "instructionsImages": ["images/instructions1.png", "images/instructions2.png"],
     "adOptions": {
-        "isTesting": "yes"
+        "isTesting": true
     },
     "bannerIdAndroid": "ca-app-pub-2813072672105928/6331936897",
     "interstitialIdAndroid": "ca-app-pub-2813072672105928/2543026891",
-    "bannerIdIos": "ca-app-pub-2813072672105928/1206210093",
+    "bannerIdIos": "ca-app-pub-2813072672105928/4715602897",
     "interstitialIdIos": "ca-app-pub-2813072672105928/2682943294",
     "sounds": {
         "menu": "menubg.mp3",
