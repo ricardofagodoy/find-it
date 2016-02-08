@@ -62,6 +62,16 @@ html, body{
     text-shadow: 2px 2px 2px #000;
 }
 
+.menuOriginalStatus {
+    color: #000 !important;
+    background-color: rgba(118, 219, 109, 0.6) !important;
+}
+
+.menuWinnerStatus {
+    color: #E0BB00 !important;
+    background-color: rgba(0, 0, 0, 0.8) !important;
+}
+
 #menu #options {
     position: relative;
     color: #76DB6D;
@@ -86,10 +96,8 @@ html, body{
 
 #menu #options #status {
     border: 2px double #000;
-    background-color: rgba(0, 0, 0, 0.6);
     border-radius: 0px 0px 0px 0px;
     -webkit-border-radius: 0px 0px 0px 0px;
-    color: #76DB6D;
 }
 
 /*** TRANSITION STYLES ***/

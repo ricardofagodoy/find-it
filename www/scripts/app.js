@@ -224,7 +224,7 @@ var Menu = {
         }).html(messages['menu.new']);
         
         // Paints status
-        this.dom.status.css('color', '#76DB6D');
+        this.dom.status.removeClass('menuWinnerStatus').addClass('menuOriginalStatus');
         
         // Update status message accoring to current level
         this.updateStatusMessage();
@@ -240,7 +240,7 @@ var Menu = {
         this.dom.title.removeClass('menuOriginal').addClass('menuWinner');
         
         // Status is painted yellow too
-        this.dom.status.css('color', '#E0BB00');
+        this.dom.status.removeClass('menuOriginalStatus').addClass('menuWinnerStatus');
 
         // FIX THIS SHIT
         var resetConfirmation = $('#reset');
@@ -643,11 +643,11 @@ var Maze = {
         // Prevent user of clicking many times
         this.removeMazeEvents();
 
-        // Cleans and resets timer
-        Timer.resetTimer();
-
         // Advances level (no params adds 1)    
         Persistence.updateLevel();
+        
+        // Cleans and resets timer
+        Timer.resetTimer();
     
         // Win the game!
         if(level > properties.maxLevel) {
@@ -972,6 +972,9 @@ var Timer = {
         this.dom.css({'transition-property': 'none',
                       'top': -windowHeight + 'px',
                       'background-color': Timer.color });
+        
+        if(level == properties['maxLevel'])
+            this.dom.css('background-color', '#FFF');
 
         // Turn off callback when animation is completed (not needed when reseting)
         this.dom.off('transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd');
