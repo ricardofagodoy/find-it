@@ -782,9 +782,13 @@ var Maze = {
                 }
                     
                 Maze.loseLevel();
-            }
-            
-        });   
+            } 
+        });  
+        
+        // COMMENT THIS, TEST ONLY
+        //Card.dom.bind('mousemove', function(event) { 
+        //    console.log('Safe check: ' + Maze.checkSafeClick(event.clientX, event.clientY));
+        //});
     },
         
     removeMazeEvents: function() {
@@ -799,7 +803,7 @@ var Maze = {
         
         console.log('Calling check safe click for x: ' + x + ' | y: ' + y);
     
-        for(var t = 0; t < this.currentCoords.length-3; t+=4)
+        for(var t = 0; t < this.currentCoords.length-3; t+=2)         
             if (colisionCircleLine(this.currentCoords[t],
                                    this.currentCoords[t+1],
                                    this.currentCoords[t+2],
@@ -809,13 +813,13 @@ var Maze = {
                                    this.safeRadius))
                 return 1;
         
-        return colisionCircleLine(this.currentCoords[this.currentCoords.length-1],
-                                  this.currentCoords[this.currentCoords.length-2],
+        return colisionCircleLine(this.currentCoords[this.currentCoords.length-2],
+                                  this.currentCoords[this.currentCoords.length-1],
                                   this.currentCoords[0],
                                   this.currentCoords[1],
                                   x,
                                   y,
-                                  this.safeRadius);       
+                                  this.safeRadius);
     }
 };
 
@@ -1397,6 +1401,11 @@ function colisionCircleLine(ax, ay, bx, by, cx, cy, r) {
     
     console.log('Colision: ax/ay ' + ax + '/' + ay + ' | bx/by ' + bx + '/' + by);
     
+    if(ax === bx && ay === by) {
+        console.log('Points A and B are the same!');
+        return 0;
+    }
+    
     var AB = distanceTwoPoints(ax, ay, bx, by),
         Dx = (bx-ax)/AB,
         Dy = (by-ay)/AB;
@@ -1406,8 +1415,15 @@ function colisionCircleLine(ax, ay, bx, by, cx, cy, r) {
     // compute the value t of the closest point to the circle center (Cx, Cy)
     var t = Dx*(cx-ax) + Dy*(cy-ay),
         Ex = t*Dx+ax,
-        Ey = t*Dy+ay,
-        EC = distanceTwoPoints(Ex, Ey, cx, cy);
+        Ey = t*Dy+ay;
+    
+    if((Ex > ax+r && Ex > bx+r) || (Ey > ay+r && Ey > by+r) || 
+       (Ex < ax-r && Ex < bx-r) || (Ey < ay-r && Ey < by-r)) {
+        console.log('Distance out of limit!');
+        return 0;
+    }
+    
+    var EC = distanceTwoPoints(Ex, Ey, cx, cy);
     
     console.log('Distance from perfect click: ' + EC);
     

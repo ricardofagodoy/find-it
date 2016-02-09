@@ -224,7 +224,7 @@ var Menu = {
         }).html(messages['menu.new']);
         
         // Paints status
-        this.dom.status.css('color', '#76DB6D');
+        this.dom.status.removeClass('menuWinnerStatus').addClass('menuOriginalStatus');
         
         // Update status message accoring to current level
         this.updateStatusMessage();
@@ -240,7 +240,7 @@ var Menu = {
         this.dom.title.removeClass('menuOriginal').addClass('menuWinner');
         
         // Status is painted yellow too
-        this.dom.status.css('color', '#E0BB00');
+        this.dom.status.removeClass('menuOriginalStatus').addClass('menuWinnerStatus');
 
         // FIX THIS SHIT
         var resetConfirmation = $('#reset');
@@ -643,11 +643,11 @@ var Maze = {
         // Prevent user of clicking many times
         this.removeMazeEvents();
 
-        // Cleans and resets timer
-        Timer.resetTimer();
-
         // Advances level (no params adds 1)    
         Persistence.updateLevel();
+        
+        // Cleans and resets timer
+        Timer.resetTimer();
     
         // Win the game!
         if(level > properties.maxLevel) {
@@ -782,9 +782,13 @@ var Maze = {
                 }
                     
                 Maze.loseLevel();
-            }
-            
-        });   
+            } 
+        });  
+        
+        // TODO: REMOVE, TEST ONLY
+        Card.dom.bind('mousemove', function(event) { 
+            console.log('Safe check: ' + Maze.checkSafeClick(event.clientX, event.clientY));
+        });
     },
         
     removeMazeEvents: function() {
@@ -799,7 +803,7 @@ var Maze = {
         
         console.log('Calling check safe click for x: ' + x + ' | y: ' + y);
     
-        for(var t = 0; t < this.currentCoords.length-3; t+=4)
+        for(var t = 0; t < this.currentCoords.length-3; t+=2)         
             if (colisionCircleLine(this.currentCoords[t],
                                    this.currentCoords[t+1],
                                    this.currentCoords[t+2],
@@ -972,6 +976,9 @@ var Timer = {
         this.dom.css({'transition-property': 'none',
                       'top': -windowHeight + 'px',
                       'background-color': Timer.color });
+        
+        if(level == properties['maxLevel'])
+            this.dom.css('background-color', '#FFF');
 
         // Turn off callback when animation is completed (not needed when reseting)
         this.dom.off('transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd');
@@ -1394,6 +1401,11 @@ function colisionCircleLine(ax, ay, bx, by, cx, cy, r) {
     
     console.log('Colision: ax/ay ' + ax + '/' + ay + ' | bx/by ' + bx + '/' + by);
     
+    if(ax === bx && ay === by) {
+        console.log('Points A and B are the same!');
+        return 0;
+    }
+    
     var AB = distanceTwoPoints(ax, ay, bx, by),
         Dx = (bx-ax)/AB,
         Dy = (by-ay)/AB;
@@ -1403,8 +1415,15 @@ function colisionCircleLine(ax, ay, bx, by, cx, cy, r) {
     // compute the value t of the closest point to the circle center (Cx, Cy)
     var t = Dx*(cx-ax) + Dy*(cy-ay),
         Ex = t*Dx+ax,
-        Ey = t*Dy+ay,
-        EC = distanceTwoPoints(Ex, Ey, cx, cy);
+        Ey = t*Dy+ay;
+    
+    if((Ex > ax && Ex > bx) || (Ey > ay && Ey > by) || 
+       (Ex < ax && Ex < bx) || (Ey < ay && Ey < by)) {
+        console.log('Distance out of limit!');
+        return 0;
+    }
+    
+    var EC = distanceTwoPoints(Ex, Ey, cx, cy);
     
     console.log('Distance from perfect click: ' + EC);
     
