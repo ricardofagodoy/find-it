@@ -76,15 +76,15 @@ function init() {
         
         // Init menu module
         Menu.init();
-        
-        // Init sounds modules
-        Sound.init();
-        
+            
         // Hide splashscreen
         setTimeout(function() {
             if(navigator.splashscreen)
                 navigator.splashscreen.hide();
         }, 1000);
+        
+        // Init sounds modules
+        Sound.init();
         
         // Init ads module
         Ads.init();
@@ -910,7 +910,7 @@ var Card = {
             break;
                 
             case STATUS.LOSE:
-                
+                                
                 // Load next level
                 Maze.loadLevel();
                 
@@ -1009,7 +1009,8 @@ var Timer = {
 
 var Ads = {
     
-    bannerVisible: false,
+    bannerVisible: null,
+    bannerShowsCount: null,
     admobid: null,
 
     init: function() {
@@ -1028,38 +1029,70 @@ var Ads = {
                 };
             }
             
+            this.bannerVisible = true;
+            this.bannerShowsCount = 0;
+            
             AdMob.setOptions(properties.adOptions);
  
-            AdMob.prepareInterstitial({adId: this.admobid.interstitial});
+            this.loadInterstitial();
+            this.loadBanner();
             
-            this.showBanner();
+            $(document).on('onAdDismiss', function(data) {
+                if(data.originalEvent.adType == 'interstitial')
+                    Ads.loadInterstitial();
+            });
+            
+            $(document).on('onAdLoaded', function(data) {
+                if (data.originalEvent.adType == 'banner' && Ads.bannerVisible) {
+                    AdMob.showBanner(AdMob.AD_POSITION.BOTTOM_CENTER);
+                    AdMob.bannerShowsCount++;
+                }
+            });     
         }
+    },
+    
+    loadBanner: function() {
+        
+        if(window.AdMob && this.admobid != null)
+            
+           AdMob.createBanner({
+                adId : this.admobid.banner,
+                position : AdMob.AD_POSITION.BOTTOM_CENTER,
+                autoShow : false,
+                overlap: true
+            }); 
+        
+        this.bannerShowsCount = 0;
     },
     
     showBanner: function() {
         
         if(window.AdMob && !this.bannerVisible && this.admobid != null) {
-            
-           AdMob.createBanner({
-                adId : this.admobid.banner,
-                position : AdMob.AD_POSITION.BOTTOM_CENTER,
-                autoShow : true,
-                overlap: true
-            });
-            
+            AdMob.showBanner(AdMob.AD_POSITION.BOTTOM_CENTER);
             this.bannerVisible = true;
+            this.bannerShowsCount++;
         }
     },
     
     hideBanner: function() {
         if(window.AdMob && this.bannerVisible && this.admobid != null) {
-            AdMob.removeBanner();
+            AdMob.hideBanner();
             this.bannerVisible = false;
+            
+            if(this.bannerShowsCount > 2) {
+                AdMob.removeBanner();
+                this.loadBanner();
+            }
         }
     },
     
+    loadInterstitial: function() {
+        if (window.AdMob)
+            AdMob.prepareInterstitial({adId: Ads.admobid.interstitial}); 
+    },
+    
     showInterstitial: function() {
-        if(window.AdMob && this.admobid != null)
+        if(window.AdMob && Ads.admobid != null)
             AdMob.showInterstitial();
     }
 };
@@ -1200,7 +1233,7 @@ var Sound = {
                 this.stop('menu');
                 
                 if(workMedia.player != null)
-                    workMedia.player.seekTo(1);
+                    workMedia.player.seekTo(0);
             break;
                 
             case 'correct': 
@@ -1451,7 +1484,7 @@ function distanceTwoPoints(x1, y1, x2, y2) {
 
 function colisionCircleLine(ax, ay, bx, by, cx, cy, r) {
     
-    console.log('Colision: ax/ay ' + ax + '/' + ay + ' | bx/by ' + bx + '/' + by);
+    // console.log('Colision: ax/ay ' + ax + '/' + ay + ' | bx/by ' + bx + '/' + by);
     
     if(ax === bx && ay === by) {
         console.log('Points A and B are the same!');
@@ -1471,13 +1504,13 @@ function colisionCircleLine(ax, ay, bx, by, cx, cy, r) {
     
     if((Ex > ax+r && Ex > bx+r) || (Ey > ay+r && Ey > by+r) || 
        (Ex < ax-r && Ex < bx-r) || (Ey < ay-r && Ey < by-r)) {
-        console.log('Distance out of limit!');
+        //console.log('Distance out of limit!');
         return 0;
     }
     
     var EC = distanceTwoPoints(Ex, Ey, cx, cy);
     
-    console.log('Distance from perfect click: ' + EC);
+    //console.log('Distance from perfect click: ' + EC);
     
     return EC <= r;
 }
