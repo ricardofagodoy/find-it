@@ -106,10 +106,14 @@ function init() {
         
         // When process goes to background, stop sound!
         document.addEventListener("pause", function() {
+            if(!Sound.isMuted())
+                Sound.toggleMute();
         }, false);
         
         // When somes to foreground again
         document.addEventListener("resume", function() {
+            if(!Persistence.retrieveMute())
+                Sound.toggleMute();
         }, false); 
         
         // Preload images
@@ -117,7 +121,7 @@ function init() {
             properties.instructionsImages[0], 
             properties.instructionsImages[1],
             'images/trophy.png',
-            'images/star.gif'
+            'images/star.png'
         ]);
       });
     
@@ -175,16 +179,25 @@ var Menu = {
         if(/(ipod|iphone|ipad)/i.test(navigator.userAgent))
             this.dom.mute.css('top', '4%');
         
+        // Musical note click for mute/unmute
         this.dom.mute.off('click').on('click', function(event) {
             
             Sound.toggleMute();
+            Persistence.updateMute();
             
             if(Sound.isMuted())
                 Menu.dom.mute.css('background-image', 'url("images/muted.png")');
             else
                 Menu.dom.mute.css('background-image', 'url("images/sound.png")');
-     
-        });
+        }); 
+        
+        // TODO: REMOVE THIS, USED FOR TEST ONLY!! FOR GODS SAKE
+        this.dom.status.on('click', function(event) {
+            if(level < properties['maxLevel']-1) {
+                level++;
+                Menu.updateStatusMessage();
+            }
+        }); 
     },
     
     configureOriginal: function() {
@@ -198,7 +211,6 @@ var Menu = {
         this.dom.play.off('click').on('click', function(event) {
             
             // Change cards
-                
             Menu.dom.self.hide();
             
             if(level > 1)
@@ -458,8 +470,8 @@ var Transition = {
                 console.log('Level {0} had {1}s to complete and took {2}s'.
                             format(newLevel-1, timePassedLevel, Timer.secondsPassed));
                 
-                // If finished in less or equal 20% of time
-                if(Timer.secondsPassed <= timePassedLevel*0.2) {
+                // If finished in less or equal 30% of time
+                if(Timer.secondsPassed <= timePassedLevel*0.3) {
                     this.dom.stars.find('#star1').show();
                     stars++;
                 }
@@ -568,7 +580,7 @@ var Maze = {
             levelInfo: $('#game #levelInfo')
         };
 
-        this.safeRadius = properties['safeRadius'];
+        this.safeRadius = 0;
     },
     
     loadLevel: function() {
@@ -611,6 +623,10 @@ var Maze = {
         
         // Load safe click coords
         this.currentCoords = adjustedCoords;
+        
+        // Set safe click radius for current level
+        this.safeRadius = levelProps['safeRadius'] ? 
+                            Math.round(levelProps['safeRadius']/widthScale) : 0;
     
         // Initialize jquery maphilight to current maze
         this.dom.target.maphilight(properties.mapHighlightProps);
@@ -801,7 +817,13 @@ var Maze = {
     
     checkSafeClick: function(x, y) {
         
-        console.log('Calling check safe click for x: ' + x + ' | y: ' + y);
+        console.log('Calling check safe click for x: ' + 
+                x + ' | y: ' + y + ' - safe radius: ' + this.safeRadius);
+        
+        if (this.safeRadius === 0) {
+            console.log('Radius is zero, no safe check allowed.');
+            return 0;
+        }
     
         for(var t = 0; t < this.currentCoords.length-3; t+=2)         
             if (colisionCircleLine(this.currentCoords[t],
@@ -1068,6 +1090,12 @@ var Sound = {
         this.levelSound = 0;
         this.muteState = 0;
         
+        // Check if it starts muted already
+        if(Persistence.retrieveMute()) {
+            Persistence.updateMute();
+            Menu.dom.mute.trigger('click');
+        }
+        
         // Load sounds!
         this.loadMenuSound();
         this.loadLevelSound();
@@ -1252,6 +1280,30 @@ var Persistence = {
 
         localStorage.setItem('stars', stars + n);     
     },    
+    
+    retrieveMute: function() {
+        
+        console.log('Retrieving mute state from local storage...');
+
+        var storeMuted = localStorage.getItem('mute');
+
+        if(storeMuted === null || storeMuted.length === 0)
+            storeMuted = 0;
+        
+        console.log('Mute value: '+ storeMuted);
+
+        return parseInt(storeMuted);
+    },
+    
+    updateMute: function(m) {
+        
+        // Default is add 1 to level
+        var mute = m ? m : (!this.retrieveMute())+0;
+        
+        console.log('Updating mute state to {0}'.format(mute));
+
+        localStorage.setItem('mute', mute); 
+    },
     
     retrieveLevelIndex: function() {
         
