@@ -861,7 +861,7 @@ var Card = {
     configure: function() {
     
         // Set up flip to work manually
-        this.dom.flip({trigger: 'manual', speed: 500});
+        this.dom.flip({trigger: 'manual', speed: 700});
         
         // When flip is done - callback
         this.dom.on('flip:done', this.flipDoneCallback);
@@ -940,6 +940,8 @@ var Card = {
     
     flip: function() {  
         console.log('Flipping card...');
+        
+        this.dom.hide().show(0);
         this.dom.flip('toggle');
     } 
 };
