@@ -81,7 +81,7 @@ function init() {
         setTimeout(function() {
             if(navigator.splashscreen)
                 navigator.splashscreen.hide();
-        }, 1000);
+        }, 600);
         
         // Init sounds modules
         Sound.init();
@@ -861,7 +861,7 @@ var Card = {
     configure: function() {
     
         // Set up flip to work manually
-        this.dom.flip({trigger: 'manual', speed: 500});
+        this.dom.flip({trigger: 'manual', speed: 700});
         
         // When flip is done - callback
         this.dom.on('flip:done', this.flipDoneCallback);
@@ -940,6 +940,8 @@ var Card = {
     
     flip: function() {  
         console.log('Flipping card...');
+        
+        //this.dom.hide().show(0);
         this.dom.flip('toggle');
     } 
 };
@@ -1203,6 +1205,9 @@ var Sound = {
     loadLevelSound: function() {
         
         var soundLevel = parseInt(level / 10);
+        
+        if(level == 50)
+            soundLevel--;
         
         if(this.media.level.player != null) {
             this.media.level.player.release();

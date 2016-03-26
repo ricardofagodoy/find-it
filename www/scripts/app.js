@@ -941,7 +941,7 @@ var Card = {
     flip: function() {  
         console.log('Flipping card...');
         
-        this.dom.hide().show(0);
+        //this.dom.hide().show(0);
         this.dom.flip('toggle');
     } 
 };
@@ -1205,6 +1205,9 @@ var Sound = {
     loadLevelSound: function() {
         
         var soundLevel = parseInt(level / 10);
+        
+        if(level == 50)
+            soundLevel--;
         
         if(this.media.level.player != null) {
             this.media.level.player.release();
