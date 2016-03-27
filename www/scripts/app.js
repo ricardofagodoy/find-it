@@ -861,7 +861,7 @@ var Card = {
     configure: function() {
     
         // Set up flip to work manually
-        this.dom.flip({trigger: 'manual', speed: 700});
+        this.dom.flip({trigger: 'manual', speed: 500});
         
         // When flip is done - callback
         this.dom.on('flip:done', this.flipDoneCallback);
@@ -1232,7 +1232,7 @@ var Sound = {
             break;
                 
             case 'level':
-                if(parseInt(level / 10) != this.levelSound)
+                if(parseInt(level / 10) != this.levelSound && level != 50)
                     this.loadLevelSound();
                 
                 this.stop('menu');
