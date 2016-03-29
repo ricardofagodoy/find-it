@@ -899,6 +899,8 @@ var Card = {
                 // Load next level
                 Maze.loadLevel();
                 
+                Sound.play('menu');
+                
                 // Change bg color from RED to level 1 color
                 Maze.dom.self.css('background-color', Transition.calculateBgColor());
                 
@@ -906,10 +908,6 @@ var Card = {
                 Ads.showBanner();
                 
                 Sound.loadLevelSound();
-                
-                setTimeout(function() {
-                    Sound.play('menu');
-                }, 200);
 
                 Card.status = STATUS.NEW;   
             break;
@@ -918,15 +916,13 @@ var Card = {
                                 
                 // Load next level
                 Maze.loadLevel();
+                
+                Sound.play('menu');
 
                 // Change bg color from RED to level 1 color
                 Maze.dom.self.css('background-color', Transition.calculateBgColor());
 
                 Sound.loadLevelSound();
-                
-                setTimeout(function() {
-                    Sound.play('menu');
-                }, 200);
                 
                 Card.status = STATUS.NEW;
             break;
@@ -1173,6 +1169,9 @@ var Sound = {
                     
                     mediaWork.isPlaying = 0;
                         
+                    if(media == 'level' && Card.status != STATUS.NEW)
+                        return;
+                    
                     if (mediaWork.loop)
                         Sound.play(media);
                 }
