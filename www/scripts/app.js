@@ -776,6 +776,8 @@ var Maze = {
 
         // Setup Transition to original state
         Transition.configure();
+        
+        Sound.loadLevelSound();
     },
     
     addMazeEvents: function() {
@@ -897,14 +899,17 @@ var Card = {
                 // Load next level
                 Maze.loadLevel();
                 
-                // Back to menu sound
-                Sound.play('menu');
-                
                 // Change bg color from RED to level 1 color
                 Maze.dom.self.css('background-color', Transition.calculateBgColor());
                 
                 // Transition gets an ad!
                 Ads.showBanner();
+                
+                Sound.loadLevelSound();
+                
+                setTimeout(function() {
+                    Sound.play('menu');
+                }, 200);
 
                 Card.status = STATUS.NEW;   
             break;
@@ -913,12 +918,16 @@ var Card = {
                                 
                 // Load next level
                 Maze.loadLevel();
-                
-                Sound.play('menu');
-                
+
                 // Change bg color from RED to level 1 color
                 Maze.dom.self.css('background-color', Transition.calculateBgColor());
 
+                Sound.loadLevelSound();
+                
+                setTimeout(function() {
+                    Sound.play('menu');
+                }, 200);
+                
                 Card.status = STATUS.NEW;
             break;
 
@@ -1122,7 +1131,7 @@ var Sound = {
         // Fix IOS issue
         this.root = this.root.replace(/%20/g, ' ');
 
-        this.levelSound = 0;
+        this.levelSound = -1;
         this.muteState = 0;
         
         // Check if it starts muted already
@@ -1209,12 +1218,16 @@ var Sound = {
         if(level == 50)
             soundLevel--;
         
+        if(soundLevel == this.levelSound)
+            return;
+            
         if(this.media.level.player != null) {
             this.media.level.player.release();
             this.media.level.isPlaying = 0;
         }
-        
+
         this.levelSound = soundLevel;
+            
         this.loadAudio('level', properties.sounds['level'].format(soundLevel));
     },
     
@@ -1231,10 +1244,7 @@ var Sound = {
                 this.stop('level');
             break;
                 
-            case 'level':
-                if(parseInt(level / 10) != this.levelSound && level != 50)
-                    this.loadLevelSound();
-                
+            case 'level':   
                 this.stop('menu');
                 
                 if(workMedia.player != null)
@@ -1261,8 +1271,11 @@ var Sound = {
         }
         
         if(workMedia.player != null && !workMedia.isPlaying) {
-            workMedia.player.play({ numberOfLoops: !workMedia.loop});
-            workMedia.isPlaying = 1;
+            
+            setTimeout(function() {
+                workMedia.player.play({ numberOfLoops: !workMedia.loop});
+                workMedia.isPlaying = 1;
+            }, 5);
         }
     },
     

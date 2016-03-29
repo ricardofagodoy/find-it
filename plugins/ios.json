@@ -123,10 +123,6 @@
                             "count": 1
                         },
                         {
-                            "xml": "<feature name=\"Device\"><param name=\"ios-package\" value=\"CDVDevice\" /></feature>",
-                            "count": 1
-                        },
-                        {
                             "xml": "<feature name=\"SplashScreen\"><param name=\"ios-package\" value=\"CDVSplashScreen\" /><param name=\"onload\" value=\"true\" /></feature>",
                             "count": 1
                         },
@@ -145,9 +141,6 @@
     },
     "installed_plugins": {
         "cordova-plugin-admobpro": {
-            "PACKAGE_NAME": "com.ricardofagodoy.findit"
-        },
-        "cordova-plugin-device": {
             "PACKAGE_NAME": "com.ricardofagodoy.findit"
         },
         "cordova-plugin-splashscreen": {

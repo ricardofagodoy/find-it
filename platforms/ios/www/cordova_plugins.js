@@ -8,13 +8,6 @@ module.exports = [
         ]
     },
     {
-        "file": "plugins/cordova-plugin-device/www/device.js",
-        "id": "cordova-plugin-device.device",
-        "clobbers": [
-            "device"
-        ]
-    },
-    {
         "file": "plugins/cordova-plugin-splashscreen/www/splashscreen.js",
         "id": "cordova-plugin-splashscreen.SplashScreen",
         "clobbers": [
@@ -186,7 +179,6 @@ module.exports.metadata =
 // TOP OF METADATA
 {
     "cordova-plugin-admobpro": "2.10.0",
-    "cordova-plugin-device": "1.1.1",
     "cordova-plugin-splashscreen": "2.1.0",
     "org.apache.cordova.file": "1.3.3",
     "org.apache.cordova.media": "0.2.16",
