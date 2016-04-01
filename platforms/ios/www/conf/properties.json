@@ -16,9 +16,7 @@
     "instructionsCorrectX": 230,
     "instructionsCorrectY": 280,
     "instructionsImages": ["images/instructions1.png", "images/instructions2.png"],
-    "adOptions": {
-        "isTesting": true
-    },
+    "isTesting": false,
     "bannerIdAndroid": "ca-app-pub-2813072672105928/2543026891",
     "interstitialIdAndroid": "ca-app-pub-2813072672105928/4159360894",
     "bannerIdIos": "ca-app-pub-2813072672105928/1206210093",

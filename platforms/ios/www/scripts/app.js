@@ -191,13 +191,13 @@ var Menu = {
                 Menu.dom.mute.css('background-image', 'url("images/sound.png")');
         }); 
         
-        // TODO: REMOVE THIS, USED FOR TEST ONLY!! FOR GODS SAKE
-        this.dom.status.on('click', function(event) {
+        // TODO: REMOVE THIS, USED FOR TEST ONLY!!
+        /*this.dom.status.on('click', function(event) {
             if(level < properties['maxLevel']-1) {
                 level++;
                 Menu.updateStatusMessage();
             }
-        }); 
+        }); */
     },
     
     configureOriginal: function() {
@@ -1039,7 +1039,7 @@ var Ads = {
             this.bannerVisible = true;
             this.bannerShowsCount = 0;
             
-            AdMob.setOptions(properties.adOptions);
+            //AdMob.setOptions({isTesting: properties.isTesting});
  
             this.loadInterstitial();
             this.loadBanner();
@@ -1168,8 +1168,9 @@ var Sound = {
                 if (status === Media.MEDIA_STOPPED) {
                     
                     mediaWork.isPlaying = 0;
-                        
-                    if(media == 'level' && Card.status != STATUS.NEW)
+                    
+                    // Prevent level to play when loading
+                    if(media == 'level' && Card.status != STATUS.NEXT)
                         return;
                     
                     if (mediaWork.loop)

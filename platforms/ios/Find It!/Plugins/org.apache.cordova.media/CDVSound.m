@@ -259,25 +259,25 @@
 {
     [self.commandDelegate runInBackground:^{
         
-    NSString* callbackId = command.callbackId;
+        NSString* callbackId = command.callbackId;
 
-#pragma unused(callbackId)
-    NSString* mediaId = [command argumentAtIndex:0];
-    NSString* resourcePath = [command argumentAtIndex:1];
-    NSDictionary* options = [command argumentAtIndex:2 withDefault:nil];
+    #pragma unused(callbackId)
+        NSString* mediaId = [command argumentAtIndex:0];
+        NSString* resourcePath = [command argumentAtIndex:1];
+        NSDictionary* options = [command argumentAtIndex:2 withDefault:nil];
 
-    BOOL bError = NO;
-    NSString* jsString = nil;
+        BOOL bError = NO;
+        NSString* jsString = nil;
 
-    CDVAudioFile* audioFile = [self audioFileForResource:resourcePath withId:mediaId doValidation:YES forRecording:NO];
-    if ((audioFile != nil) && (audioFile.resourceURL != nil)) {
-        if (audioFile.player == nil) {
-            bError = [self prepareToPlay:audioFile withId:mediaId];
-        }
-        if (!bError) {
-            // audioFile.player != nil  or player was successfully created
-            // get the audioSession and set the category to allow Playing when device is locked or ring/silent switch engaged
-            if ([self hasAudioSession]) {
+        CDVAudioFile* audioFile = [self audioFileForResource:resourcePath withId:mediaId doValidation:YES forRecording:NO];
+        if ((audioFile != nil) && (audioFile.resourceURL != nil)) {
+            if (audioFile.player == nil) {
+                bError = [self prepareToPlay:audioFile withId:mediaId];
+            }
+            if (!bError) {
+                // audioFile.player != nil  or player was successfully created
+                // get the audioSession and set the category to allow Playing when device is locked or ring/silent switch engaged
+                if ([self hasAudioSession]) {
                 NSError* __autoreleasing err = nil;
                 NSNumber* playAudioWhenScreenIsLocked = [options objectForKey:@"playAudioWhenScreenIsLocked"];
                 BOOL bPlayAudioWhenScreenIsLocked = YES;
@@ -636,7 +636,6 @@
 
 - (void)audioPlayerDidFinishPlaying:(AVAudioPlayer*)player successfully:(BOOL)flag
 {
-    
     CDVAudioPlayer* aPlayer = (CDVAudioPlayer*)player;
     NSString* mediaId = aPlayer.mediaId;
     CDVAudioFile* audioFile = [[self soundCache] objectForKey:mediaId];
@@ -652,8 +651,8 @@
         // jsString = [NSString stringWithFormat: @"%@(\"%@\",%d,%d);", @"cordova.require('org.apache.cordova.media.Media').onStatus", mediaId, MEDIA_ERROR, MEDIA_ERR_DECODE];
         jsString = [NSString stringWithFormat:@"%@(\"%@\",%d,%@);", @"cordova.require('org.apache.cordova.media.Media').onStatus", mediaId, MEDIA_ERROR, [self createMediaErrorWithCode:MEDIA_ERR_DECODE message:nil]];
     }
-   // if (self.avSession) {
-      //  [self.avSession setActive:NO error:nil];
+    //if (self.avSession) {
+   //     [self.avSession setActive:NO error:nil];
    // }
     [self.commandDelegate evalJs:jsString];
 }

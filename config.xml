@@ -19,10 +19,10 @@
     <plugin name="cordova-plugin-device" />
     <platform name="android">
         <access origin="*" />
-        <icon density="ldpi" src="iconAndroid.png" />
-        <icon density="mdpi" src="iconAndroid.png" />
-        <icon density="hdpi" src="iconAndroid.png" />
-        <icon density="xhdpi" src="iconAndroid.png" />
+        <icon density="ldpi" src="icons/iconAndroid.png" />
+        <icon density="mdpi" src="icons/iconAndroid.png" />
+        <icon density="hdpi" src="icons/iconAndroid.png" />
+        <icon density="xhdpi" src="icons/iconAndroid.png" />
         <splash density="ldpi" platform="android" src="screen.png" />
         <splash density="mdpi" platform="android" src="screen.png" />
         <splash density="hdpi" platform="android" src="screen.png" />
@@ -34,7 +34,15 @@
     </platform>
     <platform name="ios">
         <access origin="*" />
-        <icon src="iconApple.png" />
+        <icon src="icons/iconApple.png" />
+        <icon height="29" platform="ios" src="icons/Icon-29.png" width="29" />
+        <icon height="40" platform="ios" src="icons/Icon-40.png" width="40" />
+        <icon height="57" platform="ios" src="icons/Icon-57.png" width="57" />
+        <icon height="72" platform="ios" src="icons/Icon-72.png" width="72" />
+        <icon height="76" platform="ios" src="icons/Icon-76.png" width="76" />
+        <splash height="1334" platform="ios" src="screen.png" width="750" />
+        <splash height="1242" platform="ios" src="screen.png" width="2208" />
+        <splash height="2208" platform="ios" src="screen.png" width="1242" />
         <splash height="480" platform="ios" src="screen.png" width="320" />
         <splash height="960" platform="ios" src="screen.png" width="640" />
         <splash height="1136" platform="ios" src="screen.png" width="640" />
