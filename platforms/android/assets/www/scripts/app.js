@@ -1039,37 +1039,22 @@ var Ads = {
             this.bannerVisible = true;
             this.bannerShowsCount = 0;
             
-            //AdMob.setOptions({isTesting: properties.isTesting});
+            AdMob.setOptions({isTesting: properties.isTesting});
  
             this.loadInterstitial();
             this.loadBanner();
             
             $(document).on('onAdDismiss', function(data) {
-                
-                alert('AD DISMISSED');
-                
                 if(data.originalEvent.adType == 'interstitial')
                     Ads.loadInterstitial();
             });
             
             $(document).on('onAdLoaded', function(data) {
-                
-                alert('AD LOADED');
-                
                 if (data.originalEvent.adType == 'banner' && Ads.bannerVisible) {
                     AdMob.showBanner(AdMob.AD_POSITION.BOTTOM_CENTER);
                     AdMob.bannerShowsCount++;
                 }
             });  
-            
-            $(document).on('onAdFailLoad', function(data) {
-                alert('AD FAIL LOAD');
-                alert(JSON.stringify(data));
-            });
-            
-            $(document).on('onAdPresent', function(data) {
-                alert('AD PRESENT');
-            });
         }
     },
     
