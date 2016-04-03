@@ -17,8 +17,8 @@
     "instructionsCorrectY": 280,
     "instructionsImages": ["images/instructions1.png", "images/instructions2.png"],
     "isTesting": false,
-    "bannerIdAndroid": "ca-app-pub-2813072672105928/2543026891",
-    "interstitialIdAndroid": "ca-app-pub-2813072672105928/4159360894",
+    "bannerIdAndroid": "ca-app-pub-2813072672105928/4159360894",
+    "interstitialIdAndroid": "ca-app-pub-2813072672105928/2543026891",
     "bannerIdIos": "ca-app-pub-2813072672105928/1206210093",
     "interstitialIdIos": "ca-app-pub-2813072672105928/2682943294",
     "sounds": {

@@ -1039,7 +1039,7 @@ var Ads = {
             this.bannerVisible = true;
             this.bannerShowsCount = 0;
             
-            //AdMob.setOptions({isTesting: properties.isTesting});
+            AdMob.setOptions({isTesting: properties.isTesting});
  
             this.loadInterstitial();
             this.loadBanner();
@@ -1054,7 +1054,7 @@ var Ads = {
                     AdMob.showBanner(AdMob.AD_POSITION.BOTTOM_CENTER);
                     AdMob.bannerShowsCount++;
                 }
-            });     
+            });  
         }
     },
     
