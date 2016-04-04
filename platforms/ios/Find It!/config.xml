@@ -36,16 +36,16 @@
     <icon height="57" platform="ios" src="icons/Icon-57.png" width="57" />
     <icon height="72" platform="ios" src="icons/Icon-72.png" width="72" />
     <icon height="76" platform="ios" src="icons/Icon-76.png" width="76" />
-    <splash height="1334" platform="ios" src="screen.png" width="750" />
-    <splash height="1242" platform="ios" src="screen.png" width="2208" />
-    <splash height="2208" platform="ios" src="screen.png" width="1242" />
-    <splash height="480" platform="ios" src="screen.png" width="320" />
-    <splash height="960" platform="ios" src="screen.png" width="640" />
-    <splash height="1136" platform="ios" src="screen.png" width="640" />
-    <splash height="1024" platform="ios" src="screen.png" width="768" />
-    <splash height="768" platform="ios" src="screen.png" width="1024" />
-    <splash height="2048" platform="ios" src="screen.png" width="1536" />
-    <splash height="1536" platform="ios" src="screen.png" width="2048" />
+    <splash height="480" platform="ios" src="splash/Default.png" width="320" />
+    <splash height="960" platform="ios" src="splash/Default@2x.png" width="640" />
+    <splash height="1136" platform="ios" src="splash/Default-568h@2x.png" width="640" />
+    <splash height="1334" platform="ios" src="splash/Default-667h@2x.png" width="750" />
+    <splash height="2208" platform="ios" src="splash/Default-Portrait-736h@3x.png" width="1242" />
+    <splash height="1242" platform="ios" src="splash/Default-Landscape-736h@3x.png" width="2208" />
+    <splash height="1024" platform="ios" src="splash/Default-Portrait.png" width="768" />
+    <splash height="768" platform="ios" src="splash/Default-Landscape.png" width="1024" />
+    <splash height="2048" platform="ios" src="splash/Default-Portrait@2x.png" width="1536" />
+    <splash height="1536" platform="ios" src="splash/Default-Landscape@2x.png" width="2048" />
     <allow-intent href="itms:*" />
     <allow-intent href="itms-apps:*" />
     <name>Find It!</name>
@@ -57,7 +57,6 @@
     </author>
     <content src="index.html" />
     <preference name="Orientation" value="portrait" />
-    <preference name="SplashScreen" value="screen" />
     <preference name="AutoHideSplashScreen" value="false" />
     <preference name="ShowSplashScreenSpinner" value="false" />
     <preference name="android-build-tool" value="gradle" />

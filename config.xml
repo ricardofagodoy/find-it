@@ -9,7 +9,6 @@
     </author>
     <content src="index.html" />
     <preference name="Orientation" value="portrait" />
-    <preference name="SplashScreen" value="screen" />
     <preference name="AutoHideSplashScreen" value="false" />
     <preference name="ShowSplashScreenSpinner" value="false" />
     <preference name="android-build-tool" value="gradle" />
@@ -23,11 +22,11 @@
         <icon density="mdpi" src="icons/iconAndroid.png" />
         <icon density="hdpi" src="icons/iconAndroid.png" />
         <icon density="xhdpi" src="icons/iconAndroid.png" />
-        <splash density="ldpi" platform="android" src="screen.png" />
-        <splash density="mdpi" platform="android" src="screen.png" />
-        <splash density="hdpi" platform="android" src="screen.png" />
-        <splash density="xhdpi" platform="android" src="screen.png" />
-        <splash density="xxhdpi" platform="android" src="screen.png" />
+        <splash density="ldpi" platform="android" src="splash/screen.png" />
+        <splash density="mdpi" platform="android" src="splash/screen.png" />
+        <splash density="hdpi" platform="android" src="splash/screen.png" />
+        <splash density="xhdpi" platform="android" src="splash/screen.png" />
+        <splash density="xxhdpi" platform="android" src="splash/screen.png" />
         <allow-intent href="market:*" />
         <preference name="android-minSdkVersion" value="15" />
         <preference name="android-targetSdkVersion" value="19" />
@@ -40,16 +39,18 @@
         <icon height="57" platform="ios" src="icons/Icon-57.png" width="57" />
         <icon height="72" platform="ios" src="icons/Icon-72.png" width="72" />
         <icon height="76" platform="ios" src="icons/Icon-76.png" width="76" />
-        <splash height="1334" platform="ios" src="screen.png" width="750" />
-        <splash height="1242" platform="ios" src="screen.png" width="2208" />
-        <splash height="2208" platform="ios" src="screen.png" width="1242" />
-        <splash height="480" platform="ios" src="screen.png" width="320" />
-        <splash height="960" platform="ios" src="screen.png" width="640" />
-        <splash height="1136" platform="ios" src="screen.png" width="640" />
-        <splash height="1024" platform="ios" src="screen.png" width="768" />
-        <splash height="768" platform="ios" src="screen.png" width="1024" />
-        <splash height="2048" platform="ios" src="screen.png" width="1536" />
-        <splash height="1536" platform="ios" src="screen.png" width="2048" />
+        
+        <splash src="splash/Default.png" platform="ios" width="320" height="480" />
+        <splash src="splash/Default@2x.png" platform="ios" width="640" height="960" />
+        <splash src="splash/Default-568h@2x.png" platform="ios" width="640" height="1136" />
+        <splash src="splash/Default-667h@2x.png" platform="ios" width="750" height="1334" />
+        <splash src="splash/Default-Portrait-736h@3x.png" platform="ios" width="1242" height="2208" />
+        <splash src="splash/Default-Landscape-736h@3x.png" platform="ios" width="2208" height="1242" />
+        <splash src="splash/Default-Portrait.png" platform="ios" width="768" height="1024" />
+        <splash src="splash/Default-Landscape.png" platform="ios" width="1024" height="768" />
+        <splash src="splash/Default-Portrait@2x.png" platform="ios" width="1536" height="2048" />
+        <splash src="splash/Default-Landscape@2x.png" platform="ios" width="2048" height="1536" />
+        
         <allow-intent href="itms:*" />
         <allow-intent href="itms-apps:*" />
     </platform>
