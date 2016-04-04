@@ -17,6 +17,11 @@ if (!String.prototype.format) {
   };
 }
 
+// Logger
+function log(msg) {
+    console.log(msg);
+}
+
 var STATUS = { NEW: 'new', RESUME: 'resume', NEXT: 'next', LOSE: 'lose', WIN: 'win' };
 
 var propertiesDeffered = $.Deferred(),
@@ -31,13 +36,13 @@ var propertiesDeffered = $.Deferred(),
     
 function init() {
     
-    console.log('Starting to init...');
+    log('Starting to init...');
         
     // Get window size
     windowWidth = $(window).width();
     windowHeight = $(window).height();
     
-    console.log('Screen size: ' + windowWidth + ' x ' + windowHeight);
+    log('Screen size: ' + windowWidth + ' x ' + windowHeight);
     
     // Sets my body to fit in all screen!
     $('body').width(windowWidth).height(windowHeight);
@@ -48,7 +53,7 @@ function init() {
     // Load properties
     $.getJSON('conf/properties.json').done(function (json) {
         
-        console.log('Properties loaded: {0}'.format(JSON.stringify(json)));
+        // log('Properties loaded: {0}'.format(JSON.stringify(json)));
         
         properties = json;
         
@@ -69,7 +74,7 @@ function init() {
     // When properties are all loaded
     $.when(propertiesDeffered).done(function() {
         
-        console.log('Starting properties loaded callback...');
+        log('Starting properties loaded callback...');
     
         // Reads user's current level from storage
         Persistence.retrievePlayerLevel();
@@ -125,7 +130,7 @@ function init() {
         ]);
       });
     
-    console.log('Init method reached its end');
+    log('Init method reached its end');
 }
 
 // ***** Modules *****
@@ -202,7 +207,7 @@ var Menu = {
     
     configureOriginal: function() {
         
-        console.log('Loading original main menu...');
+        log('Loading original main menu...');
         
         // Original title colors
         this.dom.title.removeClass('menuWinner').addClass('menuOriginal');
@@ -241,12 +246,12 @@ var Menu = {
         // Update status message accoring to current level
         this.updateStatusMessage();
         
-        console.log('Main Menu loaded!');
+        log('Main Menu loaded!');
     },
     
     configureWinner: function() {
     
-        console.log('Configuring main menu to winner mode...');
+        log('Configuring main menu to winner mode...');
 
         // Title gets painted yellow
         this.dom.title.removeClass('menuOriginal').addClass('menuWinner');
@@ -283,7 +288,7 @@ var Menu = {
         // Click on Reset button
         this.dom.play.off('click').on('click', function(event) {  
 
-            console.log('Clicking on reset button...');
+            log('Clicking on reset button...');
             
             Sound.play('click');
 
@@ -401,7 +406,7 @@ var Transition = {
     
     configure: function() {
     
-        console.log('Loading transition...');
+        log('Loading transition...');
 
         // Shows Play button is case it was hidden
         this.dom.playWrapper.show();
@@ -421,12 +426,12 @@ var Transition = {
             onBackButtonPress();
         });
 
-        console.log('Transition screen callbacks loaded!');
+        log('Transition screen callbacks loaded!');
     },
     
     updateText: function(status, l) {
     
-        console.log('Setting transition messages to {0}...'.format(status));
+        log('Setting transition messages to {0}...'.format(status));
 
         var newLevel = l == undefined ? level : l,
             messagePattern = 'transition.{0}.{1}',
@@ -467,7 +472,7 @@ var Transition = {
                 var timePassedLevel = levels[newLevel-2].timer,
                     stars = 1;
                 
-                console.log('Level {0} had {1}s to complete and took {2}s'.
+                log('Level {0} had {1}s to complete and took {2}s'.
                             format(newLevel-1, timePassedLevel, Timer.secondsPassed));
                 
                 // If finished in less or equal 30% of time
@@ -514,7 +519,7 @@ var Transition = {
     
     calculateBgColor: function(specificLevel) {
         
-        console.log('Calculating next level color...');
+        log('Calculating next level color...');
         
         specificLevel = specificLevel == undefined ? level : specificLevel;
         
@@ -541,7 +546,7 @@ var Transition = {
         // Copy that color options
         base = $.extend({}, base);
         
-        console.log('Base color {0} and offset {1}'.format(colorLevel, levelOffset));
+        log('Base color {0} and offset {1}'.format(colorLevel, levelOffset));
         
         base.r += base['rOffset'] * levelOffset;
         base.g += base['gOffset'] * levelOffset;
@@ -558,7 +563,7 @@ var Transition = {
         
         var resultColor = 'rgba({0}, {1}, {2}, {3})'.format(base.r, base.g, base.b, opacity);
         
-        console.log('Color result: ' + resultColor);
+        log('Color result: ' + resultColor);
         return resultColor;
     }
 };
@@ -585,7 +590,7 @@ var Maze = {
     
     loadLevel: function() {
     
-        console.log('Starting to load level {0}...'.format(level));
+        log('Starting to load level {0}...'.format(level));
     
         var levelProps = levels[level-1],  // Array stars on 0
             levelIndex = Persistence.retrieveLevelIndex(),
@@ -593,11 +598,11 @@ var Maze = {
     
         // If level does not exist (error)
         if(levelProps == undefined) {
-            console.log('Invalid level: {0}'.format(level));
+            log('Invalid level: {0}'.format(level));
             return;
         }
     
-        console.log('About to load {0}...'.format(fileName));
+        log('About to load {0}...'.format(fileName));
     
         // Load image from file
         this.dom.target.attr('src', fileName);
@@ -631,12 +636,12 @@ var Maze = {
         // Initialize jquery maphilight to current maze
         this.dom.target.maphilight(properties.mapHighlightProps);
     
-        console.log('Level {0} loaded with success!'.format(level));
+        log('Level {0} loaded with success!'.format(level));
     },
     
     startLevel: function() {
       
-        console.log('Starting level {0}...'.format(level));
+        log('Starting level {0}...'.format(level));
 
         // Update and show level information
         this.dom.levelInfo.html(level);
@@ -654,7 +659,7 @@ var Maze = {
     
     winLevel: function() {
     
-        console.log('Victory level {0}'.format(level));
+        log('Victory level {0}'.format(level));
 
         // Prevent user of clicking many times
         this.removeMazeEvents();
@@ -694,7 +699,7 @@ var Maze = {
     
     loseLevel: function() { 
     
-        console.log('Lose level {0}'.format(level));
+        log('Lose level {0}'.format(level));
 
         // Remove solution from maze
         this.dom.mapTarget.find('area').remove();
@@ -736,7 +741,7 @@ var Maze = {
     
     gameOver: function() {
 
-        console.log('Player win last level ({0})!'.format(level));
+        log('Player win last level ({0})!'.format(level));
 
         // You Win when flip ends!
         Card.status = STATUS.WIN;
@@ -763,7 +768,7 @@ var Maze = {
     
     resetGame: function() {
 
-        console.log('Reseting game to level 1...');
+        log('Reseting game to level 1...');
 
         // Resets level 1, actually
         Persistence.updateLevel(properties['startingLevel']);
@@ -782,7 +787,7 @@ var Maze = {
     
     addMazeEvents: function() {
         
-        console.log('Binding maze click events...');
+        log('Binding maze click events...');
 
         // Click on correct position: win
         Maze.dom.mapTarget.find('area').bind('click', function (event) {
@@ -805,13 +810,13 @@ var Maze = {
         
         // COMMENT THIS, TEST ONLY
         //Card.dom.bind('mousemove', function(event) { 
-        //    console.log('Safe check: ' + Maze.checkSafeClick(event.clientX, event.clientY));
+        //    log('Safe check: ' + Maze.checkSafeClick(event.clientX, event.clientY));
         //});
     },
         
     removeMazeEvents: function() {
     
-        console.log('Unbinding maze click events...');
+        log('Unbinding maze click events...');
 
         this.dom.mapTarget.find('area').unbind('click');
         Card.dom.unbind('click');
@@ -819,11 +824,11 @@ var Maze = {
     
     checkSafeClick: function(x, y) {
         
-        console.log('Calling check safe click for x: ' + 
+        log('Calling check safe click for x: ' + 
                 x + ' | y: ' + y + ' - safe radius: ' + this.safeRadius);
         
         if (this.safeRadius === 0) {
-            console.log('Radius is zero, no safe check allowed.');
+            log('Radius is zero, no safe check allowed.');
             return 0;
         }
     
@@ -874,7 +879,7 @@ var Card = {
     
     flipDoneCallback: function() {
         
-        console.log('Card finished flipping status: {0}'.format(Card.status));
+        log('Card finished flipping status: {0}'.format(Card.status));
         
         switch (Card.status) {
 
@@ -944,7 +949,7 @@ var Card = {
     },
     
     flip: function() {  
-        console.log('Flipping card...');
+        log('Flipping card...');
         
         //this.dom.hide().show(0);
         this.dom.flip('toggle');
@@ -967,7 +972,7 @@ var Timer = {
 
         var seconds = levels[level-1].timer;
             
-        console.log('Starting timer for {0} seconds...'.format(seconds));
+        log('Starting timer for {0} seconds...'.format(seconds));
 
         // Set new time for that level
         // Set original transition property (top position)
@@ -985,7 +990,7 @@ var Timer = {
         // Callback when animation ends
         this.dom.one('transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd',
             function() {
-                console.log('Timer animation ended: {0} seconds passed'.format(seconds));
+                log('Timer animation ended: {0} seconds passed'.format(seconds));
 
                 Timer.dom.css('background-color', 'red');
                 Maze.loseLevel();
@@ -994,7 +999,7 @@ var Timer = {
     
     resetTimer: function() {
     
-        console.log('Reseting timer...');
+        log('Reseting timer...');
         
         // Stops counting time taken to finish maze
         clearInterval(this.secondsIntervalRef);
@@ -1145,7 +1150,7 @@ var Sound = {
         this.loadAudio('lose', properties.sounds['lose']); 
         this.loadAudio('click', properties.sounds['click']);
             
-        console.log('Sound module loaded!'); 
+        log('Sound module loaded!'); 
     },
     
     destroy: function() {
@@ -1180,9 +1185,9 @@ var Sound = {
 
             mediaWork.player = new Media(this.root + audio,
                 function () { 
-                    console.log("Audio successfuly loaded: " + audio);                       
+                    log("Audio successfuly loaded: " + audio);                       
                 },
-                function (err) { console.log("Audio Error: " 
+                function (err) { log("Audio Error: " 
                                         + audio + ' - ' + JSON.stringify(err));},
                 stateCallback
             );
@@ -1235,7 +1240,7 @@ var Sound = {
         
         var workMedia = this.media[media];
         
-        if(this.isMuted() && ['menu', 'level'].indexOf(media) > -1)
+        if(this.isMuted())
             return;
         
         switch(media) {
@@ -1312,7 +1317,7 @@ var Persistence = {
     
     retrieveStars: function() {
         
-        console.log('Retrieving stars from local storage...');
+        log('Retrieving stars from local storage...');
 
         var storedStars = localStorage.getItem('stars');
 
@@ -1324,7 +1329,7 @@ var Persistence = {
     
     updateStars: function(n) {
         
-        console.log('Updating stars, adding {0}'.format(n));
+        log('Updating stars, adding {0}'.format(n));
 
         // Default is add 1 to level
         var stars = this.retrieveStars();
@@ -1334,14 +1339,14 @@ var Persistence = {
     
     retrieveMute: function() {
         
-        console.log('Retrieving mute state from local storage...');
+        log('Retrieving mute state from local storage...');
 
         var storeMuted = localStorage.getItem('mute');
 
         if(storeMuted === null || storeMuted.length === 0)
             storeMuted = 0;
         
-        console.log('Mute value: '+ storeMuted);
+        log('Mute value: '+ storeMuted);
 
         return parseInt(storeMuted);
     },
@@ -1351,14 +1356,14 @@ var Persistence = {
         // Default is add 1 to level
         var mute = m ? m : (!this.retrieveMute())+0;
         
-        console.log('Updating mute state to {0}'.format(mute));
+        log('Updating mute state to {0}'.format(mute));
 
         localStorage.setItem('mute', mute); 
     },
     
     retrieveLevelIndex: function() {
         
-        console.log('Retrieving level index from local storage to level {0}...'.
+        log('Retrieving level index from local storage to level {0}...'.
                     format(level));
         
         var storedLevelIndex = localStorage.getItem(level);
@@ -1369,7 +1374,7 @@ var Persistence = {
         
         levelIndex = storedLevelIndex;
         
-        console.log('Retrieved level index {0} from local storage to level {1}.'.
+        log('Retrieved level index {0} from local storage to level {1}.'.
                     format(storedLevelIndex, level));
         
         return storedLevelIndex;
@@ -1377,45 +1382,45 @@ var Persistence = {
     
     updateLevelIndex: function() {
         
-        console.log('Updating level index from level {0}...'.format(level));
+        log('Updating level index from level {0}...'.format(level));
         
         // Goes from 1 to max, then becomes 1 again...
         levelIndex = (levelIndex % properties.maxLevelIndex) + 1;
         
         localStorage.setItem(level, levelIndex);
         
-        console.log('Saving level index {0} to level {1}...'.format(levelIndex, level));
+        log('Saving level index {0} to level {1}...'.format(levelIndex, level));
     },
     
     resetLevelIndexes: function() {
         
-        console.log('Reseting all level indexes to all {0} levels...'
+        log('Reseting all level indexes to all {0} levels...'
                     .format(properties.maxLevel));
         
         for(i = 1; i <= properties.maxLevel; i++) {
              localStorage.setItem(i, 1);
-            console.log('Level {0} ... Index: {1}'.format(i, 1));
+            log('Level {0} ... Index: {1}'.format(i, 1));
         }
         
-        console.log('All indexes reseted!');
+        log('All indexes reseted!');
     },
 
     updateLevel: function(newLevel) {
     
-        console.log('Updating level {0} to {1}'.format
+        log('Updating level {0} to {1}'.format
                     (level, newLevel ? newLevel : level+1));
 
         // Default is add 1 to level
         level = newLevel ? newLevel : level + 1;
 
-        console.log('Saving level {0} to local storage'.format(level));
+        log('Saving level {0} to local storage'.format(level));
 
         localStorage.setItem('level', level);
     },
     
     retrievePlayerLevel: function() {
 
-        console.log('Retrieving level from local storage...');
+        log('Retrieving level from local storage...');
 
         var storedLevel = localStorage.getItem('level');
 
@@ -1424,13 +1429,13 @@ var Persistence = {
 
         this.updateLevel(parseInt(storedLevel)); 
 
-        console.log('Retrieved level {0} from local storage.'.format(level));
+        log('Retrieved level {0} from local storage.'.format(level));
     }
 };
 
 function onBackButtonPress() {
     
-    console.log('Pressed back button');
+    log('Pressed back button');
     
     if(Card.status == STATUS.NEXT || Card.status == STATUS.LOSE)
         return;
@@ -1502,10 +1507,10 @@ function distanceTwoPoints(x1, y1, x2, y2) {
 
 function colisionCircleLine(ax, ay, bx, by, cx, cy, r) {
     
-    // console.log('Colision: ax/ay ' + ax + '/' + ay + ' | bx/by ' + bx + '/' + by);
+    // log('Colision: ax/ay ' + ax + '/' + ay + ' | bx/by ' + bx + '/' + by);
     
     if(ax === bx && ay === by) {
-        console.log('Points A and B are the same!');
+        log('Points A and B are the same!');
         return 0;
     }
     
@@ -1522,13 +1527,13 @@ function colisionCircleLine(ax, ay, bx, by, cx, cy, r) {
     
     if((Ex > ax+r && Ex > bx+r) || (Ey > ay+r && Ey > by+r) || 
        (Ex < ax-r && Ex < bx-r) || (Ey < ay-r && Ey < by-r)) {
-        //console.log('Distance out of limit!');
+        //log('Distance out of limit!');
         return 0;
     }
     
     var EC = distanceTwoPoints(Ex, Ey, cx, cy);
     
-    //console.log('Distance from perfect click: ' + EC);
+    //log('Distance from perfect click: ' + EC);
     
     return EC <= r;
 }

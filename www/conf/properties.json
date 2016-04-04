@@ -74,7 +74,7 @@
         "transition.lose.special": "DON'T GIVE UP!",
         "transition.lose.bg": "rgba(230, 20, 20, 1)",
         
-        "instructions.default": "Your goal is to find the only closed shape within the maze",
+        "instructions.default": "Your goal is to find the only closed shape within the maze<br/>(Click on screen)",
         "instructions.done1": "Just like that!<br/>Looks pretty easy, doesn't it?",
         "instructions.done2": "Things will get much more difficult and you'll get less time",
         "instructions.done3": "Well, you will figure that out!<br/>Good luck!!",
