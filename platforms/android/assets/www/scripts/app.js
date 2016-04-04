@@ -19,7 +19,7 @@ if (!String.prototype.format) {
 
 // Logger
 function log(msg) {
-    console.log(msg);
+    // console.log(msg);
 }
 
 var STATUS = { NEW: 'new', RESUME: 'resume', NEXT: 'next', LOSE: 'lose', WIN: 'win' };

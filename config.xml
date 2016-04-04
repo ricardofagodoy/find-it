@@ -39,6 +39,8 @@
         <icon height="57" platform="ios" src="icons/Icon-57.png" width="57" />
         <icon height="72" platform="ios" src="icons/Icon-72.png" width="72" />
         <icon height="76" platform="ios" src="icons/Icon-76.png" width="76" />
+        <icon height="120" platform="ios" src="icons/Icon-120.png" width="120" />
+        <icon height="152" platform="ios" src="icons/Icon-152.png" width="152" />
         
         <splash src="splash/Default.png" platform="ios" width="320" height="480" />
         <splash src="splash/Default@2x.png" platform="ios" width="640" height="960" />
