@@ -681,6 +681,8 @@ var Maze = {
         
         // Load next level transition screen
         Transition.updateText(STATUS.NEXT);
+        
+        Sound.loadLevelSound();
 
         // Wait until flip
         setTimeout(function() {
@@ -698,7 +700,7 @@ var Maze = {
     },
     
     loseLevel: function() { 
-    
+
         log('Lose level {0}'.format(level));
 
         // Remove solution from maze
@@ -911,8 +913,6 @@ var Card = {
                 
                 // Transition gets an ad!
                 Ads.showBanner();
-                
-                Sound.loadLevelSound();
 
                 Card.status = STATUS.NEW;   
             break;
@@ -926,8 +926,6 @@ var Card = {
 
                 // Change bg color from RED to level 1 color
                 Maze.dom.self.css('background-color', Transition.calculateBgColor());
-
-                Sound.loadLevelSound();
                 
                 Card.status = STATUS.NEW;
             break;
@@ -1113,7 +1111,7 @@ var Sound = {
 
     media: {
         menu: {player: null, isPlaying: 0, loop: 1},
-        level: {player: null, isPlaying: 0, loop: 1},
+        level: {player: null, sounds: [], isPlaying: 0, loop: 1},
         correct: {player: null, isPlaying: 0, loop: 0},
         win: {player: null,isPlaying: 0, loop: 0},
         lose: {player: null, isPlaying: 0, loop: 0},
@@ -1143,6 +1141,13 @@ var Sound = {
         
         // Load sounds!
         this.loadMenuSound();
+        
+        // Load all level sounds
+        for(i = 0; i <= 5; i++) {
+            this.loadAudio('level', properties.sounds['level'].format(i));
+            this.media.level.sounds[i] =  this.media.level.player;
+        }
+        
         this.loadLevelSound();
             
         this.loadAudio('correct', properties.sounds['correct']); 
@@ -1232,8 +1237,9 @@ var Sound = {
         }
 
         this.levelSound = soundLevel;
-            
-        this.loadAudio('level', properties.sounds['level'].format(soundLevel));
+        this.media.level.player = this.media.level.sounds[soundLevel];
+        
+        console.log('Switching to level sound ' + soundLevel);
     },
     
     play: function(media) {

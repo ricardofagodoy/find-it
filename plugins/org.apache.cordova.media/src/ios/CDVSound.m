@@ -341,52 +341,56 @@
 
 - (BOOL)prepareToPlay:(CDVAudioFile*)audioFile withId:(NSString*)mediaId
 {
-    BOOL bError = NO;
-    NSError* __autoreleasing playerError = nil;
 
-    // create the player
-    NSURL* resourceURL = audioFile.resourceURL;
+    [self.commandDelegate runInBackground:^{
+    
+        BOOL bError = NO;
+        NSError* __autoreleasing playerError = nil;
 
-    if ([resourceURL isFileURL]) {
-        audioFile.player = [[CDVAudioPlayer alloc] initWithContentsOfURL:resourceURL error:&playerError];
-    } else {
-        NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:resourceURL];
-        NSString* userAgent = [self.commandDelegate userAgent];
-        if (userAgent) {
-            [request setValue:userAgent forHTTPHeaderField:@"User-Agent"];
-        }
+        // create the player
+        NSURL* resourceURL = audioFile.resourceURL;
 
-        NSURLResponse* __autoreleasing response = nil;
-        NSData* data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&playerError];
-        if (playerError) {
-            NSLog(@"Unable to download audio from: %@", [resourceURL absoluteString]);
+        if ([resourceURL isFileURL]) {
+            audioFile.player = [[CDVAudioPlayer alloc] initWithContentsOfURL:resourceURL error:&playerError];
         } else {
-            // bug in AVAudioPlayer when playing downloaded data in NSData - we have to download the file and play from disk
-            CFUUIDRef uuidRef = CFUUIDCreate(kCFAllocatorDefault);
-            CFStringRef uuidString = CFUUIDCreateString(kCFAllocatorDefault, uuidRef);
-            NSString* filePath = [NSString stringWithFormat:@"%@/%@", [NSTemporaryDirectory()stringByStandardizingPath], uuidString];
-            CFRelease(uuidString);
-            CFRelease(uuidRef);
+            NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:resourceURL];
+            NSString* userAgent = [self.commandDelegate userAgent];
+            if (userAgent) {
+                [request setValue:userAgent forHTTPHeaderField:@"User-Agent"];
+            }
 
-            [data writeToFile:filePath atomically:YES];
-            NSURL* fileURL = [NSURL fileURLWithPath:filePath];
-            audioFile.player = [[CDVAudioPlayer alloc] initWithContentsOfURL:fileURL error:&playerError];
-        }
-    }
+            NSURLResponse* __autoreleasing response = nil;
+            NSData* data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&playerError];
+            if (playerError) {
+                NSLog(@"Unable to download audio from: %@", [resourceURL absoluteString]);
+            } else {
+                // bug in AVAudioPlayer when playing downloaded data in NSData - we have to download the file and play from disk
+                CFUUIDRef uuidRef = CFUUIDCreate(kCFAllocatorDefault);
+                CFStringRef uuidString = CFUUIDCreateString(kCFAllocatorDefault, uuidRef);
+                NSString* filePath = [NSString stringWithFormat:@"%@/%@", [NSTemporaryDirectory()stringByStandardizingPath], uuidString];
+                CFRelease(uuidString);
+                CFRelease(uuidRef);
 
-    if (playerError != nil) {
-        NSLog(@"Failed to initialize AVAudioPlayer: %@\n", [playerError localizedDescription]);
-        audioFile.player = nil;
-        if (self.avSession) {
-            [self.avSession setActive:NO error:nil];
+                [data writeToFile:filePath atomically:YES];
+                NSURL* fileURL = [NSURL fileURLWithPath:filePath];
+                audioFile.player = [[CDVAudioPlayer alloc] initWithContentsOfURL:fileURL error:&playerError];
+            }
         }
-        bError = YES;
-    } else {
-        audioFile.player.mediaId = mediaId;
-        audioFile.player.delegate = self;
-        bError = ![audioFile.player prepareToPlay];
-    }
-    return bError;
+
+        if (playerError != nil) {
+            NSLog(@"Failed to initialize AVAudioPlayer: %@\n", [playerError localizedDescription]);
+            audioFile.player = nil;
+            if (self.avSession) {
+                [self.avSession setActive:NO error:nil];
+            }
+            bError = YES;
+        } else {
+            audioFile.player.mediaId = mediaId;
+            audioFile.player.delegate = self;
+            bError = ![audioFile.player prepareToPlay];
+        }
+        return bError;
+    }];
 }
 
 - (void)stopPlayingAudio:(CDVInvokedUrlCommand*)command

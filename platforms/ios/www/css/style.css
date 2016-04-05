@@ -45,11 +45,12 @@ html, body{
 }
 
 #menu #title {
-    padding-top: 15%;
+    padding-top: 20%;
     padding-bottom: 15%;
     max-height: 30%;
     font-size: 4rem;
     font-weight: bold;
+    margin-left: 3.8%;
 }
 
 .menuOriginal {
@@ -258,7 +259,7 @@ html, body{
 
 #creditsScreen #title {
     font-size: 1.8rem;
-    margin-top: 10%;
+    margin-top: 20%;
     margin-bottom: 7%;
     max-height: 20%;
     color: #76DB6D;
