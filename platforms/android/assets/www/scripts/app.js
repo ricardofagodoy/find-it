@@ -230,6 +230,8 @@ var Menu = {
 
             // Resets timer - ready to play!
             Timer.resetTimer(); 
+            
+            Sound.loadLevelSound();
 
             // Position correctly level indicator
             Maze.dom.levelInfo.html(level);
@@ -1144,10 +1146,10 @@ var Sound = {
         
         // Load all level sounds
         for(i = 0; i <= 5; i++) {
-            this.loadAudio('level', properties.sounds['level'].format(i));
-            this.media.level.sounds[i] =  this.media.level.player;
+            this.loadLevelAudio(i, properties.sounds['level'].format(i));
         }
         
+        this.media.level.isPlaying = 0;
         this.loadLevelSound();
             
         this.loadAudio('correct', properties.sounds['correct']); 
@@ -1159,12 +1161,6 @@ var Sound = {
     },
     
     destroy: function() {
-        
-        for(var i in this.media)
-            if(this.media[i].player != null) {
-                this.stop(i);
-                this.media[i].player.release();
-            }
     },
     
     loadAudio: function(media, audio) {
@@ -1178,10 +1174,6 @@ var Sound = {
                 if (status === Media.MEDIA_STOPPED) {
                     
                     mediaWork.isPlaying = 0;
-                    
-                    // Prevent level to play when loading
-                    if(media == 'level' && Card.status != STATUS.NEXT)
-                        return;
                     
                     if (mediaWork.loop)
                         Sound.play(media);
@@ -1197,6 +1189,35 @@ var Sound = {
                 stateCallback
             );
         } 
+    },
+    
+    loadLevelAudio: function(i, audio) {
+        
+        if (window.Media) {
+            
+            var stateCallback = null;
+
+            stateCallback = function (status) {
+                
+                if (status === Media.MEDIA_STOPPED) {
+                                        
+                    // Prevent level to play when loading
+                    if(Card.status != STATUS.NEXT)
+                        return;
+                    
+                    Sound.play('level');
+                }
+            };
+
+            this.media.level.sounds[i] = new Media(this.root + audio,
+                function () { 
+                    log("Audio successfuly loaded: " + audio);                       
+                },
+                function (err) { log("Audio Error: " 
+                                        + audio + ' - ' + JSON.stringify(err));},
+                stateCallback
+            );
+        }
     },
     
     loadMenuSound: function() {
@@ -1230,12 +1251,7 @@ var Sound = {
         
         if(soundLevel == this.levelSound)
             return;
-            
-        if(this.media.level.player != null) {
-            this.media.level.player.release();
-            this.media.level.isPlaying = 0;
-        }
-
+        
         this.levelSound = soundLevel;
         this.media.level.player = this.media.level.sounds[soundLevel];
         
