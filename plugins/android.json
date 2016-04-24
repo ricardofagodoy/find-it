@@ -72,15 +72,15 @@
         "cordova-plugin-splashscreen": {
             "PACKAGE_NAME": "com.ricardofagodoy.findit"
         },
-        "org.apache.cordova.file": {
-            "PACKAGE_NAME": "com.ricardofagodoy.findit"
-        },
-        "org.apache.cordova.media": {
+        "cordova-plugin-media": {
             "PACKAGE_NAME": "com.ricardofagodoy.findit"
         }
     },
     "dependent_plugins": {
         "cordova-plugin-extension": {
+            "PACKAGE_NAME": "com.ricardofagodoy.findit"
+        },
+        "cordova-plugin-file": {
             "PACKAGE_NAME": "com.ricardofagodoy.findit"
         }
     }

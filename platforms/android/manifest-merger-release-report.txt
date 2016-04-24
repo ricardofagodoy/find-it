@@ -2,9 +2,9 @@
 manifest
 ADDED from AndroidManifest.xml:2:1
 	package
-		ADDED from AndroidManifest.xml:2:102
+		ADDED from AndroidManifest.xml:2:105
 	android:versionName
-		ADDED from AndroidManifest.xml:2:74
+		ADDED from AndroidManifest.xml:2:77
 	android:hardwareAccelerated
 		ADDED from AndroidManifest.xml:2:11
 	android:versionCode
@@ -12,7 +12,7 @@ ADDED from AndroidManifest.xml:2:1
 		INJECTED from AndroidManifest.xml:0:0
 		INJECTED from AndroidManifest.xml:0:0
 	xmlns:android
-		ADDED from AndroidManifest.xml:2:138
+		ADDED from AndroidManifest.xml:2:141
 supports-screens
 ADDED from AndroidManifest.xml:3:5
 	android:largeScreens

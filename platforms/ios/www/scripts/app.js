@@ -19,7 +19,7 @@ if (!String.prototype.format) {
 
 // Logger
 function log(msg) {
-    // console.log(msg);
+   // console.log(msg);
 }
 
 var STATUS = { NEW: 'new', RESUME: 'resume', NEXT: 'next', LOSE: 'lose', WIN: 'win' };
@@ -81,12 +81,6 @@ function init() {
         
         // Init menu module
         Menu.init();
-            
-        // Hide splashscreen
-        setTimeout(function() {
-            if(navigator.splashscreen)
-                navigator.splashscreen.hide();
-        }, 600);
         
         // Init sounds modules
         Sound.init();
@@ -111,13 +105,13 @@ function init() {
         
         // When process goes to background, stop sound!
         document.addEventListener("pause", function() {
-            if(!Sound.isMuted())
+            if(!Sound.isMuted() && Menu.dom.self.is(':visible'))
                 Sound.toggleMute();
         }, false);
         
         // When somes to foreground again
         document.addEventListener("resume", function() {
-            if(!Persistence.retrieveMute())
+            if(!Persistence.retrieveMute() && Menu.dom.self.is(':visible'))
                 Sound.toggleMute();
         }, false); 
         
@@ -129,6 +123,30 @@ function init() {
             'images/star.png'
         ]);
       });
+    
+    // Hide splashscreen
+    var hideSplash = setInterval(function() {
+            
+        var i = 0;
+            
+        // Wait for sounds to load
+        for (i in Sound.media)
+            if (Sound.media[i].player == null)
+                return;
+            
+        // Wait for ads to load (or fail)
+        if (Ads.bannerLoaded == 0 || Ads.interstitialLoaded == 0)
+            return;
+            
+        Sound.play('menu');
+            
+        // OK, hide splash and let game begin
+        if(navigator.splashscreen)
+            navigator.splashscreen.hide();
+            
+        clearInterval(hideSplash);
+            
+    }, 300);
     
     log('Init method reached its end');
 }
@@ -223,6 +241,8 @@ var Menu = {
             else
                 Transition.updateText(STATUS.NEW);
                 
+            Sound.fade('menu');
+            
             Maze.dom.self.fadeIn("fast");
                 
             // Load "first" level
@@ -230,8 +250,6 @@ var Menu = {
 
             // Resets timer - ready to play!
             Timer.resetTimer(); 
-            
-            Sound.loadLevelSound();
 
             // Position correctly level indicator
             Maze.dom.levelInfo.html(level);
@@ -282,6 +300,10 @@ var Menu = {
             
             // Original bg menu music, since you're at menu
             Sound.loadMenuSound();
+            
+            setTimeout(function() {
+                Sound.play('menu');
+            }, 100);
         });
         
         // Win them all
@@ -352,13 +374,9 @@ var Menu = {
                             Menu.dom.instructionScreen.find('#textual').
                                 html(messages['instructions.done1']);
                             
-                            setTimeout(function() {
-                                Sound.play('menu');
-                            }, 1500);
-                            
                             numberClick = 1;
                             
-                        }, 30);
+                        }, 20);
                         
                     });
                 break;
@@ -417,8 +435,7 @@ var Transition = {
         Card.status = STATUS.NEW;
 
         // Click on PLAY
-        this.dom.play.off('click').on('click', function(event) { 
-            
+        this.dom.play.one('click', function(event) { 
             // Flips card to maze side
             Card.flip();
         });
@@ -665,6 +682,8 @@ var Maze = {
 
         // Prevent user of clicking many times
         this.removeMazeEvents();
+        
+        Sound.stop('level' + parseInt(level/10));
 
         // Advances level (no params adds 1)    
         Persistence.updateLevel();
@@ -683,8 +702,6 @@ var Maze = {
         
         // Load next level transition screen
         Transition.updateText(STATUS.NEXT);
-        
-        Sound.loadLevelSound();
 
         // Wait until flip
         setTimeout(function() {
@@ -698,12 +715,14 @@ var Maze = {
             // Flips to next level (already preloaded)
             Card.flip();
 
-        }, 800); 
+        }, 900); 
     },
     
     loseLevel: function() { 
 
         log('Lose level {0}'.format(level));
+        
+        Sound.stop('level' + parseInt(level/10));
 
         // Remove solution from maze
         this.dom.mapTarget.find('area').remove();
@@ -719,6 +738,8 @@ var Maze = {
         
         // Goes to back to level 1
         Maze.resetGame();
+        
+        Transition.dom.play.off('click');
 
         // You lose message prepared
         Transition.updateText(STATUS.LOSE);
@@ -726,11 +747,6 @@ var Maze = {
         // You lose when flip ends!
         Card.status = STATUS.LOSE;
         
-        // Show BIG ad after 1s of losing
-        setTimeout(function() {
-            Ads.showInterstitial();
-        }, 1000);
-            
         // Wait until flip
         setTimeout(function() {
 
@@ -747,6 +763,8 @@ var Maze = {
 
         log('Player win last level ({0})!'.format(level));
 
+        Sound.stop('level' + parseInt(level/10));
+        
         // You Win when flip ends!
         Card.status = STATUS.WIN;
 
@@ -785,8 +803,6 @@ var Maze = {
 
         // Setup Transition to original state
         Transition.configure();
-        
-        Sound.loadLevelSound();
     },
     
     addMazeEvents: function() {
@@ -872,7 +888,7 @@ var Card = {
     configure: function() {
     
         // Set up flip to work manually
-        this.dom.flip({trigger: 'manual', speed: 500});
+        this.dom.flip({trigger: 'manual', speed: 700});
         
         // When flip is done - callback
         this.dom.on('flip:done', this.flipDoneCallback);
@@ -890,16 +906,16 @@ var Card = {
             // If it's flipping from transition to maze
             case STATUS.NEW:
                 
-                // No ad during maze
-                Ads.hideBanner();
-                
                 // Plays level sound already!
-                Sound.play('level');
+                Sound.play('level' + parseInt(level/10));
 
                 // Let's start game for real!
                 Maze.startLevel();
 
                 Card.status = STATUS.NEXT;
+                
+                // No ad during maze
+                Ads.hideBanner();
             break;
 
             // If its moving from maze to transition
@@ -908,33 +924,42 @@ var Card = {
                 // Load next level
                 Maze.loadLevel();
                 
-                Sound.play('menu');
-                
-                // Change bg color from RED to level 1 color
-                Maze.dom.self.css('background-color', Transition.calculateBgColor());
-                
-                // Transition gets an ad!
-                Ads.showBanner();
-
-                Card.status = STATUS.NEW;   
-            break;
-                
-            case STATUS.LOSE:
-                                
-                // Load next level
-                Maze.loadLevel();
-                
-                Sound.play('menu');
-
                 // Change bg color from RED to level 1 color
                 Maze.dom.self.css('background-color', Transition.calculateBgColor());
                 
                 Card.status = STATUS.NEW;
+                
+                Transition.dom.play.one('click', function(event) { 
+                    Card.flip();
+                });
+                
+                // Transition gets an ad!
+                Ads.showBanner();
+
+            break;
+                
+            case STATUS.LOSE:
+                            
+                // Show BIG ad
+                Ads.showInterstitial();
+                
+                if(Ads.interstitialLoaded < 1) {
+                
+                    // Load next level
+                    Maze.loadLevel();
+                    
+                    Transition.dom.play.one('click', function(event) { 
+                        Card.flip();
+                    });
+
+                    // Change bg color from RED to level 1 color
+                    Maze.dom.self.css('background-color', Transition.calculateBgColor());
+
+                    Card.status = STATUS.NEW;
+                }
             break;
 
             case STATUS.WIN: 
-                // Show BIG ad
-                Ads.showInterstitial();  
                 
                 // Victory sound
                 Sound.loadMenuSound();
@@ -1020,10 +1045,10 @@ var Timer = {
 };
 
 var Ads = {
-    
-    bannerVisible: null,
-    bannerShowsCount: null,
+
     admobid: null,
+    interstitialLoaded: 0,
+    bannerLoaded: 0,
 
     init: function() {
         
@@ -1041,31 +1066,56 @@ var Ads = {
                 };
             }
             
-            this.bannerVisible = true;
-            this.bannerShowsCount = 0;
-            
             AdMob.setOptions({isTesting: properties.isTesting});
  
-            this.loadInterstitial();
             this.loadBanner();
+            this.loadInterstitial();
             
             $(document).on('onAdDismiss', function(data) {
-                if(data.originalEvent.adType == 'interstitial')
+        
+                // bad code
+                if(data.originalEvent.adType == 'interstitial') {
+                    
+                    // Load next level
+                    Maze.loadLevel();
+                    
+                    Transition.dom.play.one('click', function(event) { 
+                        Card.flip();
+                    });
+
+                    // Change bg color from RED to level 1 color
+                    Maze.dom.self.css('background-color', Transition.calculateBgColor());
+
+                    Card.status = STATUS.NEW;
+                
+                    Ads.interstitialLoaded = 0;
                     Ads.loadInterstitial();
+                }
             });
             
             $(document).on('onAdLoaded', function(data) {
-                if (data.originalEvent.adType == 'banner' && Ads.bannerVisible) {
-                    AdMob.showBanner(AdMob.AD_POSITION.BOTTOM_CENTER);
-                    AdMob.bannerShowsCount++;
+                
+                if (data.originalEvent.adType == 'banner') {
+                    Ads.showBanner();
+                } else if (data.originalEvent.adType == 'interstitial') {
+                    Ads.interstitialLoaded = 1;
                 }
             });  
+            
+            $(document).on('onAdFailLoad', function(data) {
+                
+                if (data.originalEvent.adType == 'banner') {
+                    Ads.bannerLoaded = -1;
+                } else if (data.originalEvent.adType == 'interstitial') {
+                    Ads.interstitialLoaded = -1;
+                }
+            });
         }
     },
     
     loadBanner: function() {
         
-        if(window.AdMob && this.admobid != null)
+        if(this.admobid != null)
             
            AdMob.createBanner({
                 adId : this.admobid.banner,
@@ -1073,38 +1123,27 @@ var Ads = {
                 autoShow : false,
                 overlap: true
             }); 
-        
-        this.bannerShowsCount = 0;
     },
     
     showBanner: function() {
-        
-        if(window.AdMob && !this.bannerVisible && this.admobid != null) {
+        if(this.admobid != null && Card.status != STATUS.NEXT) {
             AdMob.showBanner(AdMob.AD_POSITION.BOTTOM_CENTER);
-            this.bannerVisible = true;
-            this.bannerShowsCount++;
+            this.bannerLoaded = 1;
         }
     },
     
     hideBanner: function() {
-        if(window.AdMob && this.bannerVisible && this.admobid != null) {
+        if(this.admobid != null && this.bannerLoaded == 1)
             AdMob.hideBanner();
-            this.bannerVisible = false;
-            
-            if(this.bannerShowsCount > 2) {
-                AdMob.removeBanner();
-                this.loadBanner();
-            }
-        }
     },
     
     loadInterstitial: function() {
-        if (window.AdMob)
+        if (this.admobid != null)
             AdMob.prepareInterstitial({adId: Ads.admobid.interstitial}); 
     },
     
     showInterstitial: function() {
-        if(window.AdMob && Ads.admobid != null)
+        if(this.admobid != null && this.interstitialLoaded == 1)
             AdMob.showInterstitial();
     }
 };
@@ -1112,17 +1151,21 @@ var Ads = {
 var Sound = {
 
     media: {
-        menu: {player: null, isPlaying: 0, loop: 1},
-        level: {player: null, sounds: [], isPlaying: 0, loop: 1},
-        correct: {player: null, isPlaying: 0, loop: 0},
-        win: {player: null,isPlaying: 0, loop: 0},
-        lose: {player: null, isPlaying: 0, loop: 0},
-        click: {player: null, isPlaying: 0, loop: 0}
+        menu: {player: null, loaded: 0, loop: 1},
+        level0: {player: null, loaded: 0, loop: 1},
+        level1: {player: null, loaded: 0, loop: 1},
+        level2: {player: null, loaded: 0, loop: 1},
+        level3: {player: null, loaded: 0, loop: 1},
+        level4: {player: null, loaded: 0, loop: 1},
+        level5: {player: null, loaded: 0, loop: 1},
+        correct: {player: null, loaded: 0},
+        win: {player: null, loaded: 0},
+        lose: {player: null, loaded: 0},
+        click: {player: null, loaded: 0}
     },
 
     root: null,
     muteState: null,
-    levelSound: null,
     
     init: function() {
             
@@ -1131,8 +1174,6 @@ var Sound = {
         
         // Fix IOS issue
         this.root = this.root.replace(/%20/g, ' ');
-
-        this.levelSound = -1;
         this.muteState = 0;
         
         // Check if it starts muted already
@@ -1144,14 +1185,12 @@ var Sound = {
         // Load sounds!
         this.loadMenuSound();
         
-        // Load all level sounds
-        for(i = 0; i <= 5; i++) {
-            this.loadLevelAudio(i, properties.sounds['level'].format(i));
-        }
-        
-        this.media.level.isPlaying = 0;
-        this.loadLevelSound();
-            
+        this.loadAudio('level0', properties.sounds['level'].format(0)); 
+        this.loadAudio('level1', properties.sounds['level'].format(1)); 
+        this.loadAudio('level2', properties.sounds['level'].format(2)); 
+        this.loadAudio('level3', properties.sounds['level'].format(3)); 
+        this.loadAudio('level4', properties.sounds['level'].format(4)); 
+        this.loadAudio('level5', properties.sounds['level'].format(5)); 
         this.loadAudio('correct', properties.sounds['correct']); 
         this.loadAudio('win', properties.sounds['win']); 
         this.loadAudio('lose', properties.sounds['lose']); 
@@ -1161,63 +1200,35 @@ var Sound = {
     },
     
     destroy: function() {
+       // for (i in Sound.media)
+        //    if(Sound.media[i].player != null && Sound.media[i].loaded)
+        //        Sound.media[i].player.release();
     },
     
     loadAudio: function(media, audio) {
         
         if (window.Media) {
             
-            var mediaWork = this.media[media],
-                stateCallback = null;
-
-            stateCallback = function (status) {
-                if (status === Media.MEDIA_STOPPED) {
-                    
-                    mediaWork.isPlaying = 0;
-                    
-                    if (mediaWork.loop)
-                        Sound.play(media);
-                }
-            }
+            var mediaWork = this.media[media];
 
             mediaWork.player = new Media(this.root + audio,
-                function () { 
-                    log("Audio successfuly loaded: " + audio);                       
-                },
-                function (err) { log("Audio Error: " 
-                                        + audio + ' - ' + JSON.stringify(err));},
-                stateCallback
-            );
-        } 
-    },
+                null,
+                null,
+                function(status) {
     
-    loadLevelAudio: function(i, audio) {
-        
-        if (window.Media) {
-            
-            var stateCallback = null;
-
-            stateCallback = function (status) {
-                
-                if (status === Media.MEDIA_STOPPED) {
-                                        
-                    // Prevent level to play when loading
-                    if(Card.status != STATUS.NEXT)
-                        return;
-                    
-                    Sound.play('level');
-                }
-            };
-
-            this.media.level.sounds[i] = new Media(this.root + audio,
-                function () { 
-                    log("Audio successfuly loaded: " + audio);                       
-                },
-                function (err) { log("Audio Error: " 
-                                        + audio + ' - ' + JSON.stringify(err));},
-                stateCallback
-            );
-        }
+                    switch(status) {
+                            
+                        case Media.MEDIA_STOPPED:
+                            if (mediaWork.loop)
+                                Sound.play(media);
+                        break;
+                            
+                        case Media.MEDIA_RUNNING:
+                            mediaWork.loaded = 1;
+                        break;
+                    }
+                });
+        } 
     },
     
     loadMenuSound: function() {
@@ -1229,105 +1240,79 @@ var Sound = {
         else
             menuSound = properties['sounds']['menu'];
         
-        if(this.media.menu.player != null) {
+        if(this.media.menu.player != null)
             this.media.menu.player.release();
-            this.media.menu.isPlaying = 0;
-        }
  
         this.loadAudio('menu', menuSound); 
-        
-        // To solve threads race in iOS
-        setTimeout(function() {
-            Sound.play('menu');
-        }, 300);
     },
     
-    loadLevelSound: function() {
-        
-        var soundLevel = parseInt(level / 10);
-        
-        if(level == 50)
-            soundLevel--;
-        
-        if(soundLevel == this.levelSound)
-            return;
-        
-        this.levelSound = soundLevel;
-        this.media.level.player = this.media.level.sounds[soundLevel];
-        
-        console.log('Switching to level sound ' + soundLevel);
-    },
-    
-    play: function(media) {
-        
-        var workMedia = this.media[media];
+    play: function(media, preload) {
         
         if(this.isMuted())
             return;
         
-        switch(media) {
-        
-            case 'menu':
-                this.stop('level');
-            break;
-                
-            case 'level':   
-                this.stop('menu');
-                
-                if(workMedia.player != null)
-                    workMedia.player.seekTo(0);
-            break;
-                
-            case 'correct': 
-                this.stop('level');
-                this.stop('menu');
-            break;
-                
-            case 'win': 
-                this.stop('level');
-                this.stop('menu');
-            break;
-                
-            case 'lose': 
-                this.stop('level');
-                this.stop('menu');
-            break;
-                
-            case 'click':     
-            break;
-        }
-        
-        if(workMedia.player != null && !workMedia.isPlaying) {
+        var workMedia = this.media[media];
+
+        if(workMedia.player != null) {
             
-            setTimeout(function() {
-                workMedia.player.play({ numberOfLoops: !workMedia.loop});
-                workMedia.isPlaying = 1;
-            }, 5);
+            if(preload)
+                workMedia.player.setVolume(0.0);
+            else
+                workMedia.player.setVolume(1.0);
+            
+            workMedia.player.play();
         }
+    },
+    
+    pause: function(media) {
+        
+        var workMedia = this.media[media];
+        
+        if(workMedia.player != null)
+            workMedia.player.pause();
     },
     
     stop: function(media) {
         
         var workMedia = this.media[media];
         
-        if(workMedia.player != null && workMedia.isPlaying) {
+        if(workMedia.player != null) {
             workMedia.player.pause();
-            workMedia.isPlaying = 0;
+            workMedia.player.seekTo(0);
         }
+    },
+    
+    fade: function(media) {
+        
+        var volume = 1.0,
+            workMedia = this.media[media].player,
+            fadeInterval;
+        
+        if (workMedia == null || this.isMuted())
+            return;
+        
+        fadeInterval = setInterval(function() {
+            
+            if(volume <= 0.0) {
+                Sound.pause(media);
+                clearInterval(fadeInterval);
+                return;
+            }
+            
+            volume-=0.1;
+            workMedia.setVolume(volume);
+            
+        }, 100);
     },
     
     toggleMute: function() {
         
         this.muteState = !this.muteState;
         
-        if(this.isMuted()) {
-
-            for(var i in this.media)
-                this.stop(i);
-            
-        } else {
-             this.play('menu');            
-        } 
+        if(this.isMuted())
+            this.pause('menu');
+        else
+            this.play('menu');            
     },
     
     isMuted: function() {
@@ -1507,6 +1492,7 @@ function onBackButtonPress() {
     } else {
         Sound.destroy();
         navigator.app.exitApp(); 
+        return;
     }
     
     Sound.play('click');
